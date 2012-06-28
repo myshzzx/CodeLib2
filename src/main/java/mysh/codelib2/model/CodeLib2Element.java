@@ -3,6 +3,9 @@ package mysh.codelib2.model;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
+
+import mysh.util.TextEncodeUtil;
 
 /**
  * 代码库元素.<br/>
@@ -26,6 +29,34 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		private static final long serialVersionUID = -3905992950416299776L;
 
 		/**
+		 * 内容类型.
+		 * 
+		 * @author Allen
+		 * 
+		 */
+		public static enum ContentType {
+			/**
+			 * 二进制.
+			 */
+			Binary, /**
+			 * UTF8 文本.
+			 */
+			UTF8Text, /**
+			 * 非 UTF8 文本.
+			 */
+			NonUTF8Text;
+
+			/**
+			 * 文本类型扩展名.
+			 */
+			private static List<String> textExt = Arrays.asList("as", "asp", "bat", "c",
+					"cpp", "cs", "css", "h", "html", "htm", "php", "pl", "ini",
+					"java", "js", "jsp", "log", "lua", "mx", "mxml", "pas",
+					"properties", "py", "sql", "sh", "txt", "vb", "vbs", "xml",
+					"xsd", "xsl");
+		}
+
+		/**
 		 * 附件名.
 		 */
 		private String name;
@@ -34,6 +65,11 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		 * 附件内容.
 		 */
 		private byte[] binaryContent;
+
+		/**
+		 * 附件内容类型.
+		 */
+		private ContentType contentType = ContentType.Binary;
 
 		@Override
 		public boolean equals(Object obj) {
@@ -85,6 +121,42 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		public void setName(String name) {
 
 			this.name = name;
+			this.judgeContentType();
+		}
+
+		/**
+		 * 内容类型.
+		 * 
+		 * @return
+		 */
+		public ContentType getContentType() {
+
+			return this.contentType;
+		}
+
+		/**
+		 * 判断内容类型.
+		 */
+		private void judgeContentType() {
+
+			this.contentType = ContentType.Binary;
+			
+			if (this.binaryContent != null && this.binaryContent.length > 0
+					&& this.name != null && this.name.length() > 0) {
+				int pointPos = this.name.lastIndexOf('.');
+				if (pointPos > -1 && pointPos < this.name.length() - 1) {
+					String ext = this.name.substring(pointPos + 1,
+							this.name.length());
+
+					if (ContentType.textExt.contains(ext)) {
+						if (TextEncodeUtil.isUTF8Bytes(this.binaryContent)) {
+							this.contentType = ContentType.UTF8Text;
+						} else {
+							this.contentType = ContentType.NonUTF8Text;
+						}
+					}
+				}
+			}
 		}
 
 		/**
@@ -105,6 +177,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		public void setBinaryContent(byte[] binaryContent) {
 
 			this.binaryContent = binaryContent;
+			this.judgeContentType();
 		}
 
 	}
