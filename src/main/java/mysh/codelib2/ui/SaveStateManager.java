@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Allen
  * 
  */
-public class SaveState {
+public class SaveStateManager {
 
 	private List<StateObserver> observers = new CopyOnWriteArrayList<>();
 
@@ -53,7 +53,7 @@ public class SaveState {
 		 * @param state
 		 * @return
 		 */
-		boolean onStateChanged(State state);
+		boolean onSaveStateChanged(State oldState, State newState);
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class SaveState {
 	 * 
 	 * @param initState
 	 */
-	public SaveState(State initState) {
+	public SaveStateManager(State initState) {
 
 		if (initState == null) {
 			this.state = State.NEW;
@@ -82,24 +82,26 @@ public class SaveState {
 	}
 
 	/**
-	 * 状态变更.
+	 * 状态变更. 返回操作结果.
 	 * 
-	 * @param state
+	 * @param newState
 	 */
-	public void changeState(State state) {
+	public boolean changeState(State newState) {
 
-		if (state == null) {
+		if (newState == null) {
 			throw new NullPointerException();
 		}
 
 		boolean stateChangeFlag = true;
 
 		for (StateObserver o : this.observers) {
-			stateChangeFlag &= o.onStateChanged(state);
+			stateChangeFlag &= o.onSaveStateChanged(this.state, newState);
 		}
 
 		if (stateChangeFlag)
-			this.state = state;
+			this.state = newState;
+
+		return stateChangeFlag;
 	}
 
 	/**

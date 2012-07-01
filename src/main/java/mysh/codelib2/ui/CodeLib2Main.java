@@ -4,11 +4,18 @@
  */
 package mysh.codelib2.ui;
 
+import javax.swing.DefaultListModel;
+
 /**
  *
  * @author Allen
  */
-public class CodeLib2Main extends javax.swing.JPanel {
+public final class CodeLib2Main extends javax.swing.JPanel {
+
+    public static interface AppTitltSetter {
+
+        void setTitle(String title);
+    }
 
     /**
      * Creates new form CodeLib2Main
@@ -16,7 +23,18 @@ public class CodeLib2Main extends javax.swing.JPanel {
     public CodeLib2Main() {
         initComponents();
 
-        this.controller = new UIController(this);
+        this.controllor = new UIControllor(this);
+    }
+
+    public CodeLib2Main setAppTitleSetter(AppTitltSetter appTitltSetter) {
+        this.appTitltSetter = appTitltSetter;
+        return this;
+    }
+
+    public void setAppTitle(String title) {
+        if (this.appTitltSetter != null) {
+            this.appTitltSetter.setTitle(title);
+        }
     }
 
     /**
@@ -137,8 +155,22 @@ public class CodeLib2Main extends javax.swing.JPanel {
 
         filterText.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
         filterText.setToolTipText("空格分隔搜索关键字, ESC 复位");
+        filterText.setNextFocusableComponent(resultList);
+        filterText.addCaretListener(new javax.swing.event.CaretListener() {
+            public void caretUpdate(javax.swing.event.CaretEvent evt) {
+                filterTextCaretUpdate(evt);
+            }
+        });
 
+        resultList.setModel(new DefaultListModel<>());
         resultList.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
+        resultList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        resultList.setNextFocusableComponent(keyWordText);
+        resultList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                resultListValueChanged(evt);
+            }
+        });
         jScrollPane1.setViewportView(resultList);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -164,6 +196,7 @@ public class CodeLib2Main extends javax.swing.JPanel {
 
         keyWordText.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
         keyWordText.setToolTipText("逗号分隔关键字, 如 java, GUI, tree");
+        keyWordText.setNextFocusableComponent(codeText);
 
         codeText.setColumns(20);
         codeText.setRows(5);
@@ -171,6 +204,7 @@ public class CodeLib2Main extends javax.swing.JPanel {
         codeText.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
         codeText.setFractionalFontMetricsEnabled(true);
         codeText.setMargin(new java.awt.Insets(4, 4, 4, 4));
+        codeText.setNextFocusableComponent(attachmentList);
         jScrollPane3.setViewportView(codeText);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -232,28 +266,36 @@ public class CodeLib2Main extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void newInstActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newInstActionPerformed
-        // TODO add your handling code here:
+        this.controllor.newInst();
     }//GEN-LAST:event_newInstActionPerformed
 
     private void openActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openActionPerformed
-        // TODO add your handling code here:
+        this.controllor.open();
     }//GEN-LAST:event_openActionPerformed
 
     private void saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveActionPerformed
-        // TODO add your handling code here:
+        this.controllor.save();
     }//GEN-LAST:event_saveActionPerformed
 
     private void addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addActionPerformed
-        // TODO add your handling code here:
+        this.controllor.addItem();
     }//GEN-LAST:event_addActionPerformed
 
     private void removeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeActionPerformed
-        // TODO add your handling code here:
+        this.controllor.removeItem();
     }//GEN-LAST:event_removeActionPerformed
 
     private void exportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportActionPerformed
-        // TODO add your handling code here:
+        this.controllor.export();
     }//GEN-LAST:event_exportActionPerformed
+
+    private void filterTextCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_filterTextCaretUpdate
+        this.controllor.filter(this.filterText.getText());
+    }//GEN-LAST:event_filterTextCaretUpdate
+
+    private void resultListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_resultListValueChanged
+        this.controllor.selectItem(this.resultList.getSelectedValue());
+    }//GEN-LAST:event_resultListValueChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     javax.swing.JTable attachmentList;
@@ -278,5 +320,6 @@ public class CodeLib2Main extends javax.swing.JPanel {
     private javax.swing.JButton save;
     javax.swing.JLabel stateBar;
     // End of variables declaration//GEN-END:variables
-    private UIController controller;
+    private UIControllor controllor;
+    private AppTitltSetter appTitltSetter;
 }

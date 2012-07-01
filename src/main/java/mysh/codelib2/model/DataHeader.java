@@ -38,7 +38,7 @@ public class DataHeader implements Serializable {
 
 	private static final Logger log = Logger.getLogger(DataHeader.class);
 
-	private transient final String compressEntry = "zcl2";
+	private static transient final String compressEntry = "zcl2";
 
 	/**
 	 * 版本号.
@@ -100,7 +100,7 @@ public class DataHeader implements Serializable {
 					public Boolean call() throws Exception {
 
 						return CompressUtil.compress(
-								DataHeader.this.compressEntry, compressIn,
+								DataHeader.compressEntry, compressIn,
 								Long.MAX_VALUE, this.compressOut, 0);
 					};
 				};
@@ -157,7 +157,7 @@ public class DataHeader implements Serializable {
 
 						try {
 							ObjectInputStream objIn = new ObjectInputStream(in);
-							if (DataHeader.this.compressEntry.equals(entry.getName())) {
+							if (DataHeader.compressEntry.equals(entry.getName())) {
 								result.add((Collection<CodeLib2Element>) objIn.readObject());
 							}
 						} catch (Exception e) {

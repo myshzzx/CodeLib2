@@ -1,4 +1,4 @@
-﻿
+
 package mysh.codelib2.model;
 
 import java.io.Serializable;
@@ -17,6 +17,11 @@ import mysh.util.TextEncodeUtil;
 public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element> {
 
 	private static final long serialVersionUID = -1657793191602091756L;
+
+	/**
+	 * 默认文本编码格式.
+	 */
+	public static final String DefaultCharsetEncode = "UTF-8";
 
 	/**
 	 * 附件.
@@ -103,6 +108,12 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 				return this.name.compareTo(o.name);
 		}
 
+		@Override
+		public String toString() {
+
+			return this.name;
+		}
+
 		/**
 		 * 附件名.
 		 * 
@@ -140,7 +151,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		private void judgeContentType() {
 
 			this.contentType = ContentType.Binary;
-			
+
 			if (this.binaryContent != null && this.binaryContent.length > 0
 					&& this.name != null && this.name.length() > 0) {
 				int pointPos = this.name.lastIndexOf('.');
@@ -227,6 +238,12 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		}
 	}
 
+	@Override
+	public String toString() {
+
+		return this.keywords;
+	}
+
 	/**
 	 * 关键字.
 	 * 
@@ -273,6 +290,9 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	 */
 	public byte[] getContent() {
 
+		if (this.content == null) {
+			return new byte[0];
+		}
 		return content;
 	}
 

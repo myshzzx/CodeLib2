@@ -18,8 +18,14 @@ public class CodeLib2Frame extends javax.swing.JFrame {
     public CodeLib2Frame() {
         initComponents();
         this.getContentPane().setLayout(new BorderLayout());
-        this.getContentPane().add(new CodeLib2Main(), BorderLayout.CENTER);
-        
+        this.getContentPane().add(new CodeLib2Main().setAppTitleSetter(new CodeLib2Main.AppTitltSetter() {
+
+            @Override
+            public void setTitle(String title) {
+                setTitle(title);
+            }
+        }), BorderLayout.CENTER);
+
         this.setLocationRelativeTo(null);
     }
 
