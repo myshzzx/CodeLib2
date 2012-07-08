@@ -1,9 +1,9 @@
 
 package mysh.codelib2.model;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import mysh.annotation.NotThreadSafe;
@@ -41,6 +41,11 @@ public final class SearchEngine {
 		 *               结果元素.
 		 */
 		void onGetSearchResult(String keyword, CodeLib2Element ele);
+
+		/**
+		 * 搜索完成.
+		 */
+		void onSearchComplete(String keyword);
 	}
 
 	/**
@@ -133,6 +138,8 @@ public final class SearchEngine {
 							+ ele + "]", e);
 				}
 			}
+
+			SearchEngine.this.onSearchTaskComplete(this);
 		}
 	}
 
@@ -156,7 +163,7 @@ public final class SearchEngine {
 	/**
 	 * 当前正在执行的搜索任务.
 	 */
-	private final Queue<SearchTask> runningTasks = new LinkedList<>();
+	private final Queue<SearchTask> runningTasks = new ConcurrentLinkedQueue<>();
 
 	/**
 	 * 当前正在搜索的目标位置.
@@ -173,7 +180,8 @@ public final class SearchEngine {
 	}
 
 	/**
-	 * 搜索关键字.
+	 * 搜索关键字.<br/>
+	 * * 表示展示全部.
 	 * 
 	 * @param keyword
 	 */
@@ -183,8 +191,13 @@ public final class SearchEngine {
 
 		String[] keys = keyword.trim().toLowerCase().split("\\s,");
 		if (keyword == null || keys == null || keyword.length() == 0 || keys.length == 0
-				|| keys[0].length() == 0)
-			throw new IllegalArgumentException("无效关键字: " + keyword);
+				|| keys[0].length() == 0) {
+			// throw new IllegalArgumentException("无效关键字: " + keyword);
+			this.resultCatcher.onSearchComplete(keyword);
+			return;
+		} else if ("*".equals(keys[0])) {
+			keys[0] = "";
+		}
 
 		SearchTask task;
 		for (int i = 0; i < ThreadCount; i++) {
@@ -196,7 +209,22 @@ public final class SearchEngine {
 	}
 
 	/**
-	 * 停止当前搜索.
+	 * 任务完成.
+	 * 
+	 * @param task
+	 */
+	private synchronized void onSearchTaskComplete(SearchTask task) {
+
+		this.runningTasks.remove(task);
+
+		if (this.runningTasks.size() == 0) {
+			this.resultCatcher.onSearchComplete(task.keyword);
+		}
+	}
+
+	/**
+	 * 停止当前搜索.<br/>
+	 * 阻塞直到操作完成.
 	 */
 	public void stopCurrentSearch() {
 

@@ -211,7 +211,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	}
 
 	/**
-	 * 关键字.
+	 * 关键字. (保证不为 null)
 	 */
 	private String keywords = "";
 

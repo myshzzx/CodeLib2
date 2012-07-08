@@ -22,6 +22,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import mysh.codelib2.model.CodeLib2Element;
+import mysh.codelib2.model.SearchEngine;
+import mysh.codelib2.model.SearchEngine.ResultCatcher;
 import mysh.codelib2.ui.SaveStateManager.State;
 import mysh.codelib2.ui.SaveStateManager.StateObserver;
 import mysh.util.CompressUtil;
@@ -34,9 +36,22 @@ import org.apache.log4j.Logger;
  * @author Allen
  * 
  */
-public class UIControllor implements StateObserver {
+public class UIControllor implements StateObserver, ResultCatcher {
 
 	private static final Logger log = Logger.getLogger(CompressUtil.class);
+
+	/**
+	 * 刷新结果列表任务.
+	 */
+	private final Runnable refreshResultListTask = new Runnable() {
+
+		@Override
+		public void run() {
+
+			Thread.yield();
+			UIControllor.this.ui.resultList.repaint();
+		}
+	};
 
 	/**
 	 * 应用名.
@@ -49,6 +64,11 @@ public class UIControllor implements StateObserver {
 	 * 数据集.
 	 */
 	private final List<CodeLib2Element> eles = new ArrayList<>();
+
+	/**
+	 * 搜索引擎.
+	 */
+	private final SearchEngine searchEnging = new SearchEngine(this.eles, this);
 
 	/**
 	 * 保存状态管理器.
@@ -148,10 +168,15 @@ public class UIControllor implements StateObserver {
 	@SuppressWarnings("unchecked")
 	void testData() {
 
-		DefaultListModel<CodeLib2Element> model = (DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel();
-		model.addElement(new CodeLib2Element().setKeywords("abcd"));
-		model.addElement(new CodeLib2Element().setKeywords("efg"));
-		model.addElement(new CodeLib2Element().setKeywords("hij"));
+		this.eles.add(new CodeLib2Element().setKeywords("abcd"));
+		this.eles.add(new CodeLib2Element().setKeywords("efg"));
+		this.eles.add(new CodeLib2Element().setKeywords("hij"));
+		this.eles.add(new CodeLib2Element().setKeywords("  java,   GUI, tree"));
+
+//		DefaultListModel<CodeLib2Element> model = (DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel();
+//		for (CodeLib2Element ele : this.eles) {
+//			model.addElement(ele);
+//		}
 	}
 
 	/**
@@ -243,15 +268,18 @@ public class UIControllor implements StateObserver {
 	}
 
 	/**
-	 * 执行过滤.
+	 * 执行搜索过滤.
 	 * 
 	 * @param text
 	 */
+	@SuppressWarnings("unchecked")
 	void filter(String text) {
 
-		if (text.length() == 0) {
-			this.ui.resultList.clearSelection();
-		}
+		this.ui.resultList.clearSelection();
+		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).removeAllElements();
+
+		this.searchEnging.stopCurrentSearch();
+		this.searchEnging.search(text);
 	}
 
 	/**
@@ -294,15 +322,16 @@ public class UIControllor implements StateObserver {
 
 			this.currentItem.setKeywords(this.ui.keyWordText.getText());
 
-			SwingUtilities.invokeLater(new Runnable() {
-
-				@Override
-				public void run() {
-
-					UIControllor.this.ui.resultList.repaint();
-				}
-			});
+			this.refreshResultList();
 		}
+	}
+
+	/**
+	 * 刷新结果列表.
+	 */
+	private void refreshResultList() {
+
+		SwingUtilities.invokeLater(this.refreshResultListTask);
 	}
 
 	/**
@@ -323,11 +352,6 @@ public class UIControllor implements StateObserver {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see mysh.codelib2.ui.SaveStateManager.StateObserver#onSaveStateChanged(mysh.codelib2.ui.
-	 * SaveStateManager.State, mysh.codelib2.ui.SaveStateManager.State)
-	 */
 	@Override
 	public boolean onSaveStateChanged(State oldState, State newState) {
 
@@ -353,5 +377,18 @@ public class UIControllor implements StateObserver {
 			break;
 		}
 		return true;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onGetSearchResult(String keyword, CodeLib2Element ele) {
+
+		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(ele);
+		this.refreshResultList();
+	}
+
+	@Override
+	public void onSearchComplete(String keyword) {
+
 	}
 }
