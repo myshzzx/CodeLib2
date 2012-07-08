@@ -22,7 +22,7 @@ public class CodeLib2Frame extends javax.swing.JFrame {
 
             @Override
             public void setTitle(String title) {
-                setTitle(title);
+                CodeLib2Frame.this.setTitle(title);
             }
         }), BorderLayout.CENTER);
 

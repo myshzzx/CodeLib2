@@ -7,11 +7,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -42,6 +46,11 @@ public class UIControllor implements StateObserver {
 	private final CodeLib2Main ui;
 
 	/**
+	 * 数据集.
+	 */
+	private final List<CodeLib2Element> eles = new ArrayList<>();
+
+	/**
 	 * 保存状态管理器.
 	 */
 	private SaveStateManager saveState = new SaveStateManager(State.NEW);
@@ -54,7 +63,7 @@ public class UIControllor implements StateObserver {
 	/**
 	 * 当前选中的条目.
 	 */
-	private CodeLib2Element currentItem;
+	private volatile CodeLib2Element currentItem;
 
 	public UIControllor(CodeLib2Main ui) {
 
@@ -66,6 +75,27 @@ public class UIControllor implements StateObserver {
 		// 注册保存状态监听.
 		this.saveState.registStateObserver(this);
 
+		// 过滤器条件更新
+		this.ui.filterText.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+
+				UIControllor.this.filter(UIControllor.this.ui.filterText.getText());
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+
+				UIControllor.this.filter(UIControllor.this.ui.filterText.getText());
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+			}
+		});
+
 		// 关键字编辑后立刻保存.
 		this.ui.keyWordText.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -73,12 +103,14 @@ public class UIControllor implements StateObserver {
 			public void removeUpdate(DocumentEvent e) {
 
 				UIControllor.this.saveCurrentItemKeywords();
+				Collections.sort(UIControllor.this.eles);
 			}
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 
 				UIControllor.this.saveCurrentItemKeywords();
+				Collections.sort(UIControllor.this.eles);
 			}
 
 			@Override
@@ -217,6 +249,9 @@ public class UIControllor implements StateObserver {
 	 */
 	void filter(String text) {
 
+		if (text.length() == 0) {
+			this.ui.resultList.clearSelection();
+		}
 	}
 
 	/**
@@ -226,9 +261,11 @@ public class UIControllor implements StateObserver {
 	 */
 	void selectItem(Object selectedValue) {
 
+		this.currentItem = null;
+
 		if (selectedValue instanceof CodeLib2Element) {
+
 			CodeLib2Element item = (CodeLib2Element) selectedValue;
-			this.currentItem = item;
 			this.ui.keyWordText.setText(item.getKeywords());
 			try {
 				this.ui.codeText.setText(new String(item.getContent(),
@@ -236,7 +273,14 @@ public class UIControllor implements StateObserver {
 				this.ui.codeText.setCaretPosition(0);
 			} catch (UnsupportedEncodingException e) {
 				log.error("编码失败.", e);
+				JOptionPane.showMessageDialog(this.ui, e.getMessage(), AppTitle,
+						JOptionPane.ERROR_MESSAGE);
 			}
+
+			this.currentItem = item;
+		} else {
+			this.ui.keyWordText.setText("");
+			this.ui.codeText.setText("");
 		}
 	}
 

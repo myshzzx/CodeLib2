@@ -59,6 +59,23 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 					"java", "js", "jsp", "log", "lua", "mx", "mxml", "pas",
 					"properties", "py", "sql", "sh", "txt", "vb", "vbs", "xml",
 					"xsd", "xsl");
+
+			/**
+			 * 取文本编码类型. 若非文本, 返回 null.
+			 * 
+			 * @return
+			 */
+			public String getTextEncode() {
+
+				switch (this) {
+				case UTF8Text:
+					return "UTF-8";
+				case NonUTF8Text:
+					return "GBK";
+				default:
+					return null;
+				}
+			}
 		}
 
 		/**
@@ -203,6 +220,11 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	 */
 	private byte[] content;
 
+	/**
+	 * 附件.
+	 */
+	private List<Attachment> attachments;
+
 	@Override
 	public boolean equals(Object obj) {
 
@@ -281,6 +303,26 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		}
 
 		return this;
+	}
+
+	/**
+	 * 附件.
+	 * 
+	 * @return
+	 */
+	public List<Attachment> getAttachments() {
+
+		return attachments;
+	}
+
+	/**
+	 * 附件.
+	 * 
+	 * @param attachments
+	 */
+	public void setAttachments(List<Attachment> attachments) {
+
+		this.attachments = attachments;
 	}
 
 	/**

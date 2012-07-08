@@ -99,9 +99,9 @@ public class DataHeader implements Serializable {
 					@Override
 					public Boolean call() throws Exception {
 
-						return CompressUtil.compress(
-								DataHeader.compressEntry, compressIn,
-								Long.MAX_VALUE, this.compressOut, 0);
+						return CompressUtil.compress(DataHeader.compressEntry,
+								compressIn, Long.MAX_VALUE,
+								this.compressOut, 0);
 					};
 				};
 
