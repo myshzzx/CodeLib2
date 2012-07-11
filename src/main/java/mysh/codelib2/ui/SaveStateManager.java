@@ -45,7 +45,7 @@ public class SaveStateManager {
 	 * @author Allen
 	 * 
 	 */
-	public interface StateObserver {
+	public static interface StateObserver {
 
 		/**
 		 * 观察者被通知状态更新, 观察者返回是否允许此次更新.

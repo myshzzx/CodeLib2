@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,13 +16,16 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileFilter;
 
 import mysh.codelib2.model.CodeLib2Element;
+import mysh.codelib2.model.DataHeader;
 import mysh.codelib2.model.SearchEngine;
 import mysh.codelib2.model.SearchEngine.ResultCatcher;
 import mysh.codelib2.ui.SaveStateManager.State;
@@ -84,6 +88,13 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 当前选中的条目.
 	 */
 	private volatile CodeLib2Element currentItem;
+
+	/**
+	 * 文件选择器.
+	 */
+	private JFileChooser fileChooser = this.getFileChooser();
+
+	private static final String Extention = ".zcl2";
 
 	public UIControllor(CodeLib2Main ui) {
 
@@ -173,10 +184,11 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		this.eles.add(new CodeLib2Element().setKeywords("hij"));
 		this.eles.add(new CodeLib2Element().setKeywords("  java,   GUI, tree"));
 
-//		DefaultListModel<CodeLib2Element> model = (DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel();
-//		for (CodeLib2Element ele : this.eles) {
-//			model.addElement(ele);
-//		}
+		// DefaultListModel<CodeLib2Element> model = (DefaultListModel<CodeLib2Element>)
+		// this.ui.resultList.getModel();
+		// for (CodeLib2Element ele : this.eles) {
+		// model.addElement(ele);
+		// }
 	}
 
 	/**
@@ -230,6 +242,31 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 */
 	void newInst() {
 
+		if (this.checkForSave()) {
+			this.saveState.changeState(State.NEW);
+			this.ui.filterText.setText("");
+			this.filter("");
+		}
+	}
+
+	/**
+	 * 在改变状态检查当前状态是否需要保存.
+	 * 
+	 * @return 是否要继续改变状态. false 表示后面的操作不继续了.
+	 */
+	private boolean checkForSave() {
+
+		if (this.saveState.getState() == State.MODIFIED) {
+			int op = JOptionPane.showConfirmDialog(this.ui, "是否保存修改?",
+					UIControllor.AppTitle, JOptionPane.YES_NO_CANCEL_OPTION);
+			if (op == JOptionPane.YES_OPTION) {
+				this.save();
+			} else if (op == JOptionPane.CANCEL_OPTION) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -237,6 +274,63 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 */
 	void open() {
 
+		if (this.checkForSave()) {
+
+			this.fileChooser.setDialogTitle("打开");
+			if (this.fileChooser.showOpenDialog(this.ui) == JFileChooser.APPROVE_OPTION) {
+				File openFile = this.fileChooser.getSelectedFile();
+				try {
+					Collection<CodeLib2Element> datas = DataHeader.readFromFile(openFile.getAbsolutePath());
+
+					this.eles.clear();
+					this.eles.addAll(datas);
+					this.currentItem = null;
+					this.file = openFile;
+
+					this.saveState.changeState(State.SAVED);
+					this.ui.filterText.setText("");
+					this.filter("");
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(this.ui,
+							"打开文件失败.\\n" + e.getMessage(),
+							UIControllor.AppTitle, JOptionPane.ERROR_MESSAGE);
+				}
+
+			}
+		}
+	}
+
+	/**
+	 * 取文件选择器.
+	 * 
+	 * @return
+	 */
+	private JFileChooser getFileChooser() {
+
+		JFileChooser filec = new JFileChooser();
+		filec.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		filec.setMultiSelectionEnabled(false);
+		filec.setDialogTitle("选个文件吧");
+		filec.setFileFilter(new FileFilter() {
+
+			@Override
+			public boolean accept(File f) {
+
+				if (f.isDirectory()
+						|| f.getName().toLowerCase().endsWith(
+								UIControllor.Extention)) {
+					return true;
+				}
+				return false;
+			}
+
+			@Override
+			public String getDescription() {
+
+				return "*.zcl2 - zzx codelib2 文件";
+			}
+		});
+		return filec;
 	}
 
 	/**
@@ -244,6 +338,30 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 */
 	void save() {
 
+		File saveFile = this.file;
+
+		this.fileChooser.setDialogTitle("保存");
+		if (saveFile == null) {
+			if (this.fileChooser.showOpenDialog(this.ui) == JFileChooser.APPROVE_OPTION) {
+				saveFile = this.fileChooser.getSelectedFile();
+				if (!saveFile.getName().endsWith(UIControllor.Extention)) {
+					saveFile = new File(saveFile.getAbsolutePath()
+							+ UIControllor.Extention);
+				}
+			} else {
+				return;
+			}
+		}
+
+		try {
+			new DataHeader().saveToFile(saveFile.getAbsolutePath(), this.eles);
+
+			this.file = saveFile;
+			this.saveState.changeState(State.SAVED);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this.ui, "保存文件失败.\\n" + e.getMessage(),
+					UIControllor.AppTitle, JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	/**
@@ -251,13 +369,26 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 */
 	void addItem() {
 
+		CodeLib2Element newEle = new CodeLib2Element();
+		this.eles.add(newEle);
+		this.onGetSearchResult(null, newEle);
+
+		this.saveState.changeState(State.MODIFIED);
 	}
 
 	/**
 	 * 移除条目.
 	 */
-	void removeItem() {
+	@SuppressWarnings("unchecked")
+	synchronized void removeItem() {
 
+		int selectedIndex = this.ui.resultList.getSelectedIndex();
+		if (selectedIndex > -1) {
+			this.eles.remove(this.ui.resultList.getSelectedValue());
+			((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).removeElementAt(selectedIndex);
+
+			this.saveState.changeState(State.MODIFIED);
+		}
 	}
 
 	/**
@@ -295,10 +426,12 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 			CodeLib2Element item = (CodeLib2Element) selectedValue;
 			this.ui.keyWordText.setText(item.getKeywords());
+			this.ui.keyWordText.setEditable(true);
 			try {
 				this.ui.codeText.setText(new String(item.getContent(),
 						CodeLib2Element.DefaultCharsetEncode));
 				this.ui.codeText.setCaretPosition(0);
+				this.ui.codeText.setEditable(true);
 			} catch (UnsupportedEncodingException e) {
 				log.error("编码失败.", e);
 				JOptionPane.showMessageDialog(this.ui, e.getMessage(), AppTitle,
@@ -308,7 +441,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.currentItem = item;
 		} else {
 			this.ui.keyWordText.setText("");
+			this.ui.keyWordText.setEditable(false);
 			this.ui.codeText.setText("");
+			this.ui.codeText.setEditable(false);
 		}
 	}
 
@@ -357,8 +492,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		switch (newState) {
 		case NEW:
-			this.file = null;
 			this.currentItem = null;
+			this.eles.clear();
+			this.file = null;
 			this.ui.setAppTitle(UIControllor.AppTitle);
 			break;
 		case MODIFIED:
@@ -381,14 +517,24 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void onGetSearchResult(String keyword, CodeLib2Element ele) {
+	public synchronized void onGetSearchResult(String keyword, CodeLib2Element ele) {
 
 		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(ele);
+		this.ui.resultList.setSelectedValue(ele, true);
 		this.refreshResultList();
 	}
 
 	@Override
 	public void onSearchComplete(String keyword) {
 
+	}
+
+	/**
+	 * 关闭前检查或询问以确定否要关闭.
+	 * 
+	 * @return
+	 */
+	boolean doClose() {
+		return this.checkForSave();
 	}
 }

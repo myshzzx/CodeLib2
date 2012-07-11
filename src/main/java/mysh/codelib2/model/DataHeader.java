@@ -36,7 +36,7 @@ public class DataHeader implements Serializable {
 
 	private static final long serialVersionUID = -5817161670435220173L;
 
-	private static final Logger log = Logger.getLogger(DataHeader.class);
+	private static transient final Logger log = Logger.getLogger(DataHeader.class);
 
 	private static transient final String compressEntry = "zcl2";
 

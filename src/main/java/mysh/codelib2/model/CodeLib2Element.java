@@ -213,7 +213,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	/**
 	 * 关键字. (保证不为 null)
 	 */
-	private String keywords = "";
+	private String keywords = " " ;
 
 	/**
 	 * 内容.
@@ -284,7 +284,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	public final CodeLib2Element setKeywords(String keywords) {
 
 		if (keywords == null) {
-			this.keywords = "";
+			this.keywords = " ";
 		} else {
 			StringBuilder r = new StringBuilder();
 			String[] keys = keywords.trim().split(",");
@@ -298,7 +298,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			if (r.length() > 2) {
 				this.keywords = r.substring(0, r.length() - 2);
 			} else {
-				this.keywords = "";
+				this.keywords = " ";
 			}
 		}
 
