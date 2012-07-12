@@ -113,6 +113,12 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		}
 
 		@Override
+		public int hashCode() {
+
+			return this.name.hashCode();
+		}
+
+		@Override
 		public int compareTo(Attachment o) {
 
 			if (this.name == o.name)
@@ -213,7 +219,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	/**
 	 * 关键字. (保证不为 null)
 	 */
-	private String keywords = " " ;
+	private String keywords = " ";
 
 	/**
 	 * 内容.
@@ -244,6 +250,12 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		}
 
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+
+		return this.keywords.hashCode();
 	}
 
 	@Override

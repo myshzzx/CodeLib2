@@ -94,6 +94,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jToolBar1.add(newInst);
 
+        open.setFont(open.getFont());
         open.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/open.png"))); // NOI18N
         open.setToolTipText("打开");
         open.setFocusable(false);
@@ -106,8 +107,9 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jToolBar1.add(open);
 
+        save.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
         save.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/save.png"))); // NOI18N
-        save.setToolTipText("保存");
+        save.setToolTipText("保存 (Ctrl + S)");
         save.setFocusable(false);
         save.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         save.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);

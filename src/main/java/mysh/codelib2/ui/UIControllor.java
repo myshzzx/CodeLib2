@@ -4,6 +4,7 @@ package mysh.codelib2.ui;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -31,6 +32,7 @@ import mysh.codelib2.model.SearchEngine.ResultCatcher;
 import mysh.codelib2.ui.SaveStateManager.State;
 import mysh.codelib2.ui.SaveStateManager.StateObserver;
 import mysh.util.CompressUtil;
+import mysh.util.HotKeyUtil;
 
 import org.apache.log4j.Logger;
 
@@ -170,13 +172,12 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			}
 		});
 
-		// 注册 ESC 热键.
-		this.registEscHotKey();
+		// 注册热键.
+		this.registHotKey();
 
-		this.testData();
+		// this.testData();
 	}
 
-	@SuppressWarnings("unchecked")
 	void testData() {
 
 		this.eles.add(new CodeLib2Element().setKeywords("abcd"));
@@ -192,47 +193,34 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	}
 
 	/**
-	 * 注册 esc 热键.
+	 * 注册热键.
 	 */
-	private void registEscHotKey() {
+	private void registHotKey() {
 
-		final HashMap<KeyStroke, Action> actionMap = new HashMap<KeyStroke, Action>();
-		KeyStroke escPressed = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+		// 注册 esc 热键.
+		HotKeyUtil.registHotKey(KeyEvent.VK_ESCAPE, 0,
+				new AbstractAction("escPressedAction") {
 
-		actionMap.put(escPressed, new AbstractAction("escPressedAction") {
+					private static final long serialVersionUID = -8642328380866972006L;
 
-			private static final long serialVersionUID = -8642328380866972006L;
+					@Override
+					public void actionPerformed(ActionEvent e) {
+
+						ui.filterText.setText("");
+						ui.filterText.requestFocus();
+					}
+				});
+
+		// 注册 Ctrl+S 热键.
+		HotKeyUtil.registHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, new AbstractAction(
+				"saveAction") {
+
+			private static final long serialVersionUID = -6294554898524200651L;
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				ui.filterText.setText("");
-				ui.filterText.requestFocus();
-			}
-		});
-
-		KeyboardFocusManager kfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-		kfm.addKeyEventDispatcher(new KeyEventDispatcher() {
-
-			@Override
-			public boolean dispatchKeyEvent(KeyEvent e) {
-
-				KeyStroke keyStroke = KeyStroke.getKeyStrokeForEvent(e);
-				if (actionMap.containsKey(keyStroke)) {
-					final Action a = actionMap.get(keyStroke);
-					final ActionEvent ae = new ActionEvent(e.getSource(), e.getID(),
-							null);
-					SwingUtilities.invokeLater(new Runnable() {
-
-						@Override
-						public void run() {
-
-							a.actionPerformed(ae);
-						}
-					});
-					return true;
-				}
-				return false;
+				save();
 			}
 		});
 	}
@@ -292,7 +280,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					this.filter("");
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(this.ui,
-							"打开文件失败.\\n" + e.getMessage(),
+							"打开文件失败.\n" + e.getMessage(),
 							UIControllor.AppTitle, JOptionPane.ERROR_MESSAGE);
 				}
 
@@ -372,6 +360,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		CodeLib2Element newEle = new CodeLib2Element();
 		this.eles.add(newEle);
 		this.onGetSearchResult(null, newEle);
+		this.ui.keyWordText.requestFocus();
 
 		this.saveState.changeState(State.MODIFIED);
 	}
@@ -384,10 +373,17 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		int selectedIndex = this.ui.resultList.getSelectedIndex();
 		if (selectedIndex > -1) {
-			this.eles.remove(this.ui.resultList.getSelectedValue());
-			((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).removeElementAt(selectedIndex);
+			CodeLib2Element selectedValue = (CodeLib2Element) this.ui.resultList.getSelectedValue();
 
-			this.saveState.changeState(State.MODIFIED);
+			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui, "删除确认:\n"
+					+ selectedValue.getKeywords(), AppTitle,
+					JOptionPane.YES_NO_OPTION)) {
+
+				this.eles.remove(selectedValue);
+				((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).removeElementAt(selectedIndex);
+
+				this.saveState.changeState(State.MODIFIED);
+			}
 		}
 	}
 
@@ -535,6 +531,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * @return
 	 */
 	boolean doClose() {
+
 		return this.checkForSave();
 	}
 }

@@ -68,6 +68,11 @@
         </Component>
         <Component class="javax.swing.JButton" name="open">
           <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
+              <FontInfo relative="true">
+                <Font component="open" property="font" relativeSize="true" size="0"/>
+              </FontInfo>
+            </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/mysh/codelib2/ui/icons/open.png"/>
             </Property>
@@ -82,10 +87,13 @@
         </Component>
         <Component class="javax.swing.JButton" name="save">
           <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Microsoft YaHei" size="12" style="0"/>
+            </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/mysh/codelib2/ui/icons/save.png"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" value="&#x4fdd;&#x5b58;"/>
+            <Property name="toolTipText" type="java.lang.String" value="&#x4fdd;&#x5b58; (Ctrl + S)"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>

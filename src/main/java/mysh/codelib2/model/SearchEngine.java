@@ -190,7 +190,7 @@ public final class SearchEngine {
 		this.stopCurrentSearch();
 
 		String[] keys = keyword.trim().toLowerCase().split("\\s,");
-		if (keyword == null || keys == null || keyword.length() == 0 || keys.length == 0
+		if (keys == null || keyword.length() == 0 || keys.length == 0
 				|| keys[0].length() == 0) {
 			// throw new IllegalArgumentException("无效关键字: " + keyword);
 			this.resultCatcher.onSearchComplete(keyword);
