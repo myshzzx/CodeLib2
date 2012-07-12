@@ -127,10 +127,10 @@ public final class SearchEngine {
 						}
 					}
 
-					if (!this.isInterrupted() && result)
-						resultCatcher.onGetSearchResult(this.keyword, ele);
-					else
+					if (this.isInterrupted())
 						break;
+					else if (result)
+						resultCatcher.onGetSearchResult(this.keyword, ele);
 				} catch (IndexOutOfBoundsException outOfBoundsEx) {
 					break;
 				} catch (Exception e) {

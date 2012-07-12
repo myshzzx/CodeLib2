@@ -414,7 +414,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 
 	 * @param selectedValue
 	 */
-	void selectItem(Object selectedValue) {
+	synchronized void selectItem(Object selectedValue) {
 
 		this.currentItem = null;
 
