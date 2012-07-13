@@ -84,44 +84,42 @@ public final class SearchEngine {
 		@Override
 		public void run() {
 
-			CodeLib2Element ele = null;
-			boolean result;
+			final int keyLength = this.keys.length;
+			if (keyLength < 1)
+				return;
 
+			CodeLib2Element ele = null;
+			int keyIndex;
+			boolean keyResult; // 单个 key 匹配结果.
 			while (!this.isInterrupted() && searchTargetIndex.get() < targetLib.size()) {
-				result = false;
 
 				try {
 					ele = targetLib.get(searchTargetIndex.getAndIncrement());
 
-					for (String key : this.keys) {
-						result |= ele.getKeywords().toLowerCase().contains(key);
-						if (result)
-							break;
-					}
+					for (keyIndex = 0, keyResult = true; keyResult && keyIndex < keyLength; keyIndex++) {
+						// 匹配关键字
+						keyResult = ele.getKeywords().toLowerCase().contains(this.keys[keyIndex]);
 
-					if (!result) {
-						for (String key : this.keys) {
-							result |= ByteUtil.findStringIndexIgnoreCase(
-									ele.getContent(),
-									CodeLib2Element.DefaultCharsetEncode,
-									0, key) > -1;
-							if (result)
-								break;
-						}
-					}
+						// 匹配内容
+						if (!keyResult) {
+							keyResult = ByteUtil.findStringIndexIgnoreCase(ele.getContent(),
+									CodeLib2Element.DefaultCharsetEncode, 0,
+									this.keys[keyIndex]) > -1;
 
-					if (!result && ele.getAttachments() != null) {
-						String attachementEncode;
-						AttachmentSearch: for (Attachment attachment : ele.getAttachments()) {
-							attachementEncode = attachment.getContentType().getTextEncode();
-							if (attachementEncode != null) {
-								for (String key : this.keys) {
-									result |= ByteUtil.findStringIndexIgnoreCase(
-											ele.getContent(),
-											attachementEncode, 0,
-											key) > -1;
-									if (result)
-										break AttachmentSearch;
+							// 匹配附件
+							if ((ele.getAttachments() != null) && !keyResult) {
+								String attachementEncode;
+								for (Attachment attachment : ele.getAttachments()) {
+									attachementEncode = attachment.getContentType().getTextEncode();
+									if (attachementEncode != null) {
+										keyResult = ByteUtil.findStringIndexIgnoreCase(
+												ele.getContent(),
+												attachementEncode, 0,
+												this.keys[keyIndex]) > -1;
+
+										if (keyResult)
+											break;
+									}
 								}
 							}
 						}
@@ -129,13 +127,12 @@ public final class SearchEngine {
 
 					if (this.isInterrupted())
 						break;
-					else if (result)
+					else if (keyResult)
 						resultCatcher.onGetSearchResult(this.keyword, ele);
 				} catch (IndexOutOfBoundsException outOfBoundsEx) {
 					break;
 				} catch (Exception e) {
-					log.error("搜索失败, [keyword: " + this.keyword + ", element: "
-							+ ele + "]", e);
+					log.error("搜索失败, [keyword: " + this.keyword + ", element: " + ele + "]", e);
 				}
 			}
 
@@ -189,13 +186,12 @@ public final class SearchEngine {
 
 		this.stopCurrentSearch();
 
-		String[] keys = keyword.trim().toLowerCase().split("\\s,");
-		if (keys == null || keyword.length() == 0 || keys.length == 0
-				|| keys[0].length() == 0) {
+		String[] keys = keyword.trim().toLowerCase().split("[\\s,]+");
+		if (keys == null || keyword.length() == 0 || keys.length == 0 || keys[0].length() == 0) {
 			// throw new IllegalArgumentException("无效关键字: " + keyword);
 			this.resultCatcher.onSearchComplete(keyword);
 			return;
-		} else if ("*".equals(keys[0])) {
+		} else if (keys.length == 1 && "*".equals(keys[0])) {
 			keys[0] = "";
 		}
 

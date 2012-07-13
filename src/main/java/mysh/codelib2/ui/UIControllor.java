@@ -267,24 +267,35 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.fileChooser.setDialogTitle("打开");
 			if (this.fileChooser.showOpenDialog(this.ui) == JFileChooser.APPROVE_OPTION) {
 				File openFile = this.fileChooser.getSelectedFile();
-				try {
-					Collection<CodeLib2Element> datas = DataHeader.readFromFile(openFile.getAbsolutePath());
-
-					this.eles.clear();
-					this.eles.addAll(datas);
-					this.currentItem = null;
-					this.file = openFile;
-
-					this.saveState.changeState(State.SAVED);
-					this.ui.filterText.setText("");
-					this.filter("");
-				} catch (Exception e) {
-					JOptionPane.showMessageDialog(this.ui,
-							"打开文件失败.\n" + e.getMessage(),
-							UIControllor.AppTitle, JOptionPane.ERROR_MESSAGE);
-				}
-
+				this.openFile(openFile);
 			}
+		}
+	}
+
+	/**
+	 * 打开文件.
+	 * 
+	 * @param openFile
+	 *               要打开的文件.
+	 */
+	void openFile(File openFile) {
+
+		try {
+			Collection<CodeLib2Element> datas = DataHeader.readFromFile(openFile.getAbsolutePath());
+
+			this.eles.clear();
+			this.eles.addAll(datas);
+			this.currentItem = null;
+			this.file = openFile;
+
+			this.saveState.changeState(State.SAVED);
+			this.ui.filterText.setText("");
+			this.filter("");
+
+			this.fileChooser.setCurrentDirectory(openFile.getParentFile());
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this.ui, "打开文件失败.\n" + e.getMessage(),
+					UIControllor.AppTitle, JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

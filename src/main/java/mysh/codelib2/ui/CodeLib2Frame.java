@@ -5,6 +5,7 @@
 package mysh.codelib2.ui;
 
 import java.awt.BorderLayout;
+import java.io.File;
 
 /**
  *
@@ -72,7 +73,7 @@ public class CodeLib2Frame extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(final String args[]) {
         /*
          * Set the Nimbus look and feel
          */
@@ -106,7 +107,12 @@ public class CodeLib2Frame extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                new CodeLib2Frame().setVisible(true);
+       	     CodeLib2Frame frame = new CodeLib2Frame();
+       	     frame.setVisible(true);
+       	    
+       	     if(args.length>0){
+       		     frame.codeLib2Main.openFile(new File(args[0]));
+       	     }
             }
         });
     }

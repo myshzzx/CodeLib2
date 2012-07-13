@@ -4,6 +4,8 @@
  */
 package mysh.codelib2.ui;
 
+import java.io.File;
+
 import javax.swing.DefaultListModel;
 
 /**
@@ -14,10 +16,15 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
     /**
      * 关闭前询问是否要关闭.
-     * @return 
+     *
+     * @return
      */
     boolean doClose() {
         return this.controllor.doClose();
+    }
+
+    public void openFile(File file) {
+        this.controllor.openFile(file);
     }
 
     public static interface AppTitltSetter {
