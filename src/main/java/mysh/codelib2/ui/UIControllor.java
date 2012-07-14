@@ -319,6 +319,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	void openFile(File openFile) {
 
 		try {
+			this.setStatusBar("正在打开文件 ...");
 			Collection<CodeLib2Element> datas = DataHeader.readFromFile(openFile.getAbsolutePath());
 
 			this.eles.clear();
@@ -337,6 +338,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					JOptionPane.ERROR_MESSAGE);
 		} finally {
 			System.gc();
+			this.setStatusBarReady();
 		}
 	}
 
@@ -391,6 +393,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		}
 
 		try {
+			this.setStatusBar("正在保存 ...");
 			new DataHeader().saveToFile(saveFile.getAbsolutePath(), this.eles);
 
 			this.file = saveFile;
@@ -398,6 +401,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "保存文件失败.\\n" + e.getMessage(), UIControllor.AppTitle,
 					JOptionPane.ERROR_MESSAGE);
+		} finally {
+			System.gc();
+			this.setStatusBarReady();
 		}
 	}
 
@@ -474,6 +480,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		try {
 			this.currentKeyword = text;
 			this.searchEnging.addSearchTask(text);
+			this.setStatusBar("正在搜索 [ " + text + " ] ...");
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "创建搜索任务失败.\n关键字: [" + text + "]\n错误:\n" + e, AppTitle,
 					JOptionPane.ERROR_MESSAGE);
@@ -726,6 +733,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	public void onSearchComplete(String keyword) {
 
 		this.refreshResultList();
+		this.setStatusBarReady();
 	}
 
 	/**
@@ -746,5 +754,23 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		Clipboard sysclip = Toolkit.getDefaultToolkit().getSystemClipboard();
 		Transferable text = new StringSelection(this.ui.codeText.getText());
 		sysclip.setContents(text, null);
+	}
+
+	/**
+	 * 设置状态栏内容.
+	 * 
+	 * @param statusText
+	 */
+	private void setStatusBar(String statusText) {
+
+		this.ui.statusBar.setText(statusText);
+	}
+
+	/**
+	 * 重置状态栏.
+	 */
+	private void setStatusBarReady() {
+
+		this.ui.statusBar.setText("就绪.");
 	}
 }

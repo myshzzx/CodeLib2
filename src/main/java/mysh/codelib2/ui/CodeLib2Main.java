@@ -83,7 +83,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         codeText = new org.fife.ui.rsyntaxtextarea.RSyntaxTextArea();
         jScrollPane4 = new javax.swing.JScrollPane();
         attachmentList = new javax.swing.JTable();
-        stateBar = new javax.swing.JLabel();
+        statusBar = new javax.swing.JLabel();
 
         setFont(getFont());
 
@@ -271,10 +271,10 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         jSplitPane1.setRightComponent(jSplitPane2);
 
-        stateBar.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
-        stateBar.setText("就绪.");
-        stateBar.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        stateBar.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+        statusBar.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
+        statusBar.setText("就绪.");
+        statusBar.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        statusBar.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -284,7 +284,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             .addComponent(jSplitPane1)
             .addGroup(layout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addComponent(stateBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -293,7 +293,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(stateBar, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(statusBar, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -352,7 +352,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private javax.swing.JButton remove;
     javax.swing.JList resultList;
     private javax.swing.JButton save;
-    javax.swing.JLabel stateBar;
+    javax.swing.JLabel statusBar;
     // End of variables declaration//GEN-END:variables
     private UIControllor controllor;
     private AppTitltSetter appTitltSetter;

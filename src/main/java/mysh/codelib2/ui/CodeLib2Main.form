@@ -27,7 +27,7 @@
           <Component id="jSplitPane1" alignment="0" max="32767" attributes="0"/>
           <Group type="102" attributes="0">
               <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
-              <Component id="stateBar" max="32767" attributes="0"/>
+              <Component id="statusBar" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -38,7 +38,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jSplitPane1" pref="493" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="stateBar" min="-2" pref="23" max="-2" attributes="0"/>
+              <Component id="statusBar" min="-2" pref="23" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -389,7 +389,7 @@
         </Container>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JLabel" name="stateBar">
+    <Component class="javax.swing.JLabel" name="statusBar">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Microsoft YaHei" size="14" style="0"/>
