@@ -178,7 +178,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jToolBar1.add(copyToClipboard);
 
-        jSplitPane1.setDividerLocation(220);
+        jSplitPane1.setDividerLocation(250);
         jSplitPane1.setDividerSize(7);
 
         jPanel1.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
@@ -202,7 +202,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(filterText)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -244,7 +244,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(keyWordText)
-            .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 760, Short.MAX_VALUE)
+            .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 730, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
