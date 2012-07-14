@@ -176,7 +176,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		// 注册热键.
 		this.registHotKey();
 
-		this.testData();
+//		this.testData();
 	}
 
 	/**
