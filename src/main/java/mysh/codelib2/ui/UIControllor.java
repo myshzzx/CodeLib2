@@ -1,8 +1,6 @@
 
 package mysh.codelib2.ui;
 
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -11,15 +9,13 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -85,6 +81,11 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 保存文件.
 	 */
 	private File file;
+
+	/**
+	 * 当前正在搜索的关键字.
+	 */
+	private volatile String currentKeyword;
 
 	/**
 	 * 当前选中的条目.
@@ -175,21 +176,54 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		// 注册热键.
 		this.registHotKey();
 
-		// this.testData();
+		this.testData();
 	}
 
-	void testData() {
+	/**
+	 * for test only.
+	 */
+	private void testData() {
 
-		this.eles.add(new CodeLib2Element().setKeywords("abcd"));
-		this.eles.add(new CodeLib2Element().setKeywords("efg"));
-		this.eles.add(new CodeLib2Element().setKeywords("hij"));
-		this.eles.add(new CodeLib2Element().setKeywords("  java,   GUI, tree"));
+		Random r = new Random();
 
-		// DefaultListModel<CodeLib2Element> model = (DefaultListModel<CodeLib2Element>)
-		// this.ui.resultList.getModel();
-		// for (CodeLib2Element ele : this.eles) {
-		// model.addElement(ele);
-		// }
+		int length = 100_000;
+
+		String dic = "abcdefghijklmnopqrstuvwxyz{}[],.;:'/?()*&^%$#@!1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		char[] dicKeywords = dic.toCharArray();
+		byte[] dicContent = (dic + "\r\n").getBytes();
+		CodeLib2Element ele;
+		for (int i = 0; i < length; i++) {
+			ele = new CodeLib2Element();
+			ele.setKeywords(this.testGenKeyword(r, dicKeywords, dicKeywords.length, r.nextInt(20) + 1));
+			ele.setContent(this.testGenContent(r, dicContent, dicContent.length, r.nextInt(10_000) + 1));
+			this.eles.add(ele);
+		}
+
+		Collections.sort(this.eles);
+	}
+
+	/**
+	 * for test only.
+	 */
+	private String testGenKeyword(Random r, char[] dic, int dicLength, int length) {
+
+		char[] c = new char[r.nextInt(length) + 1];
+		for (int i = 0; i < c.length; i++)
+			c[i] = dic[r.nextInt(dicLength)];
+
+		return new String(c);
+	}
+
+	/**
+	 * for test only.
+	 */
+	private byte[] testGenContent(Random r, byte[] dic, int dicLength, int length) {
+
+		byte[] b = new byte[r.nextInt(length)];
+		for (int i = 0; i < b.length; i++)
+			b[i] = dic[r.nextInt(dicLength)];
+
+		return b;
 	}
 
 	/**
@@ -198,22 +232,20 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	private void registHotKey() {
 
 		// 注册 esc 热键.
-		HotKeyUtil.registHotKey(KeyEvent.VK_ESCAPE, 0,
-				new AbstractAction("escPressedAction") {
+		HotKeyUtil.registHotKey(KeyEvent.VK_ESCAPE, 0, new AbstractAction("escPressedAction") {
 
-					private static final long serialVersionUID = -8642328380866972006L;
+			private static final long serialVersionUID = -8642328380866972006L;
 
-					@Override
-					public void actionPerformed(ActionEvent e) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
 
-						ui.filterText.setText("");
-						ui.filterText.requestFocus();
-					}
-				});
+				ui.filterText.setText("");
+				ui.filterText.requestFocus();
+			}
+		});
 
 		// 注册 Ctrl+S 热键.
-		HotKeyUtil.registHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, new AbstractAction(
-				"saveAction") {
+		HotKeyUtil.registHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, new AbstractAction("saveAction") {
 
 			private static final long serialVersionUID = -6294554898524200651L;
 
@@ -245,8 +277,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	private boolean checkForSave() {
 
 		if (this.saveState.getState() == State.MODIFIED) {
-			int op = JOptionPane.showConfirmDialog(this.ui, "是否保存修改?",
-					UIControllor.AppTitle, JOptionPane.YES_NO_CANCEL_OPTION);
+			int op = JOptionPane.showConfirmDialog(this.ui, "是否保存修改?", UIControllor.AppTitle,
+					JOptionPane.YES_NO_CANCEL_OPTION);
 			if (op == JOptionPane.YES_OPTION) {
 				this.save();
 			} else if (op == JOptionPane.CANCEL_OPTION) {
@@ -285,6 +317,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 			this.eles.clear();
 			this.eles.addAll(datas);
+			Collections.sort(this.eles);
 			this.currentItem = null;
 			this.file = openFile;
 
@@ -294,8 +327,10 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 			this.fileChooser.setCurrentDirectory(openFile.getParentFile());
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this.ui, "打开文件失败.\n" + e.getMessage(),
-					UIControllor.AppTitle, JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this.ui, "打开文件失败.\n" + e.getMessage(), UIControllor.AppTitle,
+					JOptionPane.ERROR_MESSAGE);
+		} finally {
+			System.gc();
 		}
 	}
 
@@ -315,9 +350,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			@Override
 			public boolean accept(File f) {
 
-				if (f.isDirectory()
-						|| f.getName().toLowerCase().endsWith(
-								UIControllor.Extention)) {
+				if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {
 					return true;
 				}
 				return false;
@@ -344,8 +377,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			if (this.fileChooser.showOpenDialog(this.ui) == JFileChooser.APPROVE_OPTION) {
 				saveFile = this.fileChooser.getSelectedFile();
 				if (!saveFile.getName().endsWith(UIControllor.Extention)) {
-					saveFile = new File(saveFile.getAbsolutePath()
-							+ UIControllor.Extention);
+					saveFile = new File(saveFile.getAbsolutePath() + UIControllor.Extention);
 				}
 			} else {
 				return;
@@ -358,8 +390,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.file = saveFile;
 			this.saveState.changeState(State.SAVED);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this.ui, "保存文件失败.\\n" + e.getMessage(),
-					UIControllor.AppTitle, JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this.ui, "保存文件失败.\\n" + e.getMessage(), UIControllor.AppTitle,
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -386,9 +418,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		if (selectedIndex > -1) {
 			CodeLib2Element selectedValue = (CodeLib2Element) this.ui.resultList.getSelectedValue();
 
-			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui, "删除确认:\n"
-					+ selectedValue.getKeywords(), AppTitle,
-					JOptionPane.YES_NO_OPTION)) {
+			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui,
+					"删除确认:\n" + selectedValue.getKeywords(), AppTitle, JOptionPane.YES_NO_OPTION)) {
 
 				this.eles.remove(selectedValue);
 				((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).removeElementAt(selectedIndex);
@@ -416,8 +447,13 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		this.ui.resultList.clearSelection();
 		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).removeAllElements();
 
-		this.searchEnging.stopCurrentSearch();
-		this.searchEnging.search(text);
+		try {
+			this.currentKeyword = text;
+			this.searchEnging.addSearchTask(text);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this.ui, "创建搜索任务失败.\n关键字: [" + text + "]\n错误:\n" + e, AppTitle,
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	/**
@@ -435,14 +471,12 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.ui.keyWordText.setText(item.getKeywords());
 			this.ui.keyWordText.setEditable(true);
 			try {
-				this.ui.codeText.setText(new String(item.getContent(),
-						CodeLib2Element.DefaultCharsetEncode));
+				this.ui.codeText.setText(new String(item.getContent(), CodeLib2Element.DefaultCharsetEncode));
 				this.ui.codeText.setCaretPosition(0);
 				this.ui.codeText.setEditable(true);
 			} catch (UnsupportedEncodingException e) {
 				log.error("编码失败.", e);
-				JOptionPane.showMessageDialog(this.ui, e.getMessage(), AppTitle,
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this.ui, e.getMessage(), AppTitle, JOptionPane.ERROR_MESSAGE);
 			}
 
 			this.currentItem = item;
@@ -524,16 +558,25 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void onGetSearchResult(String keyword, CodeLib2Element ele) {
+	public synchronized void onGetSearchResult(final String keyword, final CodeLib2Element ele) {
 
-		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(ele);
-		this.ui.resultList.setSelectedValue(ele, true);
-		this.refreshResultList();
+		if (keyword == this.currentKeyword)
+			SwingUtilities.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+
+					if (keyword == currentKeyword)
+						((DefaultListModel<CodeLib2Element>) ui.resultList.getModel()).addElement(ele);
+					// this.ui.resultList.setSelectedValue(ele, true);
+				}
+			});
 	}
 
 	@Override
 	public void onSearchComplete(String keyword) {
 
+		this.refreshResultList();
 	}
 
 	/**

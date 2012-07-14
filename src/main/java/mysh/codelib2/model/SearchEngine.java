@@ -3,10 +3,12 @@ package mysh.codelib2.model;
 
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import mysh.annotation.NotThreadSafe;
+import mysh.annotation.ThreadSafe;
 import mysh.codelib2.model.CodeLib2Element.Attachment;
 import mysh.util.ByteUtil;
 
@@ -14,12 +16,12 @@ import org.apache.log4j.Logger;
 
 /**
  * 搜索引擎.<br/>
- * 非线程安全. 一次只执行一个关键字搜索.
+ * 一次只执行一个关键字搜索.
  * 
  * @author Allen
  * 
  */
-@NotThreadSafe
+@ThreadSafe
 public final class SearchEngine {
 
 	private static final Logger log = Logger.getLogger(SearchEngine.class);
@@ -63,29 +65,65 @@ public final class SearchEngine {
 		private String keyword;
 
 		/**
-		 * 关键字 keyword 的小写分解.
+		 * 关键字 keyword 的大写分解.
 		 */
-		private String[] keys;
+		private String[] upperCaseKeys;
 
 		/**
-		 * 初始化方法.
+		 * 关键字 keyword 的小写分解.
+		 */
+		private String[] lowerCaseKeys;
+
+		/**
+		 * 关键字 keyword 大写分解的默认编码数组(仅用于内容匹配).
+		 */
+		private byte[][] upperKeysByteArray;
+
+		/**
+		 * 关键字 keyword 小写分解的默认编码数组(仅用于内容匹配).
+		 */
+		private byte[][] lowerKeysByteArray;
+
+		/**
+		 * 创建搜索任务.<br/>
+		 * 要求提供关键字分解是 关键字分解策略自由化 的考虑.<br/>
+		 * 不检查关键字分解的结果是否符合参数含义, 后果由客户端代码承担.
 		 * 
 		 * @param keyword
 		 *               关键字.
+		 * @param upperCaseKeys
+		 *               关键字 keyword 的大写分解.
 		 * @param lowerCaseKeys
 		 *               关键字 keyword 的小写分解.
+		 * @throws Exception
+		 *                创建搜索任务失败.
 		 */
-		public SearchTask(String keyword, String[] lowerCaseKeys) {
+		public SearchTask(String keyword, String[] upperCaseKeys, String[] lowerCaseKeys) throws Exception {
+
+			this.setDaemon(true);
+			this.setName("SearchTask Thread");
+
+			if (upperCaseKeys.length != lowerCaseKeys.length) {
+				throw new IllegalArgumentException();
+			}
 
 			this.keyword = keyword;
-			this.keys = lowerCaseKeys;
+			this.upperCaseKeys = upperCaseKeys;
+			this.lowerCaseKeys = lowerCaseKeys;
+
+			this.upperKeysByteArray = new byte[upperCaseKeys.length][];
+			this.lowerKeysByteArray = new byte[lowerCaseKeys.length][];
+			for (int i = 0; i < upperCaseKeys.length; i++) {
+				this.upperKeysByteArray[i] = upperCaseKeys[i].getBytes(CodeLib2Element.DefaultCharsetEncode);
+				this.lowerKeysByteArray[i] = lowerCaseKeys[i].getBytes(CodeLib2Element.DefaultCharsetEncode);
+			}
 		}
 
 		@Override
 		public void run() {
 
-			final int keyLength = this.keys.length;
-			if (keyLength < 1)
+			final int keyLength = this.lowerCaseKeys.length;
+			if (keyLength < 1 || this.upperCaseKeys.length != this.lowerCaseKeys.length)
 				return;
 
 			CodeLib2Element ele = null;
@@ -98,13 +136,15 @@ public final class SearchEngine {
 
 					for (keyIndex = 0, keyResult = true; keyResult && keyIndex < keyLength; keyIndex++) {
 						// 匹配关键字
-						keyResult = ele.getKeywords().toLowerCase().contains(this.keys[keyIndex]);
+						keyResult = this.lowerCaseKeys[keyIndex].length() == 0 ? true
+								: ele.getKeywords().toLowerCase().contains(
+										this.lowerCaseKeys[keyIndex]);
 
 						// 匹配内容
 						if (!keyResult) {
-							keyResult = ByteUtil.findStringIndexIgnoreCase(ele.getContent(),
-									CodeLib2Element.DefaultCharsetEncode, 0,
-									this.keys[keyIndex]) > -1;
+							keyResult = ByteUtil.findStringIndexIgnoreCase(ele.getContent(), 0,
+									this.upperKeysByteArray[keyIndex],
+									this.lowerKeysByteArray[keyIndex]) > -1;
 
 							// 匹配附件
 							if ((ele.getAttachments() != null) && !keyResult) {
@@ -115,7 +155,7 @@ public final class SearchEngine {
 										keyResult = ByteUtil.findStringIndexIgnoreCase(
 												ele.getContent(),
 												attachementEncode, 0,
-												this.keys[keyIndex]) > -1;
+												this.lowerCaseKeys[keyIndex]) > -1;
 
 										if (keyResult)
 											break;
@@ -137,6 +177,7 @@ public final class SearchEngine {
 			}
 
 			SearchEngine.this.onSearchTaskComplete(this);
+			System.gc();
 		}
 	}
 
@@ -144,6 +185,35 @@ public final class SearchEngine {
 	 * 允许的工作线程数.
 	 */
 	private static final int ThreadCount = Runtime.getRuntime().availableProcessors();
+
+	/**
+	 * 请求的任务队列.
+	 */
+	private final BlockingQueue<String> taskList = new LinkedBlockingQueue<>();
+
+	/**
+	 * 守护线程. 维护 taskList.
+	 */
+	private Thread taskScheduler = new Thread("SearchEngine TaskScheduler") {
+
+		public void run() {
+
+			String keyword, tempKey;
+
+			try {
+				while (true) {
+					keyword = taskList.take();
+
+					while ((tempKey = taskList.poll()) != null) {
+						keyword = tempKey;
+					}
+
+					search(keyword);
+				}
+			} catch (Exception e) {
+			}
+		};
+	};
 
 	/**
 	 * 搜索目标.<br/>
@@ -172,8 +242,21 @@ public final class SearchEngine {
 		if (targetLib == null || resultCatcher == null)
 			throw new IllegalArgumentException();
 
+		this.taskScheduler.setDaemon(true);
+		this.taskScheduler.start();
+
 		this.targetLib = targetLib;
 		this.resultCatcher = resultCatcher;
+	}
+
+	/**
+	 * 添加搜索任务. 不阻塞.
+	 * 
+	 * @param keyword
+	 */
+	public void addSearchTask(String keyword) {
+
+		this.taskList.add(keyword);
 	}
 
 	/**
@@ -181,23 +264,28 @@ public final class SearchEngine {
 	 * * 表示展示全部.
 	 * 
 	 * @param keyword
+	 * @throws Exception
+	 *                创建搜索任务失败.
 	 */
-	public void search(String keyword) {
+	private void search(String keyword) throws Exception {
 
 		this.stopCurrentSearch();
 
-		String[] keys = keyword.trim().toLowerCase().split("[\\s,]+");
-		if (keys == null || keyword.length() == 0 || keys.length == 0 || keys[0].length() == 0) {
+		String[] upperCaseKeys = keyword.trim().toUpperCase().split("[\\s,]+");
+		String[] lowerCaseKeys = keyword.trim().toLowerCase().split("[\\s,]+");
+		if (lowerCaseKeys == null || keyword.length() == 0 || lowerCaseKeys.length == 0
+				|| lowerCaseKeys[0].length() == 0) {
 			// throw new IllegalArgumentException("无效关键字: " + keyword);
 			this.resultCatcher.onSearchComplete(keyword);
 			return;
-		} else if (keys.length == 1 && "*".equals(keys[0])) {
-			keys[0] = "";
+		} else if (lowerCaseKeys.length == 1 && "*".equals(lowerCaseKeys[0])) {
+			upperCaseKeys[0] = "";
+			lowerCaseKeys[0] = "";
 		}
 
 		SearchTask task;
 		for (int i = 0; i < ThreadCount; i++) {
-			task = new SearchTask(keyword, keys);
+			task = new SearchTask(keyword, upperCaseKeys, lowerCaseKeys);
 			this.runningTasks.add(task);
 			task.start();
 		}
@@ -222,7 +310,7 @@ public final class SearchEngine {
 	 * 停止当前搜索.<br/>
 	 * 阻塞直到操作完成.
 	 */
-	public void stopCurrentSearch() {
+	private void stopCurrentSearch() {
 
 		SearchTask task;
 		while ((task = this.runningTasks.poll()) != null) {

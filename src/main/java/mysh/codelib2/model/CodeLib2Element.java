@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+import mysh.util.ByteUtil;
 import mysh.util.TextEncodeUtil;
 
 /**
@@ -21,7 +22,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	/**
 	 * 默认文本编码格式.
 	 */
-	public static final String DefaultCharsetEncode = "UTF-8";
+	public static final String DefaultCharsetEncode = ByteUtil.DefaultEncode;
 
 	/**
 	 * 附件.
@@ -54,11 +55,10 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			/**
 			 * 文本类型扩展名.
 			 */
-			private static List<String> textExt = Arrays.asList("as", "asp", "bat", "c",
-					"cpp", "cs", "css", "h", "html", "htm", "php", "pl", "ini",
-					"java", "js", "jsp", "log", "lua", "mx", "mxml", "pas",
-					"properties", "py", "sql", "sh", "txt", "vb", "vbs", "xml",
-					"xsd", "xsl");
+			private static List<String> textExt = Arrays.asList("as", "asp", "bat", "c", "cpp", "cs", "css",
+					"h", "html", "htm", "php", "pl", "ini", "java", "js", "jsp", "log", "lua", "mx",
+					"mxml", "pas", "properties", "py", "sql", "sh", "txt", "vb", "vbs", "xml", "xsd",
+					"xsl");
 
 			/**
 			 * 取文本编码类型. 若非文本, 返回 null.
@@ -175,12 +175,11 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 			this.contentType = ContentType.Binary;
 
-			if (this.binaryContent != null && this.binaryContent.length > 0
-					&& this.name != null && this.name.length() > 0) {
+			if (this.binaryContent != null && this.binaryContent.length > 0 && this.name != null
+					&& this.name.length() > 0) {
 				int pointPos = this.name.lastIndexOf('.');
 				if (pointPos > -1 && pointPos < this.name.length() - 1) {
-					String ext = this.name.substring(pointPos + 1,
-							this.name.length());
+					String ext = this.name.substring(pointPos + 1, this.name.length());
 
 					if (ContentType.textExt.contains(ext)) {
 						if (TextEncodeUtil.isUTF8Bytes(this.binaryContent)) {
@@ -354,6 +353,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	 * 内容.
 	 * 
 	 * @param content
+	 * @return
 	 */
 	public void setContent(byte[] content) {
 

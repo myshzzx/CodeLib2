@@ -104,17 +104,12 @@ public class CodeLib2Frame extends javax.swing.JFrame {
         /*
          * Create and display the form
          */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-
-            public void run() {
-       	     CodeLib2Frame frame = new CodeLib2Frame();
-       	     frame.setVisible(true);
-       	    
-       	     if(args.length>0){
-       		     frame.codeLib2Main.openFile(new File(args[0]));
-       	     }
-            }
-        });
+	 CodeLib2Frame frame = new CodeLib2Frame();
+	 frame.setVisible(true);
+	
+	 if(args.length>0){
+	      frame.codeLib2Main.openFile(new File(args[0]));
+	 }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
