@@ -70,6 +70,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         remove = new javax.swing.JButton();
         jSeparator2 = new javax.swing.JToolBar.Separator();
         export = new javax.swing.JButton();
+        copyToClipboard = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
         filterText = new javax.swing.JTextField();
@@ -165,6 +166,18 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jToolBar1.add(export);
 
+        copyToClipboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/copyToClipboard.png"))); // NOI18N
+        copyToClipboard.setToolTipText("复制到剪贴板");
+        copyToClipboard.setFocusable(false);
+        copyToClipboard.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        copyToClipboard.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        copyToClipboard.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyToClipboardActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(copyToClipboard);
+
         jSplitPane1.setDividerLocation(220);
         jSplitPane1.setDividerSize(7);
 
@@ -176,7 +189,6 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         resultList.setModel(new DefaultListModel<>());
         resultList.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
-        resultList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         resultList.setNextFocusableComponent(keyWordText);
         resultList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -306,10 +318,16 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private void resultListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_resultListValueChanged
         this.controllor.selectItem(this.resultList.getSelectedValue());
     }//GEN-LAST:event_resultListValueChanged
+
+    private void copyToClipboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyToClipboardActionPerformed
+        this.controllor.copyContentToClipboard();
+    }//GEN-LAST:event_copyToClipboardActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     javax.swing.JTable attachmentList;
     org.fife.ui.rsyntaxtextarea.RSyntaxTextArea codeText;
+    private javax.swing.JButton copyToClipboard;
     private javax.swing.JButton export;
     javax.swing.JTextField filterText;
     private javax.swing.JPanel jPanel1;

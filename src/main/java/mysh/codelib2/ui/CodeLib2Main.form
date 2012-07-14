@@ -148,6 +148,20 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="exportActionPerformed"/>
           </Events>
         </Component>
+        <Component class="javax.swing.JButton" name="copyToClipboard">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/mysh/codelib2/ui/icons/copyToClipboard.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="&#x590d;&#x5236;&#x5230;&#x526a;&#x8d34;&#x677f;"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="copyToClipboardActionPerformed"/>
+          </Events>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JSplitPane" name="jSplitPane1">
@@ -217,7 +231,6 @@
                     <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
                       <StringArray count="0"/>
                     </Property>
-                    <Property name="selectionMode" type="int" value="0"/>
                     <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
                       <ComponentRef name="keyWordText"/>
                     </Property>

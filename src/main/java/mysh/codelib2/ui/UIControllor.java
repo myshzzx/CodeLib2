@@ -1,6 +1,10 @@
 
 package mysh.codelib2.ui;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -176,12 +180,13 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		// 注册热键.
 		this.registHotKey();
 
-//		this.testData();
+		// this.testData();
 	}
 
 	/**
 	 * for test only.
 	 */
+	@SuppressWarnings("unused")
 	private void testData() {
 
 		Random r = new Random();
@@ -400,10 +405,20 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 */
 	void addItem() {
 
-		CodeLib2Element newEle = new CodeLib2Element();
+		final CodeLib2Element newEle = new CodeLib2Element();
 		this.eles.add(newEle);
-		this.onGetSearchResult(null, newEle);
-		this.ui.keyWordText.requestFocus();
+
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void run() {
+
+				((DefaultListModel<CodeLib2Element>) ui.resultList.getModel()).addElement(newEle);
+				ui.resultList.setSelectedValue(newEle, true);
+				ui.keyWordText.requestFocus();
+			}
+		});
 
 		this.saveState.changeState(State.MODIFIED);
 	}
@@ -414,15 +429,23 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	@SuppressWarnings("unchecked")
 	synchronized void removeItem() {
 
-		int selectedIndex = this.ui.resultList.getSelectedIndex();
-		if (selectedIndex > -1) {
-			CodeLib2Element selectedValue = (CodeLib2Element) this.ui.resultList.getSelectedValue();
+		final List<CodeLib2Element> selectedItems = (List<CodeLib2Element>) this.ui.resultList.getSelectedValuesList();
+		if (selectedItems.size() > 0) {
 
-			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui,
-					"删除确认:\n" + selectedValue.getKeywords(), AppTitle, JOptionPane.YES_NO_OPTION)) {
+			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui, "删除确认?", AppTitle,
+					JOptionPane.YES_NO_OPTION)) {
 
-				this.eles.remove(selectedValue);
-				((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).removeElementAt(selectedIndex);
+				this.eles.removeAll(selectedItems);
+
+				SwingUtilities.invokeLater(new Runnable() {
+
+					@Override
+					public void run() {
+
+						for (CodeLib2Element item : selectedItems)
+							((DefaultListModel<CodeLib2Element>) ui.resultList.getModel()).removeElement(item);
+					}
+				});
 
 				this.saveState.changeState(State.MODIFIED);
 			}
@@ -465,7 +488,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		this.currentItem = null;
 
-		if (selectedValue instanceof CodeLib2Element) {
+		if (selectedValue instanceof CodeLib2Element && this.ui.resultList.getSelectedIndices().length == 1) {
 
 			CodeLib2Element item = (CodeLib2Element) selectedValue;
 			this.ui.keyWordText.setText(item.getKeywords());
@@ -587,5 +610,15 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	boolean doClose() {
 
 		return this.checkForSave();
+	}
+
+	/**
+	 * 将内容编辑窗的内容复制到系统剪贴板.
+	 */
+	public void copyContentToClipboard() {
+
+		Clipboard sysclip = Toolkit.getDefaultToolkit().getSystemClipboard();
+		Transferable text = new StringSelection(this.ui.codeText.getText());
+		sysclip.setContents(text, null);
 	}
 }
