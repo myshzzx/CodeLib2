@@ -272,7 +272,7 @@
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="keyWordText" max="32767" attributes="0"/>
-                      <Component id="jScrollPane3" pref="760" max="32767" attributes="0"/>
+                      <Component id="rTextScrollPane" pref="760" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -280,7 +280,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="keyWordText" min="-2" pref="27" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane3" pref="366" max="32767" attributes="0"/>
+                          <Component id="rTextScrollPane" pref="366" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -292,7 +292,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Microsoft YaHei" size="12" style="0"/>
                     </Property>
-                    <Property name="toolTipText" type="java.lang.String" value="&#x9017;&#x53f7;&#x5206;&#x9694;&#x5173;&#x952e;&#x5b57;, &#x5982; java, GUI, tree, &#x8bed;&#x6cd5;&#x9ad8;&#x4eae;&#x5c06;&#x53c2;&#x8003;&#x7b2c;&#x4e00;&#x4e2a;&#x5173;&#x952e;&#x5b57;"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&#x9017;&#x53f7;&#x5206;&#x9694;&#x5173;&#x952e;&#x5b57;(&#x5c3d;&#x91cf;&#x5c0f;&#x5199;), &#x5982; java, GUI, tree, &#x8bed;&#x6cd5;&#x9ad8;&#x4eae;&#x5c06;&#x53c2;&#x8003;&#x7b2c;&#x4e00;&#x4e2a;&#x5173;&#x952e;&#x5b57;"/>
                     <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
                       <ComponentRef name="codeText"/>
                     </Property>
@@ -301,7 +301,7 @@
                     <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
                   </AuxValues>
                 </Component>
-                <Container class="javax.swing.JScrollPane" name="jScrollPane3">
+                <Container class="javax.swing.JScrollPane" name="rTextScrollPane">
                   <AuxValues>
                     <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
                   </AuxValues>
@@ -313,6 +313,7 @@
                         <Property name="columns" type="int" value="20"/>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="rows" type="int" value="5"/>
+                        <Property name="antiAliasingEnabled" type="boolean" value="true"/>
                         <Property name="codeFoldingEnabled" type="boolean" value="true"/>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                           <Font name="Microsoft YaHei" size="14" style="0"/>
@@ -321,11 +322,15 @@
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[4, 4, 4, 4]"/>
                         </Property>
+                        <Property name="markOccurrences" type="boolean" value="true"/>
                         <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
                           <ComponentRef name="attachmentList"/>
                         </Property>
+                        <Property name="paintMarkOccurrencesBorder" type="boolean" value="true"/>
+                        <Property name="paintTabLines" type="boolean" value="true"/>
                       </Properties>
                       <AuxValues>
+                        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="rTextScrollPane = new org.fife.ui.rtextarea.RTextScrollPane(codeText, true);&#xa;rTextScrollPane.setFont(new java.awt.Font(&quot;Microsoft YaHei&quot;, 0, 14)); // NOI18N"/>
                         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
                       </AuxValues>
                     </Component>

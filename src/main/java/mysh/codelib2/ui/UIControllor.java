@@ -35,6 +35,7 @@ import mysh.util.CompressUtil;
 import mysh.util.HotKeyUtil;
 
 import org.apache.log4j.Logger;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
 /**
  * UI 控制器. 控制UI行为及状态.
@@ -494,6 +495,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.ui.keyWordText.setText(item.getKeywords());
 			this.ui.keyWordText.setEditable(true);
 			try {
+				this.ui.codeText.setSyntaxEditingStyle(this.getSyntaxStyle(item.getFirstKeyword().toLowerCase()));
 				this.ui.codeText.setText(new String(item.getContent(), CodeLib2Element.DefaultCharsetEncode));
 				this.ui.codeText.setCaretPosition(0);
 				this.ui.codeText.setEditable(true);
@@ -512,6 +514,129 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	}
 
 	/**
+	 * 根据语法关键字取 RSyntaxTextArea 的语法样式.
+	 * 
+	 * @param syntaxKeyword
+	 *               语法关键字.
+	 * @return
+	 */
+	private String getSyntaxStyle(String syntaxKeyword) {
+
+		String result = SyntaxConstants.SYNTAX_STYLE_NONE;
+
+		switch (syntaxKeyword) {
+		case "actionscript":
+		case "as":
+			result = SyntaxConstants.SYNTAX_STYLE_ACTIONSCRIPT;
+			break;
+		case "asm":
+			result = SyntaxConstants.SYNTAX_STYLE_ASSEMBLER_X86;
+			break;
+		case "bat":
+			result = SyntaxConstants.SYNTAX_STYLE_WINDOWS_BATCH;
+			break;
+		case "bbcode":
+			result = SyntaxConstants.SYNTAX_STYLE_BBCODE;
+			break;
+		case "c":
+			result = SyntaxConstants.SYNTAX_STYLE_C;
+			break;
+		case "clj":
+		case "clojure":
+			result = SyntaxConstants.SYNTAX_STYLE_CLOJURE;
+			break;
+		case "cpp":
+		case "c++":
+			result = SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS;
+			break;
+		case "cs":
+		case "c#":
+			result = SyntaxConstants.SYNTAX_STYLE_CSHARP;
+			break;
+		case "css":
+			result = SyntaxConstants.SYNTAX_STYLE_CSS;
+			break;
+		case "delphi":
+		case "pas":
+		case "pascal":
+			result = SyntaxConstants.SYNTAX_STYLE_DELPHI;
+			break;
+		case "f":
+		case "for":
+		case "fortran":
+			result = SyntaxConstants.SYNTAX_STYLE_FORTRAN;
+			break;
+		case "groovy":
+		case "gsp":
+			result = SyntaxConstants.SYNTAX_STYLE_GROOVY;
+			break;
+		case "htm":
+		case "html":
+			result = SyntaxConstants.SYNTAX_STYLE_HTML;
+			break;
+		case "java":
+			result = SyntaxConstants.SYNTAX_STYLE_JAVA;
+			break;
+		case "javascript":
+		case "js":
+			result = SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT;
+			break;
+		case "jsp":
+			result = SyntaxConstants.SYNTAX_STYLE_JSP;
+			break;
+		case "lisp":
+			result = SyntaxConstants.SYNTAX_STYLE_LISP;
+			break;
+		case "lua":
+			result = SyntaxConstants.SYNTAX_STYLE_LUA;
+			break;
+		case "makefile":
+			result = SyntaxConstants.SYNTAX_STYLE_MAKEFILE;
+			break;
+		case "mxml":
+			result = SyntaxConstants.SYNTAX_STYLE_MXML;
+			break;
+		case "perl":
+			result = SyntaxConstants.SYNTAX_STYLE_PERL;
+			break;
+		case "php":
+			result = SyntaxConstants.SYNTAX_STYLE_PHP;
+			break;
+		case "properties":
+			result = SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE;
+			break;
+		case "py":
+		case "python":
+			result = SyntaxConstants.SYNTAX_STYLE_PYTHON;
+			break;
+		case "rb":
+		case "ruby":
+			result = SyntaxConstants.SYNTAX_STYLE_RUBY;
+			break;
+		case "sas":
+			result = SyntaxConstants.SYNTAX_STYLE_SAS;
+			break;
+		case "scala":
+			result = SyntaxConstants.SYNTAX_STYLE_SCALA;
+			break;
+		case "sh":
+			result = SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL;
+			break;
+		case "sql":
+			result = SyntaxConstants.SYNTAX_STYLE_SQL;
+			break;
+		case "tcl":
+			result = SyntaxConstants.SYNTAX_STYLE_TCL;
+			break;
+		case "xml":
+			result = SyntaxConstants.SYNTAX_STYLE_XML;
+			break;
+		}
+
+		return result;
+	}
+
+	/**
 	 * 保存当前编辑条目的关键字.
 	 */
 	private void saveCurrentItemKeywords() {
@@ -520,6 +645,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.saveState.changeState(State.MODIFIED);
 
 			this.currentItem.setKeywords(this.ui.keyWordText.getText());
+			this.ui.codeText.setSyntaxEditingStyle(this.getSyntaxStyle(this.currentItem.getFirstKeyword()));
 
 			this.refreshResultList();
 		}

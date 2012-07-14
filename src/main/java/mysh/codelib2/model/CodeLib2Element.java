@@ -317,6 +317,16 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	}
 
 	/**
+	 * 取第一个关键字.
+	 * 
+	 * @return
+	 */
+	public String getFirstKeyword() {
+
+		return this.keywords.split(",")[0];
+	}
+
+	/**
 	 * 附件.
 	 * 
 	 * @return

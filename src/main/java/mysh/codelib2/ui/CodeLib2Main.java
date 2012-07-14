@@ -79,7 +79,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
         keyWordText = new javax.swing.JTextField();
-        jScrollPane3 = new javax.swing.JScrollPane();
+        rTextScrollPane = new javax.swing.JScrollPane();
         codeText = new org.fife.ui.rsyntaxtextarea.RSyntaxTextArea();
         jScrollPane4 = new javax.swing.JScrollPane();
         attachmentList = new javax.swing.JTable();
@@ -220,32 +220,38 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         keyWordText.setEditable(false);
         keyWordText.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
-        keyWordText.setToolTipText("逗号分隔关键字, 如 java, GUI, tree, 语法高亮将参考第一个关键字");
+        keyWordText.setToolTipText("逗号分隔关键字(尽量小写), 如 java, GUI, tree, 语法高亮将参考第一个关键字");
         keyWordText.setNextFocusableComponent(codeText);
 
+        rTextScrollPane = new org.fife.ui.rtextarea.RTextScrollPane(codeText, true);
+        rTextScrollPane.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
         codeText.setColumns(20);
         codeText.setEditable(false);
         codeText.setRows(5);
+        codeText.setAntiAliasingEnabled(true);
         codeText.setCodeFoldingEnabled(true);
         codeText.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
         codeText.setFractionalFontMetricsEnabled(true);
         codeText.setMargin(new java.awt.Insets(4, 4, 4, 4));
+        codeText.setMarkOccurrences(true);
         codeText.setNextFocusableComponent(attachmentList);
-        jScrollPane3.setViewportView(codeText);
+        codeText.setPaintMarkOccurrencesBorder(true);
+        codeText.setPaintTabLines(true);
+        rTextScrollPane.setViewportView(codeText);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(keyWordText)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 760, Short.MAX_VALUE)
+            .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 760, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(keyWordText, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE))
+                .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE))
         );
 
         jSplitPane2.setTopComponent(jPanel2);
@@ -333,7 +339,6 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
@@ -343,6 +348,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     javax.swing.JTextField keyWordText;
     private javax.swing.JButton newInst;
     private javax.swing.JButton open;
+    private javax.swing.JScrollPane rTextScrollPane;
     private javax.swing.JButton remove;
     javax.swing.JList resultList;
     private javax.swing.JButton save;
