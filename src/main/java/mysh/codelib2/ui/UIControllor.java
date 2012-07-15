@@ -1,6 +1,7 @@
 
 package mysh.codelib2.ui;
 
+import java.awt.Desktop.Action;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -9,7 +10,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -636,6 +641,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			result = SyntaxConstants.SYNTAX_STYLE_TCL;
 			break;
 		case "xml":
+		case "xsd":
+		case "xsl":
 			result = SyntaxConstants.SYNTAX_STYLE_XML;
 			break;
 		}
@@ -772,5 +779,18 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	private void setStatusBarReady() {
 
 		this.ui.statusBar.setText("就绪.");
+	}
+
+	void urlClicked(URL url) {
+
+		java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+		if (desktop.isSupported(Action.BROWSE)) {
+			try {
+
+				this.setStatusBar(url.toString());
+				desktop.browse(url.toURI());
+			} catch (Exception e) {
+			}
+		}
 	}
 }

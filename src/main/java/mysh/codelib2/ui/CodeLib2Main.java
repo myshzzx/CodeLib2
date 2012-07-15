@@ -7,6 +7,7 @@ package mysh.codelib2.ui;
 import java.io.File;
 
 import javax.swing.DefaultListModel;
+import javax.swing.event.HyperlinkEvent;
 
 /**
  *
@@ -237,6 +238,11 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         codeText.setNextFocusableComponent(attachmentList);
         codeText.setPaintMarkOccurrencesBorder(true);
         codeText.setPaintTabLines(true);
+        codeText.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
+            public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
+                codeTextHyperlinkUpdate(evt);
+            }
+        });
         rTextScrollPane.setViewportView(codeText);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -329,6 +335,12 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         this.controllor.copyContentToClipboard();
     }//GEN-LAST:event_copyToClipboardActionPerformed
 
+    private void codeTextHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_codeTextHyperlinkUpdate
+
+        if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            this.controllor.urlClicked(evt.getURL());
+        }
+    }//GEN-LAST:event_codeTextHyperlinkUpdate
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     javax.swing.JTable attachmentList;

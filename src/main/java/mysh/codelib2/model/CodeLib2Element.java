@@ -55,10 +55,11 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			/**
 			 * 文本类型扩展名.
 			 */
-			private static List<String> textExt = Arrays.asList("as", "asp", "bat", "c", "cpp", "cs", "css",
-					"h", "html", "htm", "php", "pl", "ini", "java", "js", "jsp", "log", "lua", "mx",
-					"mxml", "pas", "properties", "py", "sql", "sh", "txt", "vb", "vbs", "xml", "xsd",
-					"xsl");
+			private static List<String> textExt = Arrays.asList("as", "asm", "asp", "bat", "bbcode", "c",
+					"clj", "clojure", "cpp", "cs", "css", "f", "for", "fortran", "groovy", "gsp", "h",
+					"htm", "html", "ini", "java", "js", "jsp", "lisp", "log", "lua", "mx", "mxml",
+					"pas", "php", "pl", "properties", "py", "rb", "ruby", "sas", "scala", "sh", "sql",
+					"tcl", "txt", "vb", "vbs", "xml", "xsd", "xsl");
 
 			/**
 			 * 取文本编码类型. 若非文本, 返回 null.
