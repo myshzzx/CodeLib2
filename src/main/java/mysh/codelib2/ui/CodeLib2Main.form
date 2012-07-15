@@ -3,6 +3,9 @@
 <Form version="1.8" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
     <Component class="javax.swing.JFileChooser" name="zcl2Chooser">
+      <Properties>
+        <Property name="dialogTitle" type="java.lang.String" value="zcl2 &#x6587;&#x4ef6;"/>
+      </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="zcl2Chooser.setFileFilter(new FileFilter() {&#xa;&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;&#xa;                if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {&#xa;                    return true;&#xa;                }&#xa;                return false;&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;&#xa;                return &quot;*.zcl2 - zzx codelib2 &#x6587;&#x4ef6;&quot;;&#xa;            }&#xa;        });"/>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
@@ -16,6 +19,15 @@
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="// &#x5bfc;&#x51fa;&#x9009;&#x4e2d;&#x7684;&#x8282;&#x70b9;.&#xa;        exportChooser.addChoosableFileFilter(new FileFilter() {&#xa;&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;&#xa;                if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {&#xa;                    return true;&#xa;                }&#xa;                return false;&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;&#xa;                return &quot;.zcl2&quot;;&#xa;            }&#xa;        });&#xa;&#xa;// &#x5bfc;&#x51fa;&#x4e3a;&#x7f51;&#x9875;&#xa;        exportChooser.addChoosableFileFilter(new FileFilter() {&#xa;&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;&#xa;                if (f.isDirectory() || f.getName().toLowerCase().endsWith(&quot;.html&quot;)) {&#xa;                    return true;&#xa;                }&#xa;                return false;&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;&#xa;                return &quot;.html&quot;;&#xa;            }&#xa;        });"/>
+        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JFileChooser" name="attachmentChooser">
+      <Properties>
+        <Property name="dialogTitle" type="java.lang.String" value="&#x9644;&#x4ef6;"/>
+        <Property name="multiSelectionEnabled" type="boolean" value="true"/>
+      </Properties>
+      <AuxValues>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
       </AuxValues>
     </Component>
@@ -402,6 +414,7 @@
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/mysh/codelib2/ui/icons/sAdd.png"/>
                             </Property>
+                            <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x5165;&#x9644;&#x4ef6;"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="horizontalTextPosition" type="int" value="0"/>
                             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -415,6 +428,7 @@
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/mysh/codelib2/ui/icons/sRemove.png"/>
                             </Property>
+                            <Property name="toolTipText" type="java.lang.String" value="&#x79fb;&#x9664;&#x9644;&#x4ef6;"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="horizontalTextPosition" type="int" value="0"/>
                             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -428,6 +442,7 @@
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/mysh/codelib2/ui/icons/sExport.png"/>
                             </Property>
+                            <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x51fa;&#x9644;&#x4ef6;"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="horizontalTextPosition" type="int" value="0"/>
                             <Property name="verticalTextPosition" type="int" value="3"/>

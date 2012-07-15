@@ -65,6 +65,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         zcl2Chooser = new javax.swing.JFileChooser();
         exportChooser = new javax.swing.JFileChooser();
+        attachmentChooser = new javax.swing.JFileChooser();
         jToolBar1 = new javax.swing.JToolBar();
         newInst = new javax.swing.JButton();
         open = new javax.swing.JButton();
@@ -95,6 +96,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         attachmentList = new javax.swing.JTable();
         statusBar = new javax.swing.JLabel();
 
+        zcl2Chooser.setDialogTitle("zcl2 文件");
         zcl2Chooser.setFileFilter(new FileFilter() {
 
             @Override
@@ -153,6 +155,9 @@ public final class CodeLib2Main extends javax.swing.JPanel {
                 return ".html";
             }
         });
+
+        attachmentChooser.setDialogTitle("附件");
+        attachmentChooser.setMultiSelectionEnabled(true);
 
         setFont(getFont());
 
@@ -341,6 +346,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolbar2.setRollover(true);
 
         addAttachment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/sAdd.png"))); // NOI18N
+        addAttachment.setToolTipText("导入附件");
         addAttachment.setFocusable(false);
         addAttachment.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         addAttachment.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -352,6 +358,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolbar2.add(addAttachment);
 
         removeAttachment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/sRemove.png"))); // NOI18N
+        removeAttachment.setToolTipText("移除附件");
         removeAttachment.setFocusable(false);
         removeAttachment.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         removeAttachment.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -363,6 +370,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolbar2.add(removeAttachment);
 
         exportAttachment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/sExport.png"))); // NOI18N
+        exportAttachment.setToolTipText("导出附件");
         exportAttachment.setFocusable(false);
         exportAttachment.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         exportAttachment.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -473,6 +481,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     private javax.swing.JButton addAttachment;
+    javax.swing.JFileChooser attachmentChooser;
     javax.swing.JTable attachmentList;
     private javax.swing.JPanel attachmentToolPanel;
     org.fife.ui.rsyntaxtextarea.RSyntaxTextArea codeText;

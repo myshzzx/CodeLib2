@@ -767,6 +767,10 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	void addAttachment() {
 
+		if (JFileChooser.APPROVE_OPTION == this.ui.attachmentChooser.showOpenDialog(this.ui)) {
+			this.ui.attachmentChooser.getSelectedFiles();
+		}
+
 	}
 
 	void removeAttachment() {
@@ -775,5 +779,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	void exportAttachment() {
 
+		File file = UIUtil.getSaveFileWithOverwriteChecking(this.ui.attachmentChooser, this.ui, null);
 	}
 }
