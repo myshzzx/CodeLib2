@@ -10,10 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,19 +48,6 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 public class UIControllor implements StateObserver, ResultCatcher {
 
 	private static final Logger log = Logger.getLogger(CompressUtil.class);
-
-	/**
-	 * 刷新结果列表任务.
-	 */
-	private final Runnable refreshResultListTask = new Runnable() {
-
-		@Override
-		public void run() {
-
-			Thread.yield();
-			UIControllor.this.ui.resultList.repaint();
-		}
-	};
 
 	/**
 	 * 应用名.
@@ -199,9 +183,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		int length = 100_000;
 
-		String dic = "abcdefghijklmnopqrstuvwxyz{}[],.;:'/?()*&^%$#@!1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		String dic = "abcdefghijklmnopqrstuvwxyz{}[].;:'/?()*&^%$#@!1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		char[] dicKeywords = dic.toCharArray();
-		byte[] dicContent = (dic + "\r\n").getBytes();
+		byte[] dicContent = (dic + ",\r\n").getBytes();
 		CodeLib2Element ele;
 		for (int i = 0; i < length; i++) {
 			ele = new CodeLib2Element();
@@ -273,7 +257,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 */
 	void newInst() {
 
-		if (this.checkForSave()) {
+		if (checkForSave()) {
 			this.saveState.changeState(State.NEW);
 			this.ui.filterText.setText("");
 			this.filter("");
@@ -415,22 +399,15 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 新增条目.
 	 */
+	@SuppressWarnings("unchecked")
 	void addItem() {
 
 		final CodeLib2Element newEle = new CodeLib2Element();
 		this.eles.add(newEle);
 
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public void run() {
-
-				((DefaultListModel<CodeLib2Element>) ui.resultList.getModel()).addElement(newEle);
-				ui.resultList.setSelectedValue(newEle, true);
-				ui.keyWordText.requestFocus();
-			}
-		});
+		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(newEle);
+		this.ui.resultList.setSelectedValue(newEle, true);
+		this.ui.keyWordText.requestFocus();
 
 		this.saveState.changeState(State.MODIFIED);
 	}
@@ -449,15 +426,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 				this.eles.removeAll(selectedItems);
 
-				SwingUtilities.invokeLater(new Runnable() {
-
-					@Override
-					public void run() {
-
-						for (CodeLib2Element item : selectedItems)
-							((DefaultListModel<CodeLib2Element>) ui.resultList.getModel()).removeElement(item);
-					}
-				});
+				for (CodeLib2Element item : selectedItems)
+					((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).removeElement(item);
 
 				this.saveState.changeState(State.MODIFIED);
 			}
@@ -485,7 +455,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		try {
 			this.currentKeyword = text;
 			this.searchEnging.addSearchTask(text);
-			this.setStatusBar("正在搜索 [ " + text + " ] ...");
+
+			if (this.currentKeyword.split("[\\s,]+").length > 0)
+				this.setStatusBar("正在搜索 [ " + text + " ] ...");
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "创建搜索任务失败.\n关键字: [" + text + "]\n错误:\n" + e, AppTitle,
 					JOptionPane.ERROR_MESSAGE);
@@ -497,7 +469,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 
 	 * @param selectedValue
 	 */
-	synchronized void selectItem(Object selectedValue) {
+	synchronized void selectItem(final Object selectedValue) {
 
 		this.currentItem = null;
 
@@ -507,7 +479,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.ui.keyWordText.setText(item.getKeywords());
 			this.ui.keyWordText.setEditable(true);
 			try {
-				this.ui.codeText.setSyntaxEditingStyle(this.getSyntaxStyle(item.getFirstKeyword().toLowerCase()));
+				this.ui.codeText.setSyntaxEditingStyle(getSyntaxStyle(item.getFirstKeyword().toLowerCase()));
 				this.ui.codeText.setText(new String(item.getContent(), CodeLib2Element.DefaultCharsetEncode));
 				this.ui.codeText.setCaretPosition(0);
 				this.ui.codeText.setEditable(true);
@@ -605,6 +577,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		case "makefile":
 			result = SyntaxConstants.SYNTAX_STYLE_MAKEFILE;
 			break;
+		case "mx":
 		case "mxml":
 			result = SyntaxConstants.SYNTAX_STYLE_MXML;
 			break;
@@ -632,6 +605,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			result = SyntaxConstants.SYNTAX_STYLE_SCALA;
 			break;
 		case "sh":
+		case "shell":
 			result = SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL;
 			break;
 		case "sql":
@@ -661,16 +635,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.currentItem.setKeywords(this.ui.keyWordText.getText());
 			this.ui.codeText.setSyntaxEditingStyle(this.getSyntaxStyle(this.currentItem.getFirstKeyword()));
 
-			this.refreshResultList();
+			this.ui.resultList.repaint();
 		}
-	}
-
-	/**
-	 * 刷新结果列表.
-	 */
-	private void refreshResultList() {
-
-		SwingUtilities.invokeLater(this.refreshResultListTask);
 	}
 
 	/**
@@ -739,8 +705,21 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	@Override
 	public void onSearchComplete(String keyword) {
 
-		this.refreshResultList();
-		this.setStatusBarReady();
+		// update status bar
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+
+				ui.resultList.repaint();
+
+				if (currentKeyword.split("[\\s,]+").length > 0)
+					setStatusBar("搜索 [" + currentKeyword + "] 完成, 共 "
+							+ ui.resultList.getModel().getSize() + " 个结果.");
+				else
+					setStatusBarReady();
+			}
+		});
 	}
 
 	/**
@@ -781,13 +760,17 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		this.ui.statusBar.setText("就绪.");
 	}
 
+	/**
+	 * 代码编辑窗口的 url 点击事件.
+	 * 
+	 * @param url
+	 */
 	void urlClicked(URL url) {
 
 		java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
 		if (desktop.isSupported(Action.BROWSE)) {
 			try {
 
-				this.setStatusBar(url.toString());
 				desktop.browse(url.toURI());
 			} catch (Exception e) {
 			}
