@@ -35,6 +35,7 @@ import mysh.codelib2.ui.SaveStateManager.State;
 import mysh.codelib2.ui.SaveStateManager.StateObserver;
 import mysh.util.CompressUtil;
 import mysh.util.HotKeyUtil;
+import mysh.util.UIUtil;
 
 import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -87,11 +88,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	private volatile CodeLib2Element currentItem;
 
 	/**
-	 * 文件选择器.
+	 * 文件扩展名.
 	 */
-	private JFileChooser fileChooser = this.getFileChooser();
-
-	private static final String Extention = ".zcl2";
+	static final String Extention = ".zcl2";
 
 	public UIControllor(CodeLib2Main ui) {
 
@@ -291,9 +290,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		if (this.checkForSave()) {
 
-			this.fileChooser.setDialogTitle("打开");
-			if (this.fileChooser.showOpenDialog(this.ui) == JFileChooser.APPROVE_OPTION) {
-				File openFile = this.fileChooser.getSelectedFile();
+			// this.fileChooser.setDialogTitle("打开");
+			if (this.ui.zcl2Chooser.showOpenDialog(this.ui) == JFileChooser.APPROVE_OPTION) {
+				File openFile = this.ui.zcl2Chooser.getSelectedFile();
 				this.openFile(openFile);
 			}
 		}
@@ -321,7 +320,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.ui.filterText.setText("");
 			this.filter("");
 
-			this.fileChooser.setCurrentDirectory(openFile.getParentFile());
+			this.ui.zcl2Chooser.setCurrentDirectory(openFile.getParentFile());
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "打开文件失败.\n" + e.getMessage(), UIControllor.AppTitle,
 					JOptionPane.ERROR_MESSAGE);
@@ -332,53 +331,24 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	}
 
 	/**
-	 * 取文件选择器.
-	 * 
-	 * @return
-	 */
-	private JFileChooser getFileChooser() {
-
-		JFileChooser filec = new JFileChooser();
-		filec.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		filec.setMultiSelectionEnabled(false);
-		filec.setDialogTitle("选个文件吧");
-		filec.setFileFilter(new FileFilter() {
-
-			@Override
-			public boolean accept(File f) {
-
-				if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {
-					return true;
-				}
-				return false;
-			}
-
-			@Override
-			public String getDescription() {
-
-				return "*.zcl2 - zzx codelib2 文件";
-			}
-		});
-		return filec;
-	}
-
-	/**
 	 * 保存.
 	 */
 	void save() {
 
 		File saveFile = this.file;
 
-		this.fileChooser.setDialogTitle("保存");
 		if (saveFile == null) {
-			if (this.fileChooser.showOpenDialog(this.ui) == JFileChooser.APPROVE_OPTION) {
-				saveFile = this.fileChooser.getSelectedFile();
-				if (!saveFile.getName().endsWith(UIControllor.Extention)) {
-					saveFile = new File(saveFile.getAbsolutePath() + UIControllor.Extention);
-				}
-			} else {
+			saveFile = UIUtil.getSaveFileWithOverwriteChecking(this.ui.zcl2Chooser, this.ui,
+					new UIUtil.FileExtentionGetter() {
+
+						@Override
+						public String getFileExtention() {
+
+							return UIControllor.Extention;
+						}
+					});
+			if (saveFile == null)
 				return;
-			}
 		}
 
 		try {
@@ -437,8 +407,26 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 导出.
 	 */
+	@SuppressWarnings("unchecked")
 	void export() {
 
+		List<CodeLib2Element> selectedItems;
+		if ((selectedItems = this.ui.resultList.getSelectedValuesList()).size() > 0) {
+			File exportFile = UIUtil.getSaveFileWithOverwriteChecking(this.ui.exportChooser, this.ui,
+					new UIUtil.FileExtentionGetter() {
+
+						@Override
+						public String getFileExtention() {
+
+							String ext = ui.exportChooser.getFileFilter().getDescription();
+							if (!ext.startsWith("."))
+								ext = "";
+							return ext;
+						}
+					});
+			FileFilter filter = this.ui.exportChooser.getFileFilter();
+			filter.getDescription();
+		}
 	}
 
 	/**
@@ -775,5 +763,17 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			} catch (Exception e) {
 			}
 		}
+	}
+
+	void addAttachment() {
+
+	}
+
+	void removeAttachment() {
+
+	}
+
+	void exportAttachment() {
+
 	}
 }

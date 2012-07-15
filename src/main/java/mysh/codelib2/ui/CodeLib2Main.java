@@ -8,7 +8,7 @@ import java.io.File;
 
 import javax.swing.DefaultListModel;
 import javax.swing.event.HyperlinkEvent;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -63,6 +63,8 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        zcl2Chooser = new javax.swing.JFileChooser();
+        exportChooser = new javax.swing.JFileChooser();
         jToolBar1 = new javax.swing.JToolBar();
         newInst = new javax.swing.JButton();
         open = new javax.swing.JButton();
@@ -84,10 +86,73 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         rTextScrollPane = new javax.swing.JScrollPane();
         codeText = new org.fife.ui.rsyntaxtextarea.RSyntaxTextArea();
         jSplitPane3 = new javax.swing.JSplitPane();
-        jPanel3 = new javax.swing.JPanel();
+        attachmentToolPanel = new javax.swing.JPanel();
+        jToolbar2 = new javax.swing.JToolBar();
+        addAttachment = new javax.swing.JButton();
+        removeAttachment = new javax.swing.JButton();
+        exportAttachment = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         attachmentList = new javax.swing.JTable();
         statusBar = new javax.swing.JLabel();
+
+        zcl2Chooser.setFileFilter(new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+
+                if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public String getDescription() {
+
+                return "*.zcl2 - zzx codelib2 文件";
+            }
+        });
+
+        exportChooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+        exportChooser.setApproveButtonText("导出");
+        exportChooser.setDialogTitle("导出");
+        // 导出选中的节点.
+        exportChooser.addChoosableFileFilter(new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+
+                if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public String getDescription() {
+
+                return ".zcl2";
+            }
+        });
+
+        // 导出为网页
+        exportChooser.addChoosableFileFilter(new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+
+                if (f.isDirectory() || f.getName().toLowerCase().endsWith(".html")) {
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public String getDescription() {
+
+                return ".html";
+            }
+        });
 
         setFont(getFont());
 
@@ -183,7 +248,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolBar1.add(copyToClipboard);
 
         jSplitPane1.setDividerLocation(250);
-        jSplitPane1.setDividerSize(7);
+        jSplitPane1.setDividerSize(4);
 
         jPanel1.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
 
@@ -253,30 +318,64 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(keyWordText)
-            .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 730, Short.MAX_VALUE)
+            .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 733, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(keyWordText, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE))
+                .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE))
         );
 
         jSplitPane2.setTopComponent(jPanel2);
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 148, Short.MAX_VALUE)
-        );
+        jSplitPane3.setDividerLocation(33);
+        jSplitPane3.setDividerSize(0);
+        jSplitPane3.setEnabled(false);
 
-        jSplitPane3.setLeftComponent(jPanel3);
+        attachmentToolPanel.setLayout(new java.awt.BorderLayout());
+
+        jToolbar2.setFloatable(false);
+        jToolbar2.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jToolbar2.setRollover(true);
+
+        addAttachment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/sAdd.png"))); // NOI18N
+        addAttachment.setFocusable(false);
+        addAttachment.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        addAttachment.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        addAttachment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addAttachmentActionPerformed(evt);
+            }
+        });
+        jToolbar2.add(addAttachment);
+
+        removeAttachment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/sRemove.png"))); // NOI18N
+        removeAttachment.setFocusable(false);
+        removeAttachment.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        removeAttachment.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        removeAttachment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeAttachmentActionPerformed(evt);
+            }
+        });
+        jToolbar2.add(removeAttachment);
+
+        exportAttachment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/sExport.png"))); // NOI18N
+        exportAttachment.setFocusable(false);
+        exportAttachment.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        exportAttachment.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        exportAttachment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportAttachmentActionPerformed(evt);
+            }
+        });
+        jToolbar2.add(exportAttachment);
+
+        attachmentToolPanel.add(jToolbar2, java.awt.BorderLayout.NORTH);
+
+        jSplitPane3.setLeftComponent(attachmentToolPanel);
 
         attachmentList.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
         attachmentList.setModel(new javax.swing.table.DefaultTableModel(
@@ -359,16 +458,31 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             this.controllor.urlClicked(evt.getURL());
         }
     }//GEN-LAST:event_codeTextHyperlinkUpdate
+
+    private void addAttachmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addAttachmentActionPerformed
+        this.controllor.addAttachment();
+    }//GEN-LAST:event_addAttachmentActionPerformed
+
+    private void removeAttachmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeAttachmentActionPerformed
+        this.controllor.removeAttachment();
+    }//GEN-LAST:event_removeAttachmentActionPerformed
+
+    private void exportAttachmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportAttachmentActionPerformed
+        this.controllor.exportAttachment();
+    }//GEN-LAST:event_exportAttachmentActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
+    private javax.swing.JButton addAttachment;
     javax.swing.JTable attachmentList;
+    private javax.swing.JPanel attachmentToolPanel;
     org.fife.ui.rsyntaxtextarea.RSyntaxTextArea codeText;
     private javax.swing.JButton copyToClipboard;
     private javax.swing.JButton export;
+    private javax.swing.JButton exportAttachment;
+    javax.swing.JFileChooser exportChooser;
     javax.swing.JTextField filterText;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JToolBar.Separator jSeparator1;
@@ -377,14 +491,17 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JSplitPane jSplitPane3;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JToolBar jToolbar2;
     javax.swing.JTextField keyWordText;
     private javax.swing.JButton newInst;
     private javax.swing.JButton open;
     private javax.swing.JScrollPane rTextScrollPane;
     private javax.swing.JButton remove;
+    private javax.swing.JButton removeAttachment;
     javax.swing.JList resultList;
     private javax.swing.JButton save;
     javax.swing.JLabel statusBar;
+    javax.swing.JFileChooser zcl2Chooser;
     // End of variables declaration//GEN-END:variables
     private UIControllor controllor;
     private AppTitltSetter appTitltSetter;
