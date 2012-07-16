@@ -735,7 +735,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 
 	 * @param statusText
 	 */
-	private void setStatusBar(String statusText) {
+	void setStatusBar(String statusText) {
 
 		this.ui.statusBar.setText(statusText);
 	}
@@ -743,7 +743,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 重置状态栏.
 	 */
-	private void setStatusBarReady() {
+	void setStatusBarReady() {
 
 		this.ui.statusBar.setText("就绪.");
 	}
@@ -767,8 +767,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	void addAttachment() {
 
-		if (JFileChooser.APPROVE_OPTION == this.ui.attachmentChooser.showOpenDialog(this.ui)) {
-			this.ui.attachmentChooser.getSelectedFiles();
+		if (JFileChooser.APPROVE_OPTION == this.ui.attachmentImportChooser.showOpenDialog(this.ui)) {
+			this.ui.attachmentImportChooser.getSelectedFiles();
 		}
 
 	}
@@ -779,6 +779,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	void exportAttachment() {
 
-		File file = UIUtil.getSaveFileWithOverwriteChecking(this.ui.attachmentChooser, this.ui, null);
+		File file = UIUtil.getSaveFileWithOverwriteChecking(this.ui.attachmentImportChooser, this.ui, null);
 	}
 }

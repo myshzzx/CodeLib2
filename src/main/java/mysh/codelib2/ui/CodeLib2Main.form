@@ -15,21 +15,30 @@
       <Properties>
         <Property name="dialogType" type="int" value="1"/>
         <Property name="approveButtonText" type="java.lang.String" value="&#x5bfc;&#x51fa;"/>
-        <Property name="dialogTitle" type="java.lang.String" value="&#x5bfc;&#x51fa;"/>
+        <Property name="dialogTitle" type="java.lang.String" value="&#x5bfc;&#x51fa;&#x6210;&#x4ec0;&#x4e48;&#x5462;?"/>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="// &#x5bfc;&#x51fa;&#x9009;&#x4e2d;&#x7684;&#x8282;&#x70b9;.&#xa;        exportChooser.addChoosableFileFilter(new FileFilter() {&#xa;&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;&#xa;                if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {&#xa;                    return true;&#xa;                }&#xa;                return false;&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;&#xa;                return &quot;.zcl2&quot;;&#xa;            }&#xa;        });&#xa;&#xa;// &#x5bfc;&#x51fa;&#x4e3a;&#x7f51;&#x9875;&#xa;        exportChooser.addChoosableFileFilter(new FileFilter() {&#xa;&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;&#xa;                if (f.isDirectory() || f.getName().toLowerCase().endsWith(&quot;.html&quot;)) {&#xa;                    return true;&#xa;                }&#xa;                return false;&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;&#xa;                return &quot;.html&quot;;&#xa;            }&#xa;        });"/>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
       </AuxValues>
     </Component>
-    <Component class="javax.swing.JFileChooser" name="attachmentChooser">
+    <Component class="javax.swing.JFileChooser" name="attachmentImportChooser">
       <Properties>
-        <Property name="dialogTitle" type="java.lang.String" value="&#x9644;&#x4ef6;"/>
+        <Property name="approveButtonText" type="java.lang.String" value="&#x5bfc;&#x5165;"/>
+        <Property name="dialogTitle" type="java.lang.String" value="&#x5bfc;&#x5165;&#x9644;&#x4ef6;"/>
         <Property name="multiSelectionEnabled" type="boolean" value="true"/>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
       </AuxValues>
+    </Component>
+    <Component class="javax.swing.JFileChooser" name="attachmentExportChooser">
+      <Properties>
+        <Property name="dialogType" type="int" value="1"/>
+        <Property name="approveButtonText" type="java.lang.String" value="&#x5bfc;&#x51fa;"/>
+        <Property name="dialogTitle" type="java.lang.String" value="&#x5bfc;&#x51fa;&#x9644;&#x4ef6;"/>
+        <Property name="fileSelectionMode" type="int" value="1"/>
+      </Properties>
     </Component>
   </NonVisualComponents>
   <Properties>
@@ -94,6 +103,8 @@
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="newInstMouseEntered"/>
+            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="newInstMouseExited"/>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="newInstActionPerformed"/>
           </Events>
         </Component>
@@ -113,6 +124,8 @@
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="openMouseEntered"/>
+            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="openMouseExited"/>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openActionPerformed"/>
           </Events>
         </Component>
@@ -130,6 +143,8 @@
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="saveMouseEntered"/>
+            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="saveMouseExited"/>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="saveActionPerformed"/>
           </Events>
         </Component>
@@ -140,12 +155,14 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/mysh/codelib2/ui/icons/add.png"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" value="&#x65b0;&#x589e;"/>
+            <Property name="toolTipText" type="java.lang.String" value="&#x65b0;&#x589e;&#x6761;&#x76ee;"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="addMouseEntered"/>
+            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="addMouseExited"/>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addActionPerformed"/>
           </Events>
         </Component>
@@ -154,12 +171,14 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/mysh/codelib2/ui/icons/remove.png"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" value="&#x79fb;&#x9664;"/>
+            <Property name="toolTipText" type="java.lang.String" value="&#x79fb;&#x9664;&#x6761;&#x76ee;"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="removeMouseEntered"/>
+            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="removeMouseExited"/>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="removeActionPerformed"/>
           </Events>
         </Component>
@@ -170,12 +189,14 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/mysh/codelib2/ui/icons/export.png"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x51fa;"/>
+            <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x51fa;&#x9009;&#x4e2d;&#x7684;&#x6761;&#x76ee;"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="exportMouseEntered"/>
+            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="exportMouseExited"/>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="exportActionPerformed"/>
           </Events>
         </Component>
@@ -190,6 +211,8 @@
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="copyToClipboardMouseEntered"/>
+            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="copyToClipboardMouseExited"/>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="copyToClipboardActionPerformed"/>
           </Events>
         </Component>
@@ -243,6 +266,10 @@
                   <ComponentRef name="resultList"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="filterTextMouseEntered"/>
+                <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="filterTextMouseExited"/>
+              </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
               </AuxValues>
@@ -328,6 +355,10 @@
                       <ComponentRef name="codeText"/>
                     </Property>
                   </Properties>
+                  <Events>
+                    <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="keyWordTextMouseEntered"/>
+                    <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="keyWordTextMouseExited"/>
+                  </Events>
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
                   </AuxValues>
@@ -361,6 +392,8 @@
                         <Property name="paintTabLines" type="boolean" value="true"/>
                       </Properties>
                       <Events>
+                        <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="codeTextMouseEntered"/>
+                        <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="codeTextMouseExited"/>
                         <EventHandler event="hyperlinkUpdate" listener="javax.swing.event.HyperlinkListener" parameters="javax.swing.event.HyperlinkEvent" handler="codeTextHyperlinkUpdate"/>
                       </Events>
                       <AuxValues>
@@ -420,6 +453,8 @@
                             <Property name="verticalTextPosition" type="int" value="3"/>
                           </Properties>
                           <Events>
+                            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="addAttachmentMouseEntered"/>
+                            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="addAttachmentMouseExited"/>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addAttachmentActionPerformed"/>
                           </Events>
                         </Component>
@@ -434,6 +469,8 @@
                             <Property name="verticalTextPosition" type="int" value="3"/>
                           </Properties>
                           <Events>
+                            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="removeAttachmentMouseEntered"/>
+                            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="removeAttachmentMouseExited"/>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="removeAttachmentActionPerformed"/>
                           </Events>
                         </Component>
@@ -448,6 +485,8 @@
                             <Property name="verticalTextPosition" type="int" value="3"/>
                           </Properties>
                           <Events>
+                            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="exportAttachmentMouseEntered"/>
+                            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="exportAttachmentMouseExited"/>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="exportAttachmentActionPerformed"/>
                           </Events>
                         </Component>
@@ -478,6 +517,7 @@
                             <Column editable="true" title="Size" type="java.lang.Object"/>
                           </Table>
                         </Property>
+                        <Property name="toolTipText" type="java.lang.String" value="&#x9644;&#x4ef6;&#x5217;&#x8868;, &#x6587;&#x672c;&#x9644;&#x4ef6;&#x5c06;&#x88ab;&#x7eb3;&#x5165;&#x641c;&#x7d22;&#x8fc7;&#x6ee4;&#x8303;&#x56f4;. &#x9644;&#x4ef6;&#x4e0d;&#x80fd;&#x88ab;&#x7f16;&#x8f91;, &#x4ee5;&#x4fdd;&#x8bc1;&#x5185;&#x5bb9;&#x539f;&#x59cb;&#x6027;."/>
                         <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                           <TableColumnModel selectionModel="0">
                             <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
@@ -496,6 +536,10 @@
                           <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
                         </Property>
                       </Properties>
+                      <Events>
+                        <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="attachmentListMouseEntered"/>
+                        <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="attachmentListMouseExited"/>
+                      </Events>
                       <AuxValues>
                         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
                       </AuxValues>

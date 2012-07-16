@@ -65,7 +65,8 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         zcl2Chooser = new javax.swing.JFileChooser();
         exportChooser = new javax.swing.JFileChooser();
-        attachmentChooser = new javax.swing.JFileChooser();
+        attachmentImportChooser = new javax.swing.JFileChooser();
+        attachmentExportChooser = new javax.swing.JFileChooser();
         jToolBar1 = new javax.swing.JToolBar();
         newInst = new javax.swing.JButton();
         open = new javax.swing.JButton();
@@ -117,7 +118,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         exportChooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
         exportChooser.setApproveButtonText("导出");
-        exportChooser.setDialogTitle("导出");
+        exportChooser.setDialogTitle("导出成什么呢?");
         // 导出选中的节点.
         exportChooser.addChoosableFileFilter(new FileFilter() {
 
@@ -156,8 +157,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             }
         });
 
-        attachmentChooser.setDialogTitle("附件");
-        attachmentChooser.setMultiSelectionEnabled(true);
+        attachmentImportChooser.setApproveButtonText("导入");
+        attachmentImportChooser.setDialogTitle("导入附件");
+        attachmentImportChooser.setMultiSelectionEnabled(true);
+
+        attachmentExportChooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+        attachmentExportChooser.setApproveButtonText("导出");
+        attachmentExportChooser.setDialogTitle("导出附件");
+        attachmentExportChooser.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
 
         setFont(getFont());
 
@@ -169,6 +176,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         newInst.setFocusable(false);
         newInst.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         newInst.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        newInst.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                newInstMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                newInstMouseExited(evt);
+            }
+        });
         newInst.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newInstActionPerformed(evt);
@@ -182,6 +197,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         open.setFocusable(false);
         open.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         open.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        open.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                openMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                openMouseExited(evt);
+            }
+        });
         open.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 openActionPerformed(evt);
@@ -195,6 +218,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         save.setFocusable(false);
         save.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         save.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        save.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                saveMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                saveMouseExited(evt);
+            }
+        });
         save.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveActionPerformed(evt);
@@ -204,10 +235,18 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolBar1.add(jSeparator1);
 
         add.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/add.png"))); // NOI18N
-        add.setToolTipText("新增");
+        add.setToolTipText("新增条目");
         add.setFocusable(false);
         add.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         add.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        add.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                addMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                addMouseExited(evt);
+            }
+        });
         add.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addActionPerformed(evt);
@@ -216,10 +255,18 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolBar1.add(add);
 
         remove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/remove.png"))); // NOI18N
-        remove.setToolTipText("移除");
+        remove.setToolTipText("移除条目");
         remove.setFocusable(false);
         remove.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         remove.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        remove.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                removeMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                removeMouseExited(evt);
+            }
+        });
         remove.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeActionPerformed(evt);
@@ -229,10 +276,18 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolBar1.add(jSeparator2);
 
         export.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/export.png"))); // NOI18N
-        export.setToolTipText("导出");
+        export.setToolTipText("导出选中的条目");
         export.setFocusable(false);
         export.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         export.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        export.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                exportMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                exportMouseExited(evt);
+            }
+        });
         export.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportActionPerformed(evt);
@@ -245,6 +300,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         copyToClipboard.setFocusable(false);
         copyToClipboard.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         copyToClipboard.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        copyToClipboard.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                copyToClipboardMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                copyToClipboardMouseExited(evt);
+            }
+        });
         copyToClipboard.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 copyToClipboardActionPerformed(evt);
@@ -260,6 +323,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         filterText.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
         filterText.setToolTipText("空格或逗号分隔搜索关键字, * 展示全部, ESC 复位");
         filterText.setNextFocusableComponent(resultList);
+        filterText.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                filterTextMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                filterTextMouseExited(evt);
+            }
+        });
 
         resultList.setModel(new DefaultListModel<>());
         resultList.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
@@ -296,6 +367,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         keyWordText.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
         keyWordText.setToolTipText("逗号分隔关键字(尽量小写), 如 java, GUI, tree, 语法高亮将参考第一个关键字");
         keyWordText.setNextFocusableComponent(codeText);
+        keyWordText.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                keyWordTextMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                keyWordTextMouseExited(evt);
+            }
+        });
 
         rTextScrollPane = new org.fife.ui.rtextarea.RTextScrollPane(codeText, true);
         rTextScrollPane.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
@@ -311,6 +390,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         codeText.setNextFocusableComponent(attachmentList);
         codeText.setPaintMarkOccurrencesBorder(true);
         codeText.setPaintTabLines(true);
+        codeText.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                codeTextMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                codeTextMouseExited(evt);
+            }
+        });
         codeText.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
             public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
                 codeTextHyperlinkUpdate(evt);
@@ -350,6 +437,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         addAttachment.setFocusable(false);
         addAttachment.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         addAttachment.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        addAttachment.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                addAttachmentMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                addAttachmentMouseExited(evt);
+            }
+        });
         addAttachment.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addAttachmentActionPerformed(evt);
@@ -362,6 +457,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         removeAttachment.setFocusable(false);
         removeAttachment.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         removeAttachment.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        removeAttachment.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                removeAttachmentMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                removeAttachmentMouseExited(evt);
+            }
+        });
         removeAttachment.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeAttachmentActionPerformed(evt);
@@ -374,6 +477,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         exportAttachment.setFocusable(false);
         exportAttachment.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         exportAttachment.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        exportAttachment.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                exportAttachmentMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                exportAttachmentMouseExited(evt);
+            }
+        });
         exportAttachment.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportAttachmentActionPerformed(evt);
@@ -394,6 +505,15 @@ public final class CodeLib2Main extends javax.swing.JPanel {
                 "Name", "Size"
             }
         ));
+        attachmentList.setToolTipText("附件列表, 文本附件将被纳入搜索过滤范围. 附件不能被编辑, 以保证内容原始性.");
+        attachmentList.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                attachmentListMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                attachmentListMouseExited(evt);
+            }
+        });
         jScrollPane4.setViewportView(attachmentList);
 
         jSplitPane3.setRightComponent(jScrollPane4);
@@ -478,10 +598,123 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private void exportAttachmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportAttachmentActionPerformed
         this.controllor.exportAttachment();
     }//GEN-LAST:event_exportAttachmentActionPerformed
+
+    private void keyWordTextMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_keyWordTextMouseEntered
+        this.controllor.setStatusBar(this.keyWordText.getToolTipText());
+    }//GEN-LAST:event_keyWordTextMouseEntered
+
+    private void filterTextMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_filterTextMouseEntered
+        this.controllor.setStatusBar(this.filterText.getToolTipText());
+    }//GEN-LAST:event_filterTextMouseEntered
+
+    private void copyToClipboardMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_copyToClipboardMouseEntered
+        this.controllor.setStatusBar(this.copyToClipboard.getToolTipText());
+    }//GEN-LAST:event_copyToClipboardMouseEntered
+
+    private void keyWordTextMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_keyWordTextMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_keyWordTextMouseExited
+
+    private void filterTextMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_filterTextMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_filterTextMouseExited
+
+    private void copyToClipboardMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_copyToClipboardMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_copyToClipboardMouseExited
+
+    private void exportMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportMouseEntered
+        this.controllor.setStatusBar(this.export.getToolTipText());
+    }//GEN-LAST:event_exportMouseEntered
+
+    private void removeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_removeMouseEntered
+        this.controllor.setStatusBar(this.remove.getToolTipText());
+    }//GEN-LAST:event_removeMouseEntered
+
+    private void addMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addMouseEntered
+        this.controllor.setStatusBar(this.add.getToolTipText());
+    }//GEN-LAST:event_addMouseEntered
+
+    private void saveMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_saveMouseEntered
+        this.controllor.setStatusBar(this.save.getToolTipText());
+    }//GEN-LAST:event_saveMouseEntered
+
+    private void openMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_openMouseEntered
+        this.controllor.setStatusBar(this.open.getToolTipText());
+    }//GEN-LAST:event_openMouseEntered
+
+    private void newInstMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_newInstMouseEntered
+        this.controllor.setStatusBar(this.newInst.getToolTipText());
+    }//GEN-LAST:event_newInstMouseEntered
+
+    private void codeTextMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_codeTextMouseEntered
+        this.controllor.setStatusBar("eclipse 有哪些快捷键呢?");
+    }//GEN-LAST:event_codeTextMouseEntered
+
+    private void addAttachmentMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addAttachmentMouseEntered
+        this.controllor.setStatusBar(this.addAttachment.getToolTipText());
+    }//GEN-LAST:event_addAttachmentMouseEntered
+
+    private void removeAttachmentMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_removeAttachmentMouseEntered
+        this.controllor.setStatusBar(this.removeAttachment.getToolTipText());
+    }//GEN-LAST:event_removeAttachmentMouseEntered
+
+    private void exportAttachmentMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportAttachmentMouseEntered
+        this.controllor.setStatusBar(this.exportAttachment.getToolTipText());
+    }//GEN-LAST:event_exportAttachmentMouseEntered
+
+    private void newInstMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_newInstMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_newInstMouseExited
+
+    private void openMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_openMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_openMouseExited
+
+    private void saveMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_saveMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_saveMouseExited
+
+    private void addMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_addMouseExited
+
+    private void removeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_removeMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_removeMouseExited
+
+    private void exportMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_exportMouseExited
+
+    private void codeTextMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_codeTextMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_codeTextMouseExited
+
+    private void addAttachmentMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addAttachmentMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_addAttachmentMouseExited
+
+    private void removeAttachmentMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_removeAttachmentMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_removeAttachmentMouseExited
+
+    private void exportAttachmentMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportAttachmentMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_exportAttachmentMouseExited
+
+    private void attachmentListMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attachmentListMouseEntered
+        this.controllor.setStatusBar(this.attachmentList.getToolTipText());
+    }//GEN-LAST:event_attachmentListMouseEntered
+
+    private void attachmentListMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attachmentListMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_attachmentListMouseExited
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     private javax.swing.JButton addAttachment;
-    javax.swing.JFileChooser attachmentChooser;
+    private javax.swing.JFileChooser attachmentExportChooser;
+    javax.swing.JFileChooser attachmentImportChooser;
     javax.swing.JTable attachmentList;
     private javax.swing.JPanel attachmentToolPanel;
     org.fife.ui.rsyntaxtextarea.RSyntaxTextArea codeText;
