@@ -429,10 +429,10 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					});
 
 			try {
-				ExportEngine.export(exportFile.getPath(), selectedItems);
+				if (exportFile != null)
+					ExportEngine.export(exportFile.getPath(), selectedItems);
 			} catch (Exception e) {
-				JOptionPane.showMessageDialog(this.ui, "导出失败.\n" + e.getMessage(), AppTitle,
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this.ui, "导出失败.\n" + e, AppTitle, JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
