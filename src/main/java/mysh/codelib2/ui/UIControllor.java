@@ -25,15 +25,18 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileFilter;
+import javax.swing.table.DefaultTableModel;
 
 import mysh.codelib2.model.CodeLib2Element;
+import mysh.codelib2.model.CodeLib2Element.Attachment;
 import mysh.codelib2.model.DataHeader;
+import mysh.codelib2.model.ExportEngine;
 import mysh.codelib2.model.SearchEngine;
 import mysh.codelib2.model.SearchEngine.ResultCatcher;
 import mysh.codelib2.ui.SaveStateManager.State;
 import mysh.codelib2.ui.SaveStateManager.StateObserver;
 import mysh.util.CompressUtil;
+import mysh.util.FileUtil;
 import mysh.util.HotKeyUtil;
 import mysh.util.UIUtil;
 
@@ -424,8 +427,13 @@ public class UIControllor implements StateObserver, ResultCatcher {
 							return ext;
 						}
 					});
-			FileFilter filter = this.ui.exportChooser.getFileFilter();
-			filter.getDescription();
+
+			try {
+				ExportEngine.export(exportFile.getPath(), selectedItems);
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(this.ui, "导出失败.\n" + e.getMessage(), AppTitle,
+						JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 
@@ -438,7 +446,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	void filter(String text) {
 
 		this.ui.resultList.clearSelection();
-		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).removeAllElements();
+		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).clear();
+		this.clearAttachmentTable();
 
 		try {
 			this.currentKeyword = text;
@@ -476,12 +485,22 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				JOptionPane.showMessageDialog(this.ui, e.getMessage(), AppTitle, JOptionPane.ERROR_MESSAGE);
 			}
 
+			this.clearAttachmentTable();
+			if (item.getAttachments() != null) {
+				for (Attachment attachment : item.getAttachments()) {
+					((DefaultTableModel) this.ui.attachmentTable.getModel()).addRow(new Object[] {
+							attachment, attachment.getBinaryContent().length });
+				}
+			}
+			this.ui.attachmentTable.updateUI();
+
 			this.currentItem = item;
 		} else {
 			this.ui.keyWordText.setText("");
 			this.ui.keyWordText.setEditable(false);
 			this.ui.codeText.setText("");
 			this.ui.codeText.setEditable(false);
+			((DefaultTableModel) this.ui.attachmentTable.getModel()).getDataVector().removeAllElements();
 		}
 	}
 
@@ -621,7 +640,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.saveState.changeState(State.MODIFIED);
 
 			this.currentItem.setKeywords(this.ui.keyWordText.getText());
-			this.ui.codeText.setSyntaxEditingStyle(this.getSyntaxStyle(this.currentItem.getFirstKeyword()));
+			this.ui.codeText.setSyntaxEditingStyle(this.getSyntaxStyle(this.currentItem.getFirstKeyword().toLowerCase()));
 
 			this.ui.resultList.repaint();
 		}
@@ -765,20 +784,122 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		}
 	}
 
+	/**
+	 * 导入附件.
+	 */
 	void addAttachment() {
 
-		if (JFileChooser.APPROVE_OPTION == this.ui.attachmentImportChooser.showOpenDialog(this.ui)) {
-			this.ui.attachmentImportChooser.getSelectedFiles();
+		CodeLib2Element attachToItem = this.currentItem;
+		if (attachToItem != null
+				&& JFileChooser.APPROVE_OPTION == this.ui.attachmentImportChooser.showOpenDialog(this.ui)) {
+			File[] files = this.ui.attachmentImportChooser.getSelectedFiles();
+
+			final List<Attachment> attachments = new ArrayList<>();
+
+			for (File file : files) {
+				try {
+					if (file.length() > 1_000_000
+							&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
+									file.getName() + "\n文件超过1MB, 仍然导入?", AppTitle,
+									JOptionPane.YES_NO_OPTION)) {
+						continue;
+					}
+
+					attachments.add(new Attachment().setName(file.getName()).setBinaryContent(
+							FileUtil.readFileToByteArray(file.getAbsolutePath(), Integer.MAX_VALUE)));
+				} catch (Exception e) {
+					log.error("导入附件失败. " + file.getAbsolutePath(), e);
+					JOptionPane.showMessageDialog(this.ui, "导入附件失败.\n" + file.getName(), AppTitle,
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+
+			if (attachments.size() > 0) {
+				if (attachToItem.getAttachments() == null)
+					attachToItem.setAttachments(new ArrayList<Attachment>());
+
+				attachToItem.getAttachments().addAll(attachments);
+				Collections.sort(attachToItem.getAttachments());
+			}
+
+			if (attachToItem == this.currentItem)
+				this.addAttachmentToTable(attachments);
 		}
 
 	}
 
-	void removeAttachment() {
+	/**
+	 * 清空附件列表.
+	 */
+	private void clearAttachmentTable() {
 
+		((DefaultTableModel) this.ui.attachmentTable.getModel()).getDataVector().clear();
+		this.ui.attachmentTable.updateUI();
 	}
 
+	/**
+	 * 将 List<Attachment> 添加到附件列表.
+	 * 
+	 * @param attachments
+	 */
+	private void addAttachmentToTable(List<Attachment> attachments) {
+
+		DefaultTableModel dataModel = (DefaultTableModel) this.ui.attachmentTable.getModel();
+		for (Attachment attachment : attachments) {
+			dataModel.addRow(new Object[] { attachment, attachment.getBinaryContent().length });
+		}
+		this.ui.attachmentTable.updateUI();
+	}
+
+	/**
+	 * 移除选定的附件.
+	 */
+	void removeAttachment() {
+
+		int[] selectedRows = this.ui.attachmentTable.getSelectedRows();
+		if (selectedRows.length > 0) {
+			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui, "确认移除附件?", AppTitle,
+					JOptionPane.YES_NO_OPTION)) {
+				for (int i = selectedRows.length - 1; i > -1; i--) {
+					this.currentItem.getAttachments().remove(
+							this.ui.attachmentTable.getValueAt(selectedRows[i], 0));
+					((DefaultTableModel) this.ui.attachmentTable.getModel()).removeRow(selectedRows[i]);
+				}
+				this.ui.attachmentTable.updateUI();
+			}
+		}
+	}
+
+	/**
+	 * 导出附件.
+	 */
 	void exportAttachment() {
 
-		File file = UIUtil.getSaveFileWithOverwriteChecking(this.ui.attachmentImportChooser, this.ui, null);
+		int[] selectedRows = this.ui.attachmentTable.getSelectedRows();
+		Attachment attachment;
+		if (selectedRows.length > 0
+				&& JFileChooser.APPROVE_OPTION == this.ui.attachmentExportChooser.showSaveDialog(this.ui)) {
+			File dir = this.ui.attachmentExportChooser.getSelectedFile();
+			String filepath;
+			for (int row : selectedRows) {
+				if (dir != null && dir.isDirectory()) {
+					String dirPath = dir.getAbsolutePath();
+					attachment = (Attachment) this.ui.attachmentTable.getValueAt(row, 0);
+					filepath = dirPath + '/' + attachment.getName();
+
+					if (new File(filepath).exists()
+							&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
+									"是否覆盖文件?\n" + filepath, AppTitle,
+									JOptionPane.YES_NO_OPTION)) {
+						continue;
+					}
+
+					if (!FileUtil.writeFile(filepath, attachment.getBinaryContent())) {
+						JOptionPane.showMessageDialog(this.ui, "导出失败.\n" + attachment.getName(),
+								AppTitle, JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+		}
 	}
 }

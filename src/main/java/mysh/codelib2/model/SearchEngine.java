@@ -146,22 +146,25 @@ public final class SearchEngine {
 									this.upperKeysByteArray[keyIndex],
 									this.lowerKeysByteArray[keyIndex]) > -1;
 
-							// 匹配附件
-							if ((ele.getAttachments() != null) && !keyResult) {
-								String attachementEncode;
-								for (Attachment attachment : ele.getAttachments()) {
-									attachementEncode = attachment.getContentType().getTextEncode();
-									if (attachementEncode != null) {
-										keyResult = ByteUtil.findStringIndexIgnoreCase(
-												ele.getContent(),
-												attachementEncode, 0,
-												this.lowerCaseKeys[keyIndex]) > -1;
-
-										if (keyResult)
-											break;
-									}
-								}
-							}
+							// // 匹配附件
+							// if ((ele.getAttachments() != null) &&
+							// !keyResult) {
+							// String attachementEncode;
+							// for (Attachment attachment :
+							// ele.getAttachments()) {
+							// attachementEncode =
+							// attachment.getContentType().getTextEncode();
+							// if (attachementEncode != null) {
+							// keyResult = ByteUtil.findStringIndexIgnoreCase(
+							// ele.getContent(),
+							// attachementEncode, 0,
+							// this.lowerCaseKeys[keyIndex]) > -1;
+							//
+							// if (keyResult)
+							// break;
+							// }
+							// }
+							// }
 						}
 					}
 

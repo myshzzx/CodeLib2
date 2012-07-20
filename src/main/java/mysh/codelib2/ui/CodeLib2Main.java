@@ -9,6 +9,7 @@ import java.io.File;
 import javax.swing.DefaultListModel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -94,7 +95,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         removeAttachment = new javax.swing.JButton();
         exportAttachment = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
-        attachmentList = new javax.swing.JTable();
+        attachmentTable = new javax.swing.JTable();
         statusBar = new javax.swing.JLabel();
 
         zcl2Chooser.setDialogTitle("zcl2 文件");
@@ -387,7 +388,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         codeText.setFractionalFontMetricsEnabled(true);
         codeText.setMargin(new java.awt.Insets(4, 4, 4, 4));
         codeText.setMarkOccurrences(true);
-        codeText.setNextFocusableComponent(attachmentList);
+        codeText.setNextFocusableComponent(attachmentTable);
         codeText.setPaintMarkOccurrencesBorder(true);
         codeText.setPaintTabLines(true);
         codeText.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -496,25 +497,33 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         jSplitPane3.setLeftComponent(attachmentToolPanel);
 
-        attachmentList.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
-        attachmentList.setModel(new javax.swing.table.DefaultTableModel(
+        attachmentTable.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
+        attachmentTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
                 "Name", "Size"
             }
-        ));
-        attachmentList.setToolTipText("附件列表, 文本附件将被纳入搜索过滤范围. 附件不能被编辑, 以保证内容原始性.");
-        attachmentList.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                attachmentListMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                attachmentListMouseExited(evt);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
-        jScrollPane4.setViewportView(attachmentList);
+        attachmentTable.setToolTipText("附件列表.");
+        attachmentTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                attachmentTableMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                attachmentTableMouseExited(evt);
+            }
+        });
+        jScrollPane4.setViewportView(attachmentTable);
 
         jSplitPane3.setRightComponent(jScrollPane4);
 
@@ -703,19 +712,19 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         this.controllor.setStatusBarReady();
     }//GEN-LAST:event_exportAttachmentMouseExited
 
-    private void attachmentListMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attachmentListMouseEntered
-        this.controllor.setStatusBar(this.attachmentList.getToolTipText());
-    }//GEN-LAST:event_attachmentListMouseEntered
+    private void attachmentTableMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attachmentTableMouseEntered
+        this.controllor.setStatusBar(this.attachmentTable.getToolTipText());
+    }//GEN-LAST:event_attachmentTableMouseEntered
 
-    private void attachmentListMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attachmentListMouseExited
+    private void attachmentTableMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attachmentTableMouseExited
         this.controllor.setStatusBarReady();
-    }//GEN-LAST:event_attachmentListMouseExited
+    }//GEN-LAST:event_attachmentTableMouseExited
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     private javax.swing.JButton addAttachment;
-    private javax.swing.JFileChooser attachmentExportChooser;
+    javax.swing.JFileChooser attachmentExportChooser;
     javax.swing.JFileChooser attachmentImportChooser;
-    javax.swing.JTable attachmentList;
+    javax.swing.JTable attachmentTable;
     private javax.swing.JPanel attachmentToolPanel;
     org.fife.ui.rsyntaxtextarea.RSyntaxTextArea codeText;
     private javax.swing.JButton copyToClipboard;

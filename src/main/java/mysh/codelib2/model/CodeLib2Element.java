@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import mysh.util.ByteUtil;
-import mysh.util.TextEncodeUtil;
 
 /**
  * 代码库元素.<br/>
@@ -34,50 +33,51 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		private static final long serialVersionUID = -3905992950416299776L;
 
-		/**
-		 * 内容类型.
-		 * 
-		 * @author Allen
-		 * 
-		 */
-		public static enum ContentType {
-			/**
-			 * 二进制.
-			 */
-			Binary, /**
-			 * UTF8 文本.
-			 */
-			UTF8Text, /**
-			 * 非 UTF8 文本.
-			 */
-			NonUTF8Text;
-
-			/**
-			 * 文本类型扩展名.
-			 */
-			private static List<String> textExt = Arrays.asList("as", "asm", "asp", "bat", "bbcode", "c",
-					"clj", "clojure", "cpp", "cs", "css", "f", "for", "fortran", "groovy", "gsp", "h",
-					"htm", "html", "ini", "java", "js", "jsp", "lisp", "log", "lua", "mx", "mxml",
-					"pas", "php", "pl", "properties", "py", "rb", "ruby", "sas", "scala", "sh", "sql",
-					"tcl", "txt", "vb", "vbs", "xml", "xsd", "xsl");
-
-			/**
-			 * 取文本编码类型. 若非文本, 返回 null.
-			 * 
-			 * @return
-			 */
-			public String getTextEncode() {
-
-				switch (this) {
-				case UTF8Text:
-					return "UTF-8";
-				case NonUTF8Text:
-					return "GBK";
-				default:
-					return null;
-				}
-			}
-		}
+		// /**
+		// * 内容类型.
+		// *
+		// * @author Allen
+		// *
+		// */
+		// public static enum ContentType {
+		// /**
+		// * 二进制.
+		// */
+		// Binary, /**
+		// * UTF8 文本.
+		// */
+		// UTF8Text, /**
+		// * 非 UTF8 文本.
+		// */
+		// NonUTF8Text;
+		//
+		// /**
+		// * 支持的文本类型扩展名.
+		// */
+		// private static final List<String> textExt = Arrays.asList("as", "asm", "asp",
+		// "bat", "bbcode",
+		// "c", "clj", "clojure", "cpp", "cs", "css", "f", "for", "fortran", "groovy", "gsp",
+		// "h", "htm", "html", "ini", "java", "js", "jsp", "lisp", "log", "lua", "mx", "mxml",
+		// "pas", "php", "pl", "properties", "py", "rb", "ruby", "sas", "scala", "sh", "sql",
+		// "tcl", "txt", "vb", "vbs", "xml", "xsd", "xsl");
+		//
+		// /**
+		// * 取文本编码类型. 若非文本, 返回 null.
+		// *
+		// * @return
+		// */
+		// public String getTextEncode() {
+		//
+		// switch (this) {
+		// case UTF8Text:
+		// return "UTF-8";
+		// case NonUTF8Text:
+		// return "GBK";
+		// default:
+		// return null;
+		// }
+		// }
+		// }
 
 		/**
 		 * 附件名.
@@ -89,10 +89,10 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		 */
 		private byte[] binaryContent;
 
-		/**
-		 * 附件内容类型.
-		 */
-		private ContentType contentType = ContentType.Binary;
+		// /**
+		// * 附件内容类型.
+		// */
+		// private ContentType contentType = ContentType.Binary;
 
 		@Override
 		public boolean equals(Object obj) {
@@ -153,45 +153,47 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		 * 
 		 * @param name
 		 */
-		public void setName(String name) {
+		public Attachment setName(String name) {
 
 			this.name = name;
-			this.judgeContentType();
+			// this.judgeContentType();
+			return this;
 		}
 
-		/**
-		 * 内容类型.
-		 * 
-		 * @return
-		 */
-		public ContentType getContentType() {
-
-			return this.contentType;
-		}
-
-		/**
-		 * 判断内容类型.
-		 */
-		private void judgeContentType() {
-
-			this.contentType = ContentType.Binary;
-
-			if (this.binaryContent != null && this.binaryContent.length > 0 && this.name != null
-					&& this.name.length() > 0) {
-				int pointPos = this.name.lastIndexOf('.');
-				if (pointPos > -1 && pointPos < this.name.length() - 1) {
-					String ext = this.name.substring(pointPos + 1, this.name.length());
-
-					if (ContentType.textExt.contains(ext)) {
-						if (TextEncodeUtil.isUTF8Bytes(this.binaryContent)) {
-							this.contentType = ContentType.UTF8Text;
-						} else {
-							this.contentType = ContentType.NonUTF8Text;
-						}
-					}
-				}
-			}
-		}
+		// /**
+		// * 内容类型.
+		// *
+		// * @return
+		// */
+		// public ContentType getContentType() {
+		//
+		// return this.contentType;
+		// }
+		//
+		// /**
+		// * 判断内容类型.
+		// */
+		// private void judgeContentType() {
+		//
+		// this.contentType = ContentType.Binary;
+		//
+		// if (this.binaryContent != null && this.binaryContent.length > 0 && this.name !=
+		// null
+		// && this.name.length() > 0) {
+		// int pointPos = this.name.lastIndexOf('.');
+		// if (pointPos > -1 && pointPos < this.name.length() - 1) {
+		// String ext = this.name.substring(pointPos + 1, this.name.length());
+		//
+		// if (ContentType.textExt.contains(ext)) {
+		// if (TextEncodeUtil.isUTF8Bytes(this.binaryContent)) {
+		// this.contentType = ContentType.UTF8Text;
+		// } else {
+		// this.contentType = ContentType.NonUTF8Text;
+		// }
+		// }
+		// }
+		// }
+		// }
 
 		/**
 		 * 附件内容.
@@ -200,7 +202,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		 */
 		public byte[] getBinaryContent() {
 
-			return binaryContent;
+			return this.binaryContent == null ? new byte[0] : this.binaryContent;
 		}
 
 		/**
@@ -208,10 +210,11 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		 * 
 		 * @param binaryContent
 		 */
-		public void setBinaryContent(byte[] binaryContent) {
+		public Attachment setBinaryContent(byte[] binaryContent) {
 
 			this.binaryContent = binaryContent;
-			this.judgeContentType();
+			// this.judgeContentType();
+			return this;
 		}
 
 	}
@@ -244,7 +247,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 				return false;
 			}
 
-			flag &= Arrays.equals(this.content, e.content);
+			flag &= this.content == e.content || Arrays.equals(this.content, e.content);
 
 			return flag;
 		}
