@@ -2,6 +2,7 @@
 package mysh.codelib2.model;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.List;
 
 import mysh.util.FileUtil;
@@ -46,6 +47,8 @@ public class ExportEngine {
 	 */
 	public static void export(ExportInfo info, List<CodeLib2Element> eles) throws Exception {
 
+		Collections.sort(eles);
+
 		String extention = FileUtil.getFileExtention(info.filepath);
 
 		switch (extention) {
@@ -87,9 +90,9 @@ public class ExportEngine {
 		StringBuilder html = new StringBuilder();
 		html.append("<!DOCTYPE html><html><head><meta charset='");
 		html.append(CodeLib2Element.DefaultCharsetEncode);
-		html.append("' /><script>if (navigator.appName == 'Microsoft Internet Explorer') {	alert('警告: 使用 IE 浏览器可能无法正常显示此页面.') 	}</script><title>");
+		html.append("' /><script>if (navigator.appName == 'Microsoft Internet Explorer') {	alert('警告: 使用 IE 浏览器无法正常显示此页面.') 	}</script><title>");
 		html.append(info.title);
-		html.append("</title><style type='text/css'>#itemlist ul { 	list-style: none; 	margin: 0; 	padding: 0; 	font-family: Arial; 	font-size: 13px; } #itemlist li { 	cursor: pointer; 	margin: 1px 0px 1px 0px; 	background-color: #EDF2F8; 	border-style: solid; 	border-width: 1px; 	color: #376BAD; 	border-color: #EDF5FD; } #itemlist li div:hover { 	background-color: #BBCEE6; 	border-style: solid; 	border-width: 0px; } .hideDiv { 	visibility: hidden; }</style><script type='text/javascript'>function show(index, li) {	var keywords = document.getElementById('keywords');	keywords.value = li.textContent;		var text = document.getElementById('text');	var value = document.getElementById('i' + index).innerHTML;	text.innerHTML = value; 	}</script></head><body style='position: fixed; width: 100%; height: 100%;'><div	style='position: absolute; text-align: center; width: 100%; height: 15%;'><h1>");
+		html.append("</title><style type='text/css'>#itemlist ul { 	list-style: none; 	margin: 0; 	padding: 0; 	font-family: Arial; 	font-size: 13px; } #itemlist li { 	cursor: pointer; 	margin: 1px 0px 1px 0px; 	background-color: #EDF2F8; 	border-style: solid; 	border-width: 1px; 	color: #376BAD; 	border-color: #EDF5FD; } #itemlist li div:hover { 	background-color: #BBCEE6; 	border-style: solid; 	border-width: 0px; } .hideDiv { 	visibility: hidden; }</style><script type='text/javascript'>function show(index, li) {	var keywords = document.getElementById('keywords');	keywords.value = li.innerText;		var text = document.getElementById('text');	var value = document.getElementById('i' + index).innerHTML;	text.innerHTML = value; 	}</script></head><body style='position: fixed; width: 100%; height: 100%;'><div	style='position: absolute; text-align: center; width: 100%; height: 15%;'><h1>");
 		html.append(info.title);
 		html.append("</h1></div><div style='position: absolute; top: 15%; width: 100%; height: 85%;'><div id='itemlist' style='position: absolute; width: 30%; height: 95%; overflow-y: auto;'><ul>");
 
@@ -111,6 +114,7 @@ public class ExportEngine {
 			html.append("<div id='i");
 			html.append(itemIndex);
 			html.append("' class='hideDiv'>");
+
 			html.append(StringEscapeUtils.escapeHtml4(new String(ele.getContent(),
 					CodeLib2Element.DefaultCharsetEncode)));
 			html.append("</div>");
