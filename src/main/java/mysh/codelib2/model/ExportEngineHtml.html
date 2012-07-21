@@ -2,6 +2,11 @@
 <html>
 <head>
 <meta charset='UTF-8' />
+<script>
+	if (navigator.appName == 'Microsoft Internet Explorer') {
+		alert('警告: 使用 IE 浏览器可能无法正常显示此页面.')
+	}
+</script>
 <title>CodeLib2 - Sample</title>
 
 <style type='text/css'>
@@ -37,8 +42,8 @@
 <script type='text/javascript'>
 	function show(index, li) {
 		var keywords = document.getElementById('keywords');
-		keywords.value = li.outerText;
-		
+		keywords.value = li.textContent;
+
 		var text = document.getElementById('text');
 		var value = document.getElementById('i' + index).innerHTML;
 		text.innerHTML = value;
