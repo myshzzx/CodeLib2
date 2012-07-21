@@ -31,6 +31,7 @@ import mysh.codelib2.model.CodeLib2Element;
 import mysh.codelib2.model.CodeLib2Element.Attachment;
 import mysh.codelib2.model.DataHeader;
 import mysh.codelib2.model.ExportEngine;
+import mysh.codelib2.model.ExportEngine.ExportInfo;
 import mysh.codelib2.model.SearchEngine;
 import mysh.codelib2.model.SearchEngine.ResultCatcher;
 import mysh.codelib2.ui.SaveStateManager.State;
@@ -429,10 +430,24 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					});
 
 			try {
-				if (exportFile != null)
-					ExportEngine.export(exportFile.getPath(), selectedItems);
+				if (exportFile != null) {
+					ExportEngine.ExportInfo info = new ExportInfo();
+					
+					info.filepath = exportFile.getPath();
+					if (this.file == null) {
+						info.title = AppTitle + " - "
+								+ FileUtil.getFileNameWithoutExtention(info.filepath);
+					} else {
+						info.title = AppTitle + " - "
+								+ FileUtil.getFileNameWithoutExtention(this.file.getPath());
+					}
+					
+					ExportEngine.export(info, selectedItems);
+				}
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(this.ui, "导出失败.\n" + e, AppTitle, JOptionPane.ERROR_MESSAGE);
+			} finally {
+				System.gc();
 			}
 		}
 	}
