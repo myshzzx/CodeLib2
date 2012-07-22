@@ -528,13 +528,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         jSplitPane3.setLeftComponent(attachmentToolPanel);
 
+        attachmentTable.setAutoCreateRowSorter(true);
         attachmentTable.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
         attachmentTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Name", "Size"
+                "附件名", "附件大小(字节)"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -545,7 +546,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        attachmentTable.setToolTipText("附件列表.");
+        attachmentTable.setToolTipText("附件列表");
         attachmentTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 attachmentTableMouseEntered(evt);
@@ -555,6 +556,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             }
         });
         jScrollPane4.setViewportView(attachmentTable);
+        attachmentTable.getAccessibleContext().setAccessibleDescription("附件列表");
 
         jSplitPane3.setRightComponent(jScrollPane4);
 
@@ -563,7 +565,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jSplitPane1.setRightComponent(jSplitPane2);
 
         statusBar.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
-        statusBar.setText("就绪.");
+        statusBar.setText("就绪");
         statusBar.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         statusBar.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
 

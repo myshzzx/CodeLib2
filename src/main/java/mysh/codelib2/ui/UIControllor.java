@@ -779,7 +779,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 */
 	void setStatusBarReady() {
 
-		this.ui.statusBar.setText("就绪.");
+		this.ui.statusBar.setText("就绪");
 	}
 
 	/**
@@ -948,8 +948,10 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.setStatusBarReady();
 			System.gc();
 
-			if (successImportCount == files.length) {
+			if (successImportCount > 0)
 				this.saveState.changeState(State.MODIFIED);
+			
+			if (successImportCount == files.length) {
 				JOptionPane.showMessageDialog(this.ui, "导入成功: " + successImportCount + " 个文件", AppTitle,
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
