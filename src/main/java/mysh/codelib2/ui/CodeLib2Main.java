@@ -17,6 +17,26 @@ import javax.swing.table.DefaultTableModel;
  */
 public final class CodeLib2Main extends javax.swing.JPanel {
 
+    private UIControllor controllor;
+    private AppTitltSetter appTitltSetter;
+    private FileFilter zcl2Filter = new FileFilter() {
+
+        @Override
+        public boolean accept(File f) {
+
+            if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public String getDescription() {
+
+            return "*.zcl2 - zzx codelib2 文件";
+        }
+    };
+
     /**
      * 关闭前询问是否要关闭.
      *
@@ -64,10 +84,11 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        zcl2Chooser = new javax.swing.JFileChooser();
-        exportChooser = new javax.swing.JFileChooser();
+        zcl2OpenChooser = new javax.swing.JFileChooser();
+        itemExportChooser = new javax.swing.JFileChooser();
         attachmentImportChooser = new javax.swing.JFileChooser();
         attachmentExportChooser = new javax.swing.JFileChooser();
+        zcl2ImportChooser = new javax.swing.JFileChooser();
         jToolBar1 = new javax.swing.JToolBar();
         newInst = new javax.swing.JButton();
         open = new javax.swing.JButton();
@@ -76,6 +97,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         add = new javax.swing.JButton();
         remove = new javax.swing.JButton();
         jSeparator2 = new javax.swing.JToolBar.Separator();
+        importButton = new javax.swing.JButton();
         export = new javax.swing.JButton();
         copyToClipboard = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
@@ -98,30 +120,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         attachmentTable = new javax.swing.JTable();
         statusBar = new javax.swing.JLabel();
 
-        zcl2Chooser.setDialogTitle("zcl2 文件");
-        zcl2Chooser.setFileFilter(new FileFilter() {
+        zcl2OpenChooser.setDialogTitle("zcl2 文件");
+        zcl2OpenChooser.setFileFilter(this.zcl2Filter);
 
-            @Override
-            public boolean accept(File f) {
-
-                if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public String getDescription() {
-
-                return "*.zcl2 - zzx codelib2 文件";
-            }
-        });
-
-        exportChooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
-        exportChooser.setApproveButtonText("导出");
-        exportChooser.setDialogTitle("导出成什么呢?");
+        itemExportChooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+        itemExportChooser.setApproveButtonText("导出");
+        itemExportChooser.setDialogTitle("导出成什么呢?");
         // 导出选中的节点.
-        exportChooser.addChoosableFileFilter(new FileFilter() {
+        itemExportChooser.addChoosableFileFilter(new FileFilter() {
 
             @Override
             public boolean accept(File f) {
@@ -140,7 +146,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
 
         // 导出为网页
-        exportChooser.addChoosableFileFilter(new FileFilter() {
+        itemExportChooser.addChoosableFileFilter(new FileFilter() {
 
             @Override
             public boolean accept(File f) {
@@ -166,6 +172,11 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         attachmentExportChooser.setApproveButtonText("导出");
         attachmentExportChooser.setDialogTitle("导出附件");
         attachmentExportChooser.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
+
+        zcl2ImportChooser.setApproveButtonText("导入");
+        zcl2ImportChooser.setDialogTitle("选择 zcl2 文件(可多选)");
+        zcl2ImportChooser.setMultiSelectionEnabled(true);
+        zcl2ImportChooser.setFileFilter(this.zcl2Filter);
 
         setFont(getFont());
 
@@ -275,6 +286,26 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jToolBar1.add(remove);
         jToolBar1.add(jSeparator2);
+
+        importButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/import.png"))); // NOI18N
+        importButton.setToolTipText("导入 zcl2 文件");
+        importButton.setFocusable(false);
+        importButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        importButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        importButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                importButtonMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                importButtonMouseExited(evt);
+            }
+        });
+        importButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(importButton);
 
         export.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/export.png"))); // NOI18N
         export.setToolTipText("导出选中的条目");
@@ -719,6 +750,18 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private void attachmentTableMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attachmentTableMouseExited
         this.controllor.setStatusBarReady();
     }//GEN-LAST:event_attachmentTableMouseExited
+
+    private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
+        this.controllor.importZcl2();
+    }//GEN-LAST:event_importButtonActionPerformed
+
+    private void importButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_importButtonMouseEntered
+        this.controllor.setStatusBar(this.importButton.getToolTipText());
+    }//GEN-LAST:event_importButtonMouseEntered
+
+    private void importButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_importButtonMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_importButtonMouseExited
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     private javax.swing.JButton addAttachment;
@@ -730,8 +773,9 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private javax.swing.JButton copyToClipboard;
     private javax.swing.JButton export;
     private javax.swing.JButton exportAttachment;
-    javax.swing.JFileChooser exportChooser;
     javax.swing.JTextField filterText;
+    private javax.swing.JButton importButton;
+    javax.swing.JFileChooser itemExportChooser;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -752,8 +796,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     javax.swing.JList resultList;
     private javax.swing.JButton save;
     javax.swing.JLabel statusBar;
-    javax.swing.JFileChooser zcl2Chooser;
+    javax.swing.JFileChooser zcl2ImportChooser;
+    javax.swing.JFileChooser zcl2OpenChooser;
     // End of variables declaration//GEN-END:variables
-    private UIControllor controllor;
-    private AppTitltSetter appTitltSetter;
 }

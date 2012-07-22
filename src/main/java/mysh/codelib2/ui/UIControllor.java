@@ -295,8 +295,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		if (this.checkForSave()) {
 
 			// this.fileChooser.setDialogTitle("打开");
-			if (this.ui.zcl2Chooser.showOpenDialog(this.ui) == JFileChooser.APPROVE_OPTION) {
-				File openFile = this.ui.zcl2Chooser.getSelectedFile();
+			if (this.ui.zcl2OpenChooser.showOpenDialog(this.ui) == JFileChooser.APPROVE_OPTION) {
+				File openFile = this.ui.zcl2OpenChooser.getSelectedFile();
 				this.openFile(openFile);
 			}
 		}
@@ -324,7 +324,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.ui.filterText.setText("");
 			this.filter("");
 
-			this.ui.zcl2Chooser.setCurrentDirectory(openFile.getParentFile());
+			this.ui.zcl2OpenChooser.setCurrentDirectory(openFile.getParentFile());
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "打开文件失败.\n" + e.getMessage(), UIControllor.AppTitle,
 					JOptionPane.ERROR_MESSAGE);
@@ -342,7 +342,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		File saveFile = this.file;
 
 		if (saveFile == null) {
-			saveFile = UIUtil.getSaveFileWithOverwriteChecking(this.ui.zcl2Chooser, this.ui,
+			saveFile = UIUtil.getSaveFileWithOverwriteChecking(this.ui.zcl2OpenChooser, this.ui,
 					new UIUtil.FileExtentionGetter() {
 
 						@Override
@@ -416,13 +416,13 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		List<CodeLib2Element> selectedItems;
 		if ((selectedItems = this.ui.resultList.getSelectedValuesList()).size() > 0) {
-			File exportFile = UIUtil.getSaveFileWithOverwriteChecking(this.ui.exportChooser, this.ui,
+			File exportFile = UIUtil.getSaveFileWithOverwriteChecking(this.ui.itemExportChooser, this.ui,
 					new UIUtil.FileExtentionGetter() {
 
 						@Override
 						public String getFileExtention() {
 
-							String ext = ui.exportChooser.getFileFilter().getDescription();
+							String ext = ui.itemExportChooser.getFileFilter().getDescription();
 							if (!ext.startsWith("."))
 								ext = "";
 							return ext;
@@ -432,7 +432,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			try {
 				if (exportFile != null) {
 					ExportEngine.ExportInfo info = new ExportInfo();
-					
+
 					info.filepath = exportFile.getPath();
 					if (this.file == null) {
 						info.title = AppTitle + " - "
@@ -441,7 +441,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 						info.title = AppTitle + " - "
 								+ FileUtil.getFileNameWithoutExtention(this.file.getPath());
 					}
-					
+
 					ExportEngine.export(info, selectedItems);
 				}
 			} catch (Exception e) {
@@ -915,6 +915,49 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * 导入 zcl2 文件.
+	 */
+	@SuppressWarnings("unchecked")
+	public void importZcl2() {
+
+		if (JFileChooser.APPROVE_OPTION == this.ui.zcl2ImportChooser.showOpenDialog(this.ui)) {
+			File[] files = this.ui.zcl2ImportChooser.getSelectedFiles();
+			// 成功导入计数.
+			int successImportCount = 0;
+			Collection<CodeLib2Element> readItems;
+
+			this.setStatusBar("正在导入 ...");
+			for (File file : files) {
+				try {
+					readItems = DataHeader.readFromFile(file.getAbsolutePath());
+					this.eles.addAll(readItems);
+
+					for (CodeLib2Element ele : readItems)
+						((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(ele);
+
+					successImportCount++;
+				} catch (Exception e) {
+					log.error("导入 zcl2 文件失败: " + file.getAbsolutePath(), e);
+				}
+			}
+			Collections.sort(this.eles);
+			this.setStatusBarReady();
+			System.gc();
+
+			if (successImportCount == files.length) {
+				this.saveState.changeState(State.MODIFIED);
+				JOptionPane.showMessageDialog(this.ui, "导入成功: " + successImportCount + " 个文件", AppTitle,
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(this.ui, "导入成功: " + successImportCount + " 个文件\n导入失败: "
+						+ (files.length - successImportCount) + " 个文件\n失败详情查看日志", AppTitle,
+						JOptionPane.INFORMATION_MESSAGE);
+			}
+
 		}
 	}
 }

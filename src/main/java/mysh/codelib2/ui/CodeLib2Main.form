@@ -2,23 +2,23 @@
 
 <Form version="1.8" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
-    <Component class="javax.swing.JFileChooser" name="zcl2Chooser">
+    <Component class="javax.swing.JFileChooser" name="zcl2OpenChooser">
       <Properties>
         <Property name="dialogTitle" type="java.lang.String" value="zcl2 &#x6587;&#x4ef6;"/>
       </Properties>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="zcl2Chooser.setFileFilter(new FileFilter() {&#xa;&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;&#xa;                if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {&#xa;                    return true;&#xa;                }&#xa;                return false;&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;&#xa;                return &quot;*.zcl2 - zzx codelib2 &#x6587;&#x4ef6;&quot;;&#xa;            }&#xa;        });"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="zcl2OpenChooser.setFileFilter(this.zcl2Filter);"/>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
       </AuxValues>
     </Component>
-    <Component class="javax.swing.JFileChooser" name="exportChooser">
+    <Component class="javax.swing.JFileChooser" name="itemExportChooser">
       <Properties>
         <Property name="dialogType" type="int" value="1"/>
         <Property name="approveButtonText" type="java.lang.String" value="&#x5bfc;&#x51fa;"/>
         <Property name="dialogTitle" type="java.lang.String" value="&#x5bfc;&#x51fa;&#x6210;&#x4ec0;&#x4e48;&#x5462;?"/>
       </Properties>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="// &#x5bfc;&#x51fa;&#x9009;&#x4e2d;&#x7684;&#x8282;&#x70b9;.&#xa;        exportChooser.addChoosableFileFilter(new FileFilter() {&#xa;&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;&#xa;                if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {&#xa;                    return true;&#xa;                }&#xa;                return false;&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;&#xa;                return &quot;.zcl2&quot;;&#xa;            }&#xa;        });&#xa;&#xa;// &#x5bfc;&#x51fa;&#x4e3a;&#x7f51;&#x9875;&#xa;        exportChooser.addChoosableFileFilter(new FileFilter() {&#xa;&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;&#xa;                if (f.isDirectory() || f.getName().toLowerCase().endsWith(&quot;.html&quot;)) {&#xa;                    return true;&#xa;                }&#xa;                return false;&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;&#xa;                return &quot;.html&quot;;&#xa;            }&#xa;        });"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="// &#x5bfc;&#x51fa;&#x9009;&#x4e2d;&#x7684;&#x8282;&#x70b9;.&#xa;        itemExportChooser.addChoosableFileFilter(new FileFilter() {&#xa;&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;&#xa;                if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {&#xa;                    return true;&#xa;                }&#xa;                return false;&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;&#xa;                return &quot;.zcl2&quot;;&#xa;            }&#xa;        });&#xa;&#xa;// &#x5bfc;&#x51fa;&#x4e3a;&#x7f51;&#x9875;&#xa;        itemExportChooser.addChoosableFileFilter(new FileFilter() {&#xa;&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;&#xa;                if (f.isDirectory() || f.getName().toLowerCase().endsWith(&quot;.html&quot;)) {&#xa;                    return true;&#xa;                }&#xa;                return false;&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;&#xa;                return &quot;.html&quot;;&#xa;            }&#xa;        });"/>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
       </AuxValues>
     </Component>
@@ -40,6 +40,17 @@
         <Property name="fileSelectionMode" type="int" value="1"/>
       </Properties>
       <AuxValues>
+        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JFileChooser" name="zcl2ImportChooser">
+      <Properties>
+        <Property name="approveButtonText" type="java.lang.String" value="&#x5bfc;&#x5165;"/>
+        <Property name="dialogTitle" type="java.lang.String" value="&#x9009;&#x62e9; zcl2 &#x6587;&#x4ef6;(&#x53ef;&#x591a;&#x9009;)"/>
+        <Property name="multiSelectionEnabled" type="boolean" value="true"/>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="zcl2ImportChooser.setFileFilter(this.zcl2Filter);"/>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
       </AuxValues>
     </Component>
@@ -186,6 +197,22 @@
           </Events>
         </Component>
         <Component class="javax.swing.JToolBar$Separator" name="jSeparator2">
+        </Component>
+        <Component class="javax.swing.JButton" name="importButton">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/mysh/codelib2/ui/icons/import.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x5165; zcl2 &#x6587;&#x4ef6;"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="importButtonMouseEntered"/>
+            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="importButtonMouseExited"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="importButtonActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="export">
           <Properties>
