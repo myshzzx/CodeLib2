@@ -9,7 +9,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import mysh.annotation.ThreadSafe;
-import mysh.codelib2.model.CodeLib2Element.Attachment;
 import mysh.util.ByteUtil;
 
 import org.apache.log4j.Logger;
