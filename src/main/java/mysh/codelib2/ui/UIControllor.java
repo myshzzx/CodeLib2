@@ -491,7 +491,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.ui.keyWordText.setText(item.getKeywords());
 			this.ui.keyWordText.setEditable(true);
 			try {
-				this.ui.codeText.setSyntaxEditingStyle(getSyntaxStyle(item.getFirstKeyword().toLowerCase()));
+				this.ui.codeText.setSyntaxEditingStyle(this.getSyntaxStyle(item.getFirstKeyword().toLowerCase()));
 				this.ui.codeText.setText(new String(item.getContent(), CodeLib2Element.DefaultCharsetEncode));
 				this.ui.codeText.setCaretPosition(0);
 				this.ui.codeText.setEditable(true);
@@ -567,6 +567,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		case "pascal":
 			result = SyntaxConstants.SYNTAX_STYLE_DELPHI;
 			break;
+		case "dtd":
+			result = SyntaxConstants.SYNTAX_STYLE_DTD;
+			break;
 		case "f":
 		case "for":
 		case "fortran":
@@ -590,6 +593,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		case "jsp":
 			result = SyntaxConstants.SYNTAX_STYLE_JSP;
 			break;
+		case "latex":
+			result = SyntaxConstants.SYNTAX_STYLE_LATEX;
+			break;
 		case "lisp":
 			result = SyntaxConstants.SYNTAX_STYLE_LISP;
 			break;
@@ -603,7 +609,12 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		case "mxml":
 			result = SyntaxConstants.SYNTAX_STYLE_MXML;
 			break;
+		case "nsi":
+		case "nsis":
+			result = SyntaxConstants.SYNTAX_STYLE_NSIS;
+			break;
 		case "perl":
+		case "pl":
 			result = SyntaxConstants.SYNTAX_STYLE_PERL;
 			break;
 		case "php":
@@ -950,7 +961,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 			if (successImportCount > 0)
 				this.saveState.changeState(State.MODIFIED);
-			
+
 			if (successImportCount == files.length) {
 				JOptionPane.showMessageDialog(this.ui, "导入成功: " + successImportCount + " 个文件", AppTitle,
 						JOptionPane.INFORMATION_MESSAGE);
