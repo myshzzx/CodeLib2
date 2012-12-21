@@ -196,7 +196,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         zcl2ImportChooser.setMultiSelectionEnabled(true);
         zcl2ImportChooser.setFileFilter(this.zcl2Filter);
 
-        setFont(getFont());
+        setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
 
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
@@ -367,6 +367,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         jSplitPane1.setDividerLocation(330);
         jSplitPane1.setDividerSize(4);
+        jSplitPane1.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
 
         jPanel1.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
 
@@ -437,7 +438,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         codeText.setFractionalFontMetricsEnabled(true);
         codeText.setMargin(new java.awt.Insets(4, 4, 4, 4));
         codeText.setMarkOccurrences(true);
-        codeText.setNextFocusableComponent(attachmentTable);
+        codeText.setNextFocusableComponent(filterText);
         codeText.setPaintMarkOccurrencesBorder(true);
         codeText.setPaintTabLines(true);
         codeText.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -546,8 +547,10 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         jSplitPane3.setLeftComponent(attachmentToolPanel);
 
+        jScrollPane4.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
+
         attachmentTable.setAutoCreateRowSorter(true);
-        attachmentTable.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
+        attachmentTable.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
         attachmentTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -589,7 +592,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         findText.setLabel("搜索代码框(正则) (Ctrl + F)");
         findText.getDocument().addDocumentListener(this.findTextListener);
         findText.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
-        findText.setNextFocusableComponent(filterText);
+        findText.setNextFocusableComponent(keyWordText);
         findText.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 findTextActionPerformed(evt);
