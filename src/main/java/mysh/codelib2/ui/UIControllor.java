@@ -785,11 +785,15 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 				ui.resultList.repaint();
 
-				if (currentKeyword.split("[\\s,]+").length > 0)
+				if (currentKeyword.split("[\\s,]+").length > 0) {
 					setStatusBar("搜索 [" + currentKeyword + "] 完成, 共 "
 							+ ui.resultList.getModel().getSize() + " 个结果.");
-				else
+					if (ui.resultList.getModel().getSize() > 0) {
+						ui.resultList.setSelectedIndex(0);
+					}
+				} else {
 					setStatusBarReady();
+				}
 			}
 		});
 	}
