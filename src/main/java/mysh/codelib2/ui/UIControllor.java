@@ -1,6 +1,7 @@
 
 package mysh.codelib2.ui;
 
+import java.awt.Color;
 import java.awt.Desktop.Action;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -17,6 +18,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
@@ -43,6 +46,7 @@ import mysh.util.UIUtil;
 
 import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rtextarea.SearchContext;
 
 /**
  * UI 控制器. 控制UI行为及状态.
@@ -95,6 +99,11 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 文件扩展名.
 	 */
 	static final String Extention = ".zcl2";
+
+	/**
+	 * 代码框文本搜索.
+	 */
+	private SearchContext findContext = new SearchContext();
 
 	public UIControllor(CodeLib2Main ui) {
 
@@ -173,6 +182,12 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		// 注册热键.
 		this.registHotKey();
 
+		// 代码框文本搜索.
+		this.findContext.setMatchCase(false);
+		this.findContext.setRegularExpression(true);
+		this.findContext.setSearchForward(true);
+		this.findContext.setWholeWord(false);
+
 		// this.testData();
 	}
 
@@ -242,6 +257,19 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			}
 		});
 
+		// 注册 Ctrl+F 热键.
+		HotKeyUtil.registHotKey(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK, new AbstractAction("saveAction") {
+
+			private static final long serialVersionUID = -6294554898524200651L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				ui.findText.requestFocus();
+				ui.findText.selectAll();
+			}
+		});
+
 		// 注册 Ctrl+S 热键.
 		HotKeyUtil.registHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, new AbstractAction("saveAction") {
 
@@ -253,6 +281,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				save();
 			}
 		});
+
 	}
 
 	/**
@@ -322,6 +351,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 			this.saveState.changeState(State.SAVED);
 			this.ui.filterText.setText("");
+			this.ui.filterText.requestFocus();
 			this.filter("");
 
 			this.ui.zcl2OpenChooser.setCurrentDirectory(openFile.getParentFile());
@@ -495,6 +525,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				this.ui.codeText.setText(new String(item.getContent(), CodeLib2Element.DefaultCharsetEncode));
 				this.ui.codeText.setCaretPosition(0);
 				this.ui.codeText.setEditable(true);
+
+				this.findText();
 			} catch (UnsupportedEncodingException e) {
 				log.error("编码失败.", e);
 				JOptionPane.showMessageDialog(this.ui, e.getMessage(), AppTitle, JOptionPane.ERROR_MESSAGE);
@@ -736,13 +768,20 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	}
 
 	@Override
-	public void onSearchComplete(String keyword) {
+	public void onSearchComplete(final String keyword) {
 
 		// update status bar
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
 			public void run() {
+
+				String[] keywords = keyword.trim().split("[\\s,]+");
+				if (keywords.length > 0 && keywords[keywords.length - 1].trim().length() > 0) {
+					ui.findText.setText(keywords[keywords.length - 1].trim());
+				} else {
+					ui.findText.setText(null);
+				}
 
 				ui.resultList.repaint();
 
@@ -972,5 +1011,67 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			}
 
 		}
+	}
+
+	/**
+	 * 查找(代码框).
+	 */
+	private void findText() {
+
+		// if find nothing, set the find text to red
+		this.ui.findText.setForeground(Color.RED);
+
+		String text = this.ui.findText.getText().trim();
+		try {
+			Pattern.compile(text);
+		} catch (PatternSyntaxException e) {
+			text = "";
+		}
+
+		boolean findResult = false;
+		if (text.length() > 0) {
+			this.findContext.setSearchFor(text);
+
+			int oldCaretPosition = this.ui.codeText.getCaretPosition();
+			findResult = org.fife.ui.rtextarea.SearchEngine.find(this.ui.codeText, this.findContext);
+			if (!findResult) {
+				if (this.findContext.getSearchForward()) {
+					this.ui.codeText.setCaretPosition(0);
+				} else {
+					this.ui.codeText.setCaretPosition(this.ui.codeText.getText().length());
+				}
+				findResult = org.fife.ui.rtextarea.SearchEngine.find(this.ui.codeText, this.findContext);
+			}
+
+			if (findResult) {
+				this.ui.findText.setForeground(Color.BLACK);
+			} else {
+				this.ui.codeText.setCaretPosition(oldCaretPosition);
+			}
+
+		} else {
+			this.ui.codeText.getHighlighter().removeAllHighlights();
+		}
+
+		this.ui.findPreviousBtn.setEnabled(findResult);
+		this.ui.findNextBtn.setEnabled(findResult);
+	}
+
+	/**
+	 * 查找前一个.(代码框)
+	 */
+	void findPrevious() {
+
+		this.findContext.setSearchForward(false);
+		this.findText();
+	}
+
+	/**
+	 * 查找下一个.(代码框)
+	 */
+	void findNext() {
+
+		this.findContext.setSearchForward(true);
+		this.findText();
 	}
 }

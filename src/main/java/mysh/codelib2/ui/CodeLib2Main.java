@@ -7,9 +7,10 @@ package mysh.codelib2.ui;
 import java.io.File;
 
 import javax.swing.DefaultListModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -20,7 +21,6 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private UIControllor controllor;
     private AppTitltSetter appTitltSetter;
     private FileFilter zcl2Filter = new FileFilter() {
-
         @Override
         public boolean accept(File f) {
 
@@ -34,6 +34,21 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         public String getDescription() {
 
             return "*.zcl2 - zzx codelib2 文件";
+        }
+    };
+    private DocumentListener findTextListener = new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            controllor.findNext();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            controllor.findNext();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
         }
     };
 
@@ -119,6 +134,9 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jScrollPane4 = new javax.swing.JScrollPane();
         attachmentTable = new javax.swing.JTable();
         statusBar = new javax.swing.JLabel();
+        findText = new mysh.ui.JTextFieldWithTips();
+        findPreviousBtn = new javax.swing.JButton();
+        findNextBtn = new javax.swing.JButton();
 
         zcl2OpenChooser.setDialogTitle("zcl2 文件");
         zcl2OpenChooser.setFileFilter(this.zcl2Filter);
@@ -354,6 +372,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         filterText.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
         filterText.setToolTipText("空格或逗号分隔搜索关键字, * 展示全部, ESC 复位");
+        filterText.setFocusTraversalPolicyProvider(true);
         filterText.setNextFocusableComponent(resultList);
         filterText.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -366,7 +385,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         resultList.setModel(new DefaultListModel<>());
         resultList.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
-        resultList.setNextFocusableComponent(keyWordText);
+        resultList.setNextFocusableComponent(findText);
         resultList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 resultListValueChanged(evt);
@@ -410,10 +429,9 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         rTextScrollPane = new org.fife.ui.rtextarea.RTextScrollPane(codeText, true);
         rTextScrollPane.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
-        codeText.setColumns(20);
         codeText.setEditable(false);
+        codeText.setColumns(20);
         codeText.setRows(5);
-        codeText.setAntiAliasingEnabled(true);
         codeText.setCodeFoldingEnabled(true);
         codeText.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
         codeText.setFractionalFontMetricsEnabled(true);
@@ -556,7 +574,6 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             }
         });
         jScrollPane4.setViewportView(attachmentTable);
-        attachmentTable.getAccessibleContext().setAccessibleDescription("附件列表");
 
         jSplitPane3.setRightComponent(jScrollPane4);
 
@@ -569,20 +586,67 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         statusBar.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         statusBar.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
 
+        findText.setLabel("搜索代码框(正则) (Ctrl + F)");
+        findText.getDocument().addDocumentListener(this.findTextListener);
+        findText.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
+        findText.setNextFocusableComponent(filterText);
+        findText.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                findTextActionPerformed(evt);
+            }
+        });
+
+        findPreviousBtn.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
+        findPreviousBtn.setText("<");
+        findPreviousBtn.setToolTipText("查找上一个");
+        findPreviousBtn.setEnabled(false);
+        findPreviousBtn.setFocusable(false);
+        findPreviousBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                findPreviousBtnActionPerformed(evt);
+            }
+        });
+
+        findNextBtn.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
+        findNextBtn.setText(">");
+        findNextBtn.setToolTipText("查找下一个");
+        findNextBtn.setEnabled(false);
+        findNextBtn.setFocusable(false);
+        findNextBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                findNextBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jSplitPane1)
             .addGroup(layout.createSequentialGroup()
                 .addGap(10, 10, 10)
                 .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(findPreviousBtn)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(findNextBtn)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(findText, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(findText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(findPreviousBtn)
+                            .addComponent(findNextBtn))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -764,6 +828,19 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private void importButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_importButtonMouseExited
         this.controllor.setStatusBarReady();
     }//GEN-LAST:event_importButtonMouseExited
+
+    private void findTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findTextActionPerformed
+        this.controllor.findNext();
+    }//GEN-LAST:event_findTextActionPerformed
+
+    private void findPreviousBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findPreviousBtnActionPerformed
+        this.controllor.findPrevious();
+    }//GEN-LAST:event_findPreviousBtnActionPerformed
+
+    private void findNextBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findNextBtnActionPerformed
+        this.controllor.findNext();
+    }//GEN-LAST:event_findNextBtnActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     private javax.swing.JButton addAttachment;
@@ -776,6 +853,9 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private javax.swing.JButton export;
     private javax.swing.JButton exportAttachment;
     javax.swing.JTextField filterText;
+    javax.swing.JButton findNextBtn;
+    javax.swing.JButton findPreviousBtn;
+    mysh.ui.JTextFieldWithTips findText;
     private javax.swing.JButton importButton;
     javax.swing.JFileChooser itemExportChooser;
     private javax.swing.JPanel jPanel1;
