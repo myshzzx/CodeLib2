@@ -593,6 +593,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         findText.getDocument().addDocumentListener(this.findTextListener);
         findText.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
         findText.setNextFocusableComponent(keyWordText);
+        findText.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                findTextMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                findTextMouseExited(evt);
+            }
+        });
         findText.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 findTextActionPerformed(evt);
@@ -604,6 +612,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         findPreviousBtn.setToolTipText("查找上一个");
         findPreviousBtn.setEnabled(false);
         findPreviousBtn.setFocusable(false);
+        findPreviousBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                findPreviousBtnMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                findPreviousBtnMouseExited(evt);
+            }
+        });
         findPreviousBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 findPreviousBtnActionPerformed(evt);
@@ -615,6 +631,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         findNextBtn.setToolTipText("查找下一个");
         findNextBtn.setEnabled(false);
         findNextBtn.setFocusable(false);
+        findNextBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                findNextBtnMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                findNextBtnMouseExited(evt);
+            }
+        });
         findNextBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 findNextBtnActionPerformed(evt);
@@ -844,6 +868,29 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         this.controllor.findNext();
     }//GEN-LAST:event_findNextBtnActionPerformed
 
+    private void findPreviousBtnMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findPreviousBtnMouseEntered
+        this.controllor.setStatusBar(this.findPreviousBtn.getToolTipText());
+    }//GEN-LAST:event_findPreviousBtnMouseEntered
+
+    private void findNextBtnMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findNextBtnMouseEntered
+        this.controllor.setStatusBar(this.findNextBtn.getToolTipText());
+    }//GEN-LAST:event_findNextBtnMouseEntered
+
+    private void findTextMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findTextMouseEntered
+        this.controllor.setStatusBar(this.findText.getToolTipText());
+    }//GEN-LAST:event_findTextMouseEntered
+
+    private void findPreviousBtnMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findPreviousBtnMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_findPreviousBtnMouseExited
+
+    private void findNextBtnMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findNextBtnMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_findNextBtnMouseExited
+
+    private void findTextMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findTextMouseExited
+        this.controllor.setStatusBarReady();
+    }//GEN-LAST:event_findTextMouseExited
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     private javax.swing.JButton addAttachment;
