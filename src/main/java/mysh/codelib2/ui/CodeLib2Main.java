@@ -430,6 +430,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         rTextScrollPane = new org.fife.ui.rtextarea.RTextScrollPane(codeText, true);
         rTextScrollPane.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
+        codeText.setLineWrap(true);
         codeText.setEditable(false);
         codeText.setColumns(20);
         codeText.setRows(5);

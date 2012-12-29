@@ -646,11 +646,15 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			result = SyntaxConstants.SYNTAX_STYLE_NSIS;
 			break;
 		case "perl":
-		case "pl":
 			result = SyntaxConstants.SYNTAX_STYLE_PERL;
 			break;
 		case "php":
 			result = SyntaxConstants.SYNTAX_STYLE_PHP;
+			break;
+		case "pl":
+		case "prol":
+		case "prolog":
+			result = SyntaxConstants.SYNTAX_STYLE_C;
 			break;
 		case "properties":
 			result = SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE;

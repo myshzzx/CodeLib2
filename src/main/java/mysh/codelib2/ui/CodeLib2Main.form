@@ -447,7 +447,7 @@
                         <EventHandler event="hyperlinkUpdate" listener="javax.swing.event.HyperlinkListener" parameters="javax.swing.event.HyperlinkEvent" handler="codeTextHyperlinkUpdate"/>
                       </Events>
                       <AuxValues>
-                        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="rTextScrollPane = new org.fife.ui.rtextarea.RTextScrollPane(codeText, true);&#xa;rTextScrollPane.setFont(new java.awt.Font(&quot;Microsoft YaHei&quot;, 0, 14)); // NOI18N"/>
+                        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="rTextScrollPane = new org.fife.ui.rtextarea.RTextScrollPane(codeText, true);&#xa;rTextScrollPane.setFont(new java.awt.Font(&quot;Microsoft YaHei&quot;, 0, 14)); // NOI18N&#xa;codeText.setLineWrap(true);"/>
                         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
                       </AuxValues>
                     </Component>
