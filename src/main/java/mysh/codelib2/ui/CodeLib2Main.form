@@ -573,7 +573,7 @@
                             <Column editable="false" title="&#x9644;&#x4ef6;&#x5927;&#x5c0f;(&#x5b57;&#x8282;)" type="java.lang.Object"/>
                           </Table>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="&#x9644;&#x4ef6;&#x5217;&#x8868;"/>
+                        <Property name="toolTipText" type="java.lang.String" value="&#x9644;&#x4ef6;&#x5217;&#x8868;, &#x53cc;&#x51fb;&#x6253;&#x5f00;&#x6587;&#x4ef6;"/>
                         <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                           <TableColumnModel selectionModel="0">
                             <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
@@ -593,6 +593,7 @@
                         </Property>
                       </Properties>
                       <Events>
+                        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="attachmentTableMouseClicked"/>
                         <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="attachmentTableMouseEntered"/>
                         <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="attachmentTableMouseExited"/>
                       </Events>

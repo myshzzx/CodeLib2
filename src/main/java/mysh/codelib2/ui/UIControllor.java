@@ -2,6 +2,7 @@
 package mysh.codelib2.ui;
 
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Desktop.Action;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -11,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -62,6 +64,12 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 应用名.
 	 */
 	private static final String AppTitle = "CodeLib2";
+
+	/**
+	 * 临时目录.
+	 */
+	private static final String TempDir = System.getProperty("java.io.tmpdir") + AppTitle
+			+ System.getProperty("file.separator");
 
 	private final CodeLib2Main ui;
 
@@ -602,8 +610,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		case "dtd":
 			result = SyntaxConstants.SYNTAX_STYLE_DTD;
 			break;
-		case "f":
-		case "for":
 		case "fortran":
 			result = SyntaxConstants.SYNTAX_STYLE_FORTRAN;
 			break;
@@ -651,10 +657,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		case "php":
 			result = SyntaxConstants.SYNTAX_STYLE_PHP;
 			break;
-		case "pl":
-		case "prol":
 		case "prolog":
-			result = SyntaxConstants.SYNTAX_STYLE_C;
+			result = SyntaxConstants.SYNTAX_STYLE_CLOJURE;
 			break;
 		case "properties":
 			result = SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE;
@@ -663,7 +667,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		case "python":
 			result = SyntaxConstants.SYNTAX_STYLE_PYTHON;
 			break;
-		case "rb":
 		case "ruby":
 			result = SyntaxConstants.SYNTAX_STYLE_RUBY;
 			break;
@@ -673,7 +676,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		case "scala":
 			result = SyntaxConstants.SYNTAX_STYLE_SCALA;
 			break;
-		case "sh":
 		case "shell":
 			result = SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL;
 			break;
@@ -893,6 +895,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 				attachToItem.getAttachments().addAll(attachments);
 				Collections.sort(attachToItem.getAttachments());
+
+				this.saveState.changeState(State.MODIFIED);
 			}
 
 			if (attachToItem == this.currentItem)
@@ -938,6 +942,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 							this.ui.attachmentTable.getValueAt(selectedRows[i], 0));
 					((DefaultTableModel) this.ui.attachmentTable.getModel()).removeRow(selectedRows[i]);
 				}
+				this.saveState.changeState(State.MODIFIED);
 				this.ui.attachmentTable.updateUI();
 			}
 		}
@@ -1081,5 +1086,34 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		this.findContext.setSearchForward(true);
 		this.findText();
+	}
+
+	/**
+	 * 打开附件.
+	 */
+	void openAttachment() {
+
+		int selectedRow = this.ui.attachmentTable.getSelectedRow();
+		if (selectedRow > -1) {
+			Attachment attachment = (Attachment) this.ui.attachmentTable.getValueAt(selectedRow, 0);
+			String filePath = TempDir + attachment.getName();
+
+			if (new File(filePath).exists()) {
+				String fName = FileUtil.getFileNameWithoutExtention(filePath);
+				String fExt = FileUtil.getFileExtention(filePath);
+				int i = 0;
+				while (new File(filePath = (TempDir + fName + " (" + (++i) + ")." + fExt)).exists())
+					;
+			}
+			FileUtil.writeFile(filePath, attachment.getBinaryContent());
+			try {
+				File tempFile = new File(filePath);
+				Desktop.getDesktop().open(tempFile);
+				tempFile.deleteOnExit();
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(this.ui, "文件:\n" + filePath, "打开文件失败",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
 	}
 }

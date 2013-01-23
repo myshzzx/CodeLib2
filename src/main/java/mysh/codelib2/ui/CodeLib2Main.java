@@ -568,8 +568,11 @@ public final class CodeLib2Main extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        attachmentTable.setToolTipText("附件列表");
+        attachmentTable.setToolTipText("附件列表, 双击打开文件");
         attachmentTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                attachmentTableMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 attachmentTableMouseEntered(evt);
             }
@@ -892,6 +895,12 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private void findTextMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findTextMouseExited
         this.controllor.setStatusBarReady();
     }//GEN-LAST:event_findTextMouseExited
+
+    private void attachmentTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attachmentTableMouseClicked
+        if (evt.getClickCount() == 2) {
+            this.controllor.openAttachment();
+        }
+    }//GEN-LAST:event_attachmentTableMouseClicked
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     private javax.swing.JButton addAttachment;
