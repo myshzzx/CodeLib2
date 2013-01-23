@@ -1108,8 +1108,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			FileUtil.writeFile(filePath, attachment.getBinaryContent());
 			try {
 				File tempFile = new File(filePath);
-				Desktop.getDesktop().open(tempFile);
 				tempFile.deleteOnExit();
+				Desktop.getDesktop().open(tempFile);
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this.ui, "文件:\n" + filePath, "打开文件失败",
 						JOptionPane.ERROR_MESSAGE);
