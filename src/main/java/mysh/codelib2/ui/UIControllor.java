@@ -68,8 +68,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 临时目录.
 	 */
-	private static final String TempDir = System.getProperty("java.io.tmpdir") + AppTitle
-			+ System.getProperty("file.separator");
+	private static final String TempDir = System.getProperty("java.io.tmpdir") + AppTitle + File.separatorChar;
 
 	private final CodeLib2Main ui;
 
@@ -1096,23 +1095,29 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		int selectedRow = this.ui.attachmentTable.getSelectedRow();
 		if (selectedRow > -1) {
 			Attachment attachment = (Attachment) this.ui.attachmentTable.getValueAt(selectedRow, 0);
-			String filePath = TempDir + attachment.getName();
-
-			if (new File(filePath).exists()) {
-				String fName = FileUtil.getFileNameWithoutExtention(filePath);
-				String fExt = FileUtil.getFileExtention(filePath);
-				int i = 0;
-				while (new File(filePath = (TempDir + fName + " (" + (++i) + ")." + fExt)).exists())
-					;
-			}
+			final String oriFilePath = TempDir + attachment.getName();
+			String filePath = FileUtil.getWritableFile(oriFilePath).getPath();
 			FileUtil.writeFile(filePath, attachment.getBinaryContent());
+
+			File tempFile = new File(filePath);
 			try {
-				File tempFile = new File(filePath);
 				tempFile.deleteOnExit();
 				Desktop.getDesktop().open(tempFile);
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(this.ui, "文件:\n" + filePath, "打开文件失败",
-						JOptionPane.ERROR_MESSAGE);
+				if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui,
+						"打开文件失败, 要尝试用文本方式打开吗?\n" + oriFilePath, "打开文件", JOptionPane.YES_NO_OPTION)) {
+					File textFile = FileUtil.getWritableFile(oriFilePath + ".txt");
+					if (tempFile.renameTo(textFile)) {
+						textFile.deleteOnExit();
+						try {
+							Desktop.getDesktop().open(textFile);
+						} catch (IOException e1) {
+							JOptionPane.showMessageDialog(this.ui,
+									textFile.getAbsolutePath() + e1.getMessage(),
+									"打开文本文件失败.", JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				}
 			}
 		}
 	}
