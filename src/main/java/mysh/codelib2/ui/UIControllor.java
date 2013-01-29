@@ -627,6 +627,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		case "js":
 			result = SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT;
 			break;
+		case "json":
+			result = SyntaxConstants.SYNTAX_STYLE_JSON;
+			break;
 		case "jsp":
 			result = SyntaxConstants.SYNTAX_STYLE_JSP;
 			break;
