@@ -283,7 +283,11 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	@Override
 	public String toString() {
 
-		return this.keywords;
+		if (this.attachments == null || this.attachments.size() == 0) {
+			return this.keywords;
+		} else {
+			return this.keywords + " [附]";
+		}
 	}
 
 	/**

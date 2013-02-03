@@ -495,7 +495,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * @param text
 	 */
 	@SuppressWarnings("unchecked")
-	void filter(String text) {
+	private void filter(String text) {
 
 		this.ui.resultList.clearSelection();
 		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).clear();
@@ -864,7 +864,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 导入附件.
 	 */
-	void addAttachment() {
+	 void addAttachment() {
 
 		CodeLib2Element attachToItem = this.currentItem;
 		if (attachToItem != null
@@ -899,6 +899,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				Collections.sort(attachToItem.getAttachments());
 
 				this.saveState.changeState(State.MODIFIED);
+				this.ui.resultList.repaint();
 			}
 
 			if (attachToItem == this.currentItem)
@@ -945,6 +946,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					((DefaultTableModel) this.ui.attachmentTable.getModel()).removeRow(selectedRows[i]);
 				}
 				this.saveState.changeState(State.MODIFIED);
+				this.ui.resultList.repaint();
 				this.ui.attachmentTable.updateUI();
 			}
 		}
