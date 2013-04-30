@@ -1,13 +1,15 @@
 
 package mysh.codelib2.model;
 
-import java.io.UnsupportedEncodingException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
 import mysh.util.FileUtil;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * 导出引擎.
@@ -83,45 +85,54 @@ public class ExportEngine {
 	 * @param filepath
 	 * 
 	 * @param eles
-	 * @throws UnsupportedEncodingException
+	 * @throws IOException
 	 */
-	private static void toHtml(ExportInfo info, List<CodeLib2Element> eles) throws UnsupportedEncodingException {
+	private static void toHtml(ExportInfo info, List<CodeLib2Element> eles) throws IOException {
 
-		StringBuilder html = new StringBuilder();
-		html.append("<!DOCTYPE html><html><head><meta charset='");
-		html.append(CodeLib2Element.DefaultCharsetEncode);
-		html.append("' /><script>if (navigator.appName == 'Microsoft Internet Explorer') {	alert('警告: 使用 IE 浏览器无法正常显示此页面.') 	}</script><title>");
-		html.append(info.title);
-		html.append("</title><style type='text/css'>#itemlist ul { 	list-style: none; 	margin: 0; 	padding: 0; 	font-family: Arial; 	font-size: 13px; } #itemlist li { 	cursor: pointer; 	margin: 1px 0px 1px 0px; 	background-color: #EDF2F8; 	border-style: solid; 	border-width: 1px; 	color: #376BAD; 	border-color: #EDF5FD; } #itemlist li div:hover { 	background-color: #BBCEE6; 	border-style: solid; 	border-width: 0px; } .hideDiv { 	visibility: hidden; }</style><script type='text/javascript'>function show(index, li) {	var keywords = document.getElementById('keywords');	keywords.value = li.innerText;		var text = document.getElementById('text');	var value = document.getElementById('i' + index).innerHTML;	text.innerHTML = value; 	}</script></head><body style='position: fixed; width: 100%; height: 100%;'><div	style='position: absolute; text-align: center; width: 100%; height: 15%;'><h1>");
-		html.append(info.title);
-		html.append("</h1></div><div style='position: absolute; top: 15%; width: 100%; height: 85%;'><div id='itemlist' style='position: absolute; width: 30%; height: 95%; overflow-y: auto;'><ul>");
+		try (FileOutputStream htmlOut = FileUtil.getFileOutputStream(info.filepath)) {
+			htmlOut.write("<!DOCTYPE html><html><head><meta charset='".getBytes(CodeLib2Element.DefaultCharsetEncode));
+			htmlOut.write(CodeLib2Element.DefaultCharsetEncode.getBytes(CodeLib2Element.DefaultCharsetEncode));
+			htmlOut.write("' /><script>var title = '".getBytes(CodeLib2Element.DefaultCharsetEncode));
+			htmlOut.write(info.title.getBytes(CodeLib2Element.DefaultCharsetEncode));
+			htmlOut.write("';var keys=[".getBytes(CodeLib2Element.DefaultCharsetEncode));
 
-		int itemIndex = 0;
-		for (CodeLib2Element ele : eles) {
-			itemIndex++;
-			html.append("<li onclick='show(");
-			html.append(itemIndex);
-			html.append(", this)'><div>");
-			html.append(StringEscapeUtils.escapeHtml4(ele.getKeywords()));
-			html.append("</div></li>");
+			int index;
+			CodeLib2Element ele;
+			int len = eles.size();
+			for (index = 0; index < len; index++) {
+				ele = eles.get(index);
+				if (index > 0)
+					htmlOut.write(',');
+
+				htmlOut.write('\'');
+				htmlOut.write(Base64.encodeBase64(ele.getKeywords().getBytes(
+						CodeLib2Element.DefaultCharsetEncode)));
+				htmlOut.write('\'');
+			}
+
+			htmlOut.write("];var datas=[".getBytes(CodeLib2Element.DefaultCharsetEncode));
+
+			for (index = 0; index < len; index++) {
+				ele = eles.get(index);
+				if (index > 0)
+					htmlOut.write(',');
+
+				htmlOut.write('\'');
+				htmlOut.write(Base64.encodeBase64(ele.getContent()));
+				htmlOut.write('\'');
+			}
+
+			htmlOut.write("];".getBytes(CodeLib2Element.DefaultCharsetEncode));
+
+			// read compressed html and write to target.
+			InputStream tempInput = ExportEngine.class.getResourceAsStream("/html/minimized/html.html");
+			final byte[] tempBuf = new byte[1_000_000];
+			int tempLen;
+			while ((tempLen = tempInput.read(tempBuf)) > 0) {
+				htmlOut.write(tempBuf, 0, tempLen);
+			}
+			
+			htmlOut.flush();
 		}
-
-		html.append("</ul></div><div style='position: absolute; width: 65%; height: 95%; left: 32%;'><input id='keywords' readonly='readonly' style='width: 100%' /><textarea id='text' readonly='readonly'	style='width: 100%; height: 90%;'> </textarea></div></div>");
-
-		itemIndex = 0;
-		for (CodeLib2Element ele : eles) {
-			itemIndex++;
-			html.append("<div id='i");
-			html.append(itemIndex);
-			html.append("' class='hideDiv'>");
-
-			html.append(StringEscapeUtils.escapeHtml4(new String(ele.getContent(),
-					CodeLib2Element.DefaultCharsetEncode)));
-			html.append("</div>");
-		}
-
-		html.append("</body></html>");
-
-		FileUtil.writeFile(info.filepath, html.toString().getBytes(CodeLib2Element.DefaultCharsetEncode));
 	}
 }

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='UTF-8' />
+		
+		<script>
+		var title = 'CodeLib2 - myshCL';
+		var keys = ['a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5Mg=='];
+		var datas = ['a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5Mg=='];
+		</script>
+		
+		
+	<script src='codemirror.js'></script>
+	<script src='base64.js'></script>
+	<link rel='stylesheet' href='codemirror.css'>
+	<link rel='stylesheet' href='solarized.css'>
+		
+		<script type='text/javascript'>
+		
+		function g(id){
+			return document.getElementById(id);
+		}
+		
+		function init(){
+			document.title = title;
+			g('title').innerHTML = document.title;
+			for(var i=0; i<keys.length; i++){
+				var key = document.createElement('li');
+				var keyValue = document.createElement('div');
+				keyValue.appendChild(document.createTextNode(Base64.decode(keys[i])));
+				key.appendChild(keyValue);
+				key.onclick=new Function('showData('+i+')');
+				g('keylist').appendChild(key);
+			}
+			
+			showData(1);
+		}
+		
+		function showData(index){
+			g('keywords').value=Base64.decode(keys[index]);
+			g('text').innerHTML=Base64.decode(datas[index]);
+			
+			if(g('text').parentNode.childNodes.length>2){
+				g('text').parentNode.removeChild(g('text').parentNode.lastChild);
+			}
+			
+			var text = CodeMirror.fromTextArea(document.getElementById('text'), {
+				lineNumbers: true,
+				mode: getCMMode(Base64.decode(keys[index]).toLocaleLowerCase().split(",")[0]),
+				readOnly: true,
+				tabSize: 3,
+				indentWithTabs: true,
+				indentUnit: 3
+			});
+			text.setOption('theme', 'solarized light');
+			text.setSize('100%', '97%');
+			
+		}
+		
+		function getCMMode(lang){
+			var mode = {
+				"apl": "text/apl",
+				"aspx" : "application/x-aspx",
+				"asterisk" : "text/x-asterisk",
+				"c" : "text/x-csrc",
+				"c++" : "text/x-c++src",
+				"cpp" : "text/x-c++src",
+				"cs" : "text/x-csharp",
+				"c#" : "text/x-csharp",
+				"clojure" : "text/x-clojure",
+				"clj": "text/x-clojure",
+				"coffeescript" : "text/x-coffeescript",
+				"css" : "text/css",
+				"d" : "text/x-d",
+				"diff" : "text/x-diff",
+				"ecl" : "text/x-ecl",
+				"erlang" : "text/x-erlang",
+				"gas" : "text/x-gas",
+				"go" : "text/x-go",
+				"groovy" : "text/x-groovy",
+				"haskell" : "text/x-haskell",
+				"haxe" : "text/x-haxe",
+				"ejs" : "application/x-ejs",
+				"jsp" : "application/x-jsp",
+				"htm" : "text/html",
+				"html" : "text/html",
+				"http" : "message/http",
+				"java" : "text/x-java",
+				"javascript" : "text/javascript",
+				"js" : "text/javascript",
+				"less" : "text/x-less",
+				"lisp" : "text/x-common-lisp",
+				"livescript" : "text/x-livescript",
+				"ls" : "text/x-livescript",
+				"lua" : "text/x-lua",
+				"markdown" : "markdown",
+				"mirc" : "text/mirc",
+				"nt" : "text/n-triples",
+				"ocaml" : "text/x-ocaml",
+				"pascal" : "text/x-pascal",
+				"perl" : "text/x-perl",
+				"php" : "application/x-httpd-php",
+				"pig" : "text/x-pig",
+				"properties" : "text/x-properties",
+				"py" : "text/x-python",
+				"python" : "text/x-python",
+				"q" : "text/x-q",
+				"r" : "text/x-rsrc",
+				"rsrc" : "text/x-rsrc",
+				"ru" : "text/x-ruby",
+				"ruby" : "text/x-ruby",
+				"rust" : "text/x-rustsrc",
+				"sass" : "text/x-sass",
+				"scala" : "text/x-scala",
+				"scheme" : "text/x-scheme",
+				"scss" : "text/scss",
+				"sh" : "text/x-sh",
+				"sieve" : "application/sieve",
+				"smalltalk" : "text/x-stsrc",
+				"smarty" : "text/x-smarty",
+				"sql" : "text/x-sql",
+				"sparql" : "application/x-sparql-query",
+				"stex" : "text/x-stex",
+				"tcl" : "text/x-tcl",
+				"tiddlywiki" : "text/x-tiddlywiki",
+				"tikiWikiMode" : "tiki",
+				"turtle" : "text/turtle",
+				"vb" : "text/x-vb",
+				"vbs" : "text/vbscript",
+				"velocity" : "text/velocity",
+				"verilog" : "text/x-verilog",
+				"xml" : "application/xml",
+				"xql" : "application/xquery",
+				"yaml" : "text/x-yaml",
+				"z80" : "text/x-z80"
+				
+			}[lang];
+			return mode==null? "" : mode;
+		}
+		
+		</script>
+		<style type='text/css'>#itemlist ul { 	list-style: none; 	margin: 0; 	padding: 0; 	font-family: Arial; 	font-size: 13px; } #itemlist li { 	cursor: pointer; 	margin: 1px 0px 1px 0px; 	background-color: #EDF2F8; 	border-style: solid; 	border-width: 1px; 	color: #376BAD; 	border-color: #EDF5FD; } #itemlist li div:hover { 	background-color: #BBCEE6; 	border-style: solid; 	border-width: 0px; } .hideDiv { 	visibility: hidden; }</style>
+	</head>
+	<body style='position: fixed; width: 100%; height: 100%;' onload='init()'>
+		<div style='position: absolute; text-align: center; width: 100%; height: 12%;'>
+			<h1 id='title'></h1>
+		</div>
+		<div style='position: absolute; top: 12%; width: 100%; height: 87%;'>
+			<div id='itemlist' style='position: absolute; width: 20%; height: 99%; overflow-y: auto;'>
+				<ul id='keylist'>
+				</ul>
+			</div>
+			<div style='position: absolute; width: 77%; height: 98%; left: 21%;'>
+				<input id='keywords' readonly='readonly' style='width: 100%' />
+				<textarea id='text' style="display:none"></textarea>
+			</div>
+		</div>
+	</body>
+</html>
