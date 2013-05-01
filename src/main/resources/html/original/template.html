@@ -7,6 +7,8 @@
 		var title = 'CodeLib2 - myshCL';
 		var keys = ['a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5Mg=='];
 		var datas = ['a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5MQ==' , 'a2V5Mg=='];
+		
+<!-- PROGRAM GENERATE END -->
 		</script>
 		
 		
@@ -33,7 +35,7 @@
 				g('keylist').appendChild(key);
 			}
 			
-			showData(1);
+			showData(0);
 		}
 		
 		function showData(index){
@@ -45,12 +47,14 @@
 			}
 			
 			var text = CodeMirror.fromTextArea(document.getElementById('text'), {
-				lineNumbers: true,
 				mode: getCMMode(Base64.decode(keys[index]).toLocaleLowerCase().split(",")[0]),
-				readOnly: true,
 				tabSize: 3,
 				indentWithTabs: true,
-				indentUnit: 3
+				indentUnit: 3,
+				lineNumbers: true,
+				lineWrapping: true,
+				readOnly: true,
+				viewportMargin: Infinity
 			});
 			text.setOption('theme', 'solarized light');
 			text.setSize('100%', '97%');
@@ -115,6 +119,7 @@
 				"scheme" : "text/x-scheme",
 				"scss" : "text/scss",
 				"sh" : "text/x-sh",
+				"shell" : "text/x-sh",				
 				"sieve" : "application/sieve",
 				"smalltalk" : "text/x-stsrc",
 				"smarty" : "text/x-smarty",
@@ -129,7 +134,7 @@
 				"vbs" : "text/vbscript",
 				"velocity" : "text/velocity",
 				"verilog" : "text/x-verilog",
-				"xml" : "application/xml",
+				"xml" : "text/html",
 				"xql" : "application/xquery",
 				"yaml" : "text/x-yaml",
 				"z80" : "text/x-z80"
