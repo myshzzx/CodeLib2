@@ -11,7 +11,7 @@
 支持代码折叠, 以及三十多种语言的语法高亮, 语法高亮方案将参考第一个关键字
 代码编辑框可以支持 eclipse 的一些快捷键, 貌似可以把它当代码编辑器来用
 支持给每个片段条目加附件, 支持双击打开附件
-支持把某些片段条目导出为 html 文件, 导出的html在IE下显示不正常, 代码无法换行(因为IE不把 textarea 里的 \n 当作换行符处理)
+支持把某些片段条目导出为 html 文件, 且带语法高亮
 保存的 zcl2 库文件有压缩处理
 功能提示都会在状态栏或 tooltips 里出现
 ]]></description>
@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>com.fifesoft</groupId>
 			<artifactId>rsyntaxtextarea</artifactId>
-			<version>2.0.6</version>
+			<version>2.0.7</version>
 		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>com.fifesoft</groupId> -->

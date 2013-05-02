@@ -430,18 +430,30 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         rTextScrollPane = new org.fife.ui.rtextarea.RTextScrollPane(codeText, true);
         rTextScrollPane.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
-        codeText.setLineWrap(true);
+        codeText.setAnimateBracketMatching(true);
+        codeText.setAntiAliasingEnabled(true);
+        codeText.setAutoscrolls(true);
+        codeText.setBracketMatchingEnabled(true);
+        codeText.setCloseCurlyBraces(true);
+        codeText.setCloseMarkupTags(true);
+        codeText.setCodeFoldingEnabled(true);
         codeText.setEditable(false);
+        codeText.setFractionalFontMetricsEnabled(true);
+        codeText.setHighlightCurrentLine(true);
+        codeText.setHyperlinksEnabled(true);
+        codeText.setLineWrap(true);
+        codeText.setMarkOccurrences(true);
+        codeText.setMarginLineEnabled(true);
+        codeText.setPaintMarkOccurrencesBorder(true);
+        codeText.setPaintMatchedBracketPair(true);
+        codeText.setPaintTabLines(true);
+        codeText.setUseFocusableTips(true);
+        
         codeText.setColumns(20);
         codeText.setRows(5);
-        codeText.setCodeFoldingEnabled(true);
         codeText.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
-        codeText.setFractionalFontMetricsEnabled(true);
         codeText.setMargin(new java.awt.Insets(4, 4, 4, 4));
-        codeText.setMarkOccurrences(true);
         codeText.setNextFocusableComponent(filterText);
-        codeText.setPaintMarkOccurrencesBorder(true);
-        codeText.setPaintTabLines(true);
         codeText.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 codeTextMouseEntered(evt);
