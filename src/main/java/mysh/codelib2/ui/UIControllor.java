@@ -687,6 +687,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		case "tcl":
 			result = SyntaxConstants.SYNTAX_STYLE_TCL;
 			break;
+		case "vbs":
+			result = SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC;
+			break;
 		case "xml":
 		case "xsd":
 		case "xsl":
@@ -864,7 +867,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 导入附件.
 	 */
-	 void addAttachment() {
+	void addAttachment() {
 
 		CodeLib2Element attachToItem = this.currentItem;
 		if (attachToItem != null
