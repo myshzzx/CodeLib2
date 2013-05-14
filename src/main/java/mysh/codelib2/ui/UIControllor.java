@@ -687,6 +687,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		case "tcl":
 			result = SyntaxConstants.SYNTAX_STYLE_TCL;
 			break;
+		case "vb":
 		case "vbs":
 			result = SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC;
 			break;
