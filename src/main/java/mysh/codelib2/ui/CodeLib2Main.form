@@ -107,7 +107,7 @@
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jSplitPane1" pref="493" max="32767" attributes="0"/>
+              <Component id="jSplitPane1" pref="489" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="statusBar" min="-2" pref="23" max="-2" attributes="0"/>
           </Group>
@@ -126,7 +126,7 @@
         <Component class="javax.swing.JButton" name="newInst">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/mysh/codelib2/ui/icons/new.png"/>
+              <Image iconType="3" name="/icons/new.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="&#x65b0;&#x5efa;"/>
             <Property name="focusable" type="boolean" value="false"/>
@@ -147,7 +147,7 @@
               </FontInfo>
             </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/mysh/codelib2/ui/icons/open.png"/>
+              <Image iconType="3" name="/icons/open.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="&#x6253;&#x5f00;"/>
             <Property name="focusable" type="boolean" value="false"/>
@@ -166,7 +166,7 @@
               <Font name="Microsoft YaHei" size="12" style="0"/>
             </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/mysh/codelib2/ui/icons/save.png"/>
+              <Image iconType="3" name="/icons/save.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="&#x4fdd;&#x5b58; (Ctrl + S)"/>
             <Property name="focusable" type="boolean" value="false"/>
@@ -184,7 +184,7 @@
         <Component class="javax.swing.JButton" name="add">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/mysh/codelib2/ui/icons/add.png"/>
+              <Image iconType="3" name="/icons/add.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="&#x65b0;&#x589e;&#x6761;&#x76ee;"/>
             <Property name="focusable" type="boolean" value="false"/>
@@ -200,7 +200,7 @@
         <Component class="javax.swing.JButton" name="remove">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/mysh/codelib2/ui/icons/remove.png"/>
+              <Image iconType="3" name="/icons/remove.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="&#x79fb;&#x9664;&#x6761;&#x76ee;"/>
             <Property name="focusable" type="boolean" value="false"/>
@@ -218,7 +218,7 @@
         <Component class="javax.swing.JButton" name="importButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/mysh/codelib2/ui/icons/import.png"/>
+              <Image iconType="3" name="/icons/import.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x5165; zcl2 &#x6587;&#x4ef6;"/>
             <Property name="focusable" type="boolean" value="false"/>
@@ -234,7 +234,7 @@
         <Component class="javax.swing.JButton" name="export">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/mysh/codelib2/ui/icons/export.png"/>
+              <Image iconType="3" name="/icons/export.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x51fa;&#x9009;&#x4e2d;&#x7684;&#x6761;&#x76ee;"/>
             <Property name="focusable" type="boolean" value="false"/>
@@ -250,7 +250,7 @@
         <Component class="javax.swing.JButton" name="copyToClipboard">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/mysh/codelib2/ui/icons/copyToClipboard.png"/>
+              <Image iconType="3" name="/icons/copyToClipboard.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="&#x590d;&#x5236;&#x5230;&#x526a;&#x8d34;&#x677f;"/>
             <Property name="focusable" type="boolean" value="false"/>
@@ -300,7 +300,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="filterText" min="-2" pref="29" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="456" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="452" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -389,7 +389,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="keyWordText" min="-2" pref="27" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="rTextScrollPane" pref="416" max="32767" attributes="0"/>
+                          <Component id="rTextScrollPane" pref="414" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -495,7 +495,7 @@
                         <Component class="javax.swing.JButton" name="addAttachment">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/mysh/codelib2/ui/icons/sAdd.png"/>
+                              <Image iconType="3" name="/icons/sAdd.png"/>
                             </Property>
                             <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x5165;&#x9644;&#x4ef6;"/>
                             <Property name="focusable" type="boolean" value="false"/>
@@ -511,7 +511,7 @@
                         <Component class="javax.swing.JButton" name="removeAttachment">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/mysh/codelib2/ui/icons/sRemove.png"/>
+                              <Image iconType="3" name="/icons/sRemove.png"/>
                             </Property>
                             <Property name="toolTipText" type="java.lang.String" value="&#x79fb;&#x9664;&#x9644;&#x4ef6;"/>
                             <Property name="focusable" type="boolean" value="false"/>
@@ -527,7 +527,7 @@
                         <Component class="javax.swing.JButton" name="exportAttachment">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                              <Image iconType="3" name="/mysh/codelib2/ui/icons/sExport.png"/>
+                              <Image iconType="3" name="/icons/sExport.png"/>
                             </Property>
                             <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x51fa;&#x9644;&#x4ef6;"/>
                             <Property name="focusable" type="boolean" value="false"/>

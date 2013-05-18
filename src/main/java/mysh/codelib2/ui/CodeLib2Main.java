@@ -405,7 +405,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(filterText, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE))
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
@@ -429,30 +429,18 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         rTextScrollPane = new org.fife.ui.rtextarea.RTextScrollPane(codeText, true);
         rTextScrollPane.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
-        codeText.setAnimateBracketMatching(true);
-        codeText.setAntiAliasingEnabled(true);
-        codeText.setAutoscrolls(true);
-        codeText.setBracketMatchingEnabled(true);
-        codeText.setCloseCurlyBraces(true);
-        codeText.setCloseMarkupTags(true);
-        codeText.setCodeFoldingEnabled(true);
-        codeText.setEditable(false);
-        codeText.setFractionalFontMetricsEnabled(true);
-        codeText.setHighlightCurrentLine(true);
-        codeText.setHyperlinksEnabled(true);
         codeText.setLineWrap(true);
-        codeText.setMarkOccurrences(true);
-        codeText.setMarginLineEnabled(true);
-        codeText.setPaintMarkOccurrencesBorder(true);
-        codeText.setPaintMatchedBracketPair(true);
-        codeText.setPaintTabLines(true);
-        codeText.setUseFocusableTips(true);
-        
+        codeText.setEditable(false);
         codeText.setColumns(20);
         codeText.setRows(5);
+        codeText.setCodeFoldingEnabled(true);
         codeText.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
+        codeText.setFractionalFontMetricsEnabled(true);
         codeText.setMargin(new java.awt.Insets(4, 4, 4, 4));
+        codeText.setMarkOccurrences(true);
         codeText.setNextFocusableComponent(filterText);
+        codeText.setPaintMarkOccurrencesBorder(true);
+        codeText.setPaintTabLines(true);
         codeText.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 codeTextMouseEntered(evt);
@@ -480,7 +468,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(keyWordText, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
+                .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE))
         );
 
         jSplitPane2.setTopComponent(jPanel2);
@@ -690,7 +678,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
                             .addComponent(findPreviousBtn)
                             .addComponent(findNextBtn))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(statusBar, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
