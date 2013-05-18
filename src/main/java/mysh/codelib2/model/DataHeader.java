@@ -28,9 +28,9 @@ import org.apache.log4j.Logger;
 /**
  * 文件数据头部. <br/>
  * 描述数据基本信息(如是否压缩, 是否加密). <br/>
- * 
+ *
  * @author Allen
- * 
+ *
  */
 public class DataHeader implements Serializable {
 
@@ -39,11 +39,6 @@ public class DataHeader implements Serializable {
 	private static transient final Logger log = Logger.getLogger(DataHeader.class);
 
 	private static transient final String compressEntry = "zcl2";
-
-	/**
-	 * 版本号.
-	 */
-	private final String version = "zcl2";
 
 	/**
 	 * 压缩标记.
@@ -67,8 +62,8 @@ public class DataHeader implements Serializable {
 	 */
 	public void saveToFile(String filepath, Collection<CodeLib2Element> eles) throws Exception {
 
-		ObjectOutputStream codeDataSerialOut = null;
-		try (final FileOutputStream fileOut = FileUtil.getFileOutputStream(filepath);) {
+		ObjectOutputStream codeDataSerialOut;
+		try (final FileOutputStream fileOut = FileUtil.getFileOutputStream(filepath)) {
 
 			if (fileOut == null) {
 				throw new Exception("文件写入失败: " + filepath);
@@ -102,7 +97,7 @@ public class DataHeader implements Serializable {
 						return CompressUtil.compress(DataHeader.compressEntry,
 								compressIn, Long.MAX_VALUE,
 								this.compressOut, 0);
-					};
+					}
 				};
 
 				compressFutureResult = exec.submit(compressThread);
@@ -138,7 +133,7 @@ public class DataHeader implements Serializable {
 	@SuppressWarnings("unchecked")
 	public static Collection<CodeLib2Element> readFromFile(String filepath) throws Exception {
 
-		try (final FileInputStream fileIn = FileUtil.getFileInputStream(filepath);) {
+		try (final FileInputStream fileIn = FileUtil.getFileInputStream(filepath)) {
 			if (fileIn == null)
 				throw new Exception("读取文件失败: " + filepath);
 
@@ -219,15 +214,5 @@ public class DataHeader implements Serializable {
 	//
 	// this.encrypted = encrypted;
 	// }
-
-	/**
-	 * 取版本号.
-	 * 
-	 * @return
-	 */
-	public String getVersion() {
-
-		return version;
-	}
 
 }

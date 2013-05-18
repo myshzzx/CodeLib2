@@ -36,7 +36,7 @@ public class SaveStateManager {
 		MODIFIED, /**
 		 * 保存.
 		 */
-		SAVED;
+		SAVED
 	}
 
 	/**
@@ -50,7 +50,6 @@ public class SaveStateManager {
 		/**
 		 * 观察者被通知状态更新, 观察者返回是否允许此次更新.
 		 * 
-		 * @param state
 		 * @return
 		 */
 		boolean onSaveStateChanged(State oldState, State newState);
