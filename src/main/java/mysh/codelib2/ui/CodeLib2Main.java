@@ -4,13 +4,12 @@
  */
 package mysh.codelib2.ui;
 
-import java.io.File;
-
-import javax.swing.DefaultListModel;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileFilter;
+import java.io.File;
 
 /**
  *
@@ -201,7 +200,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        newInst.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/new.png"))); // NOI18N
+        newInst.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/new.png"))); // NOI18N
         newInst.setToolTipText("新建");
         newInst.setFocusable(false);
         newInst.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -222,7 +221,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolBar1.add(newInst);
 
         open.setFont(open.getFont());
-        open.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/open.png"))); // NOI18N
+        open.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/open.png"))); // NOI18N
         open.setToolTipText("打开");
         open.setFocusable(false);
         open.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -243,7 +242,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolBar1.add(open);
 
         save.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
-        save.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/save.png"))); // NOI18N
+        save.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save.png"))); // NOI18N
         save.setToolTipText("保存 (Ctrl + S)");
         save.setFocusable(false);
         save.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -264,7 +263,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolBar1.add(save);
         jToolBar1.add(jSeparator1);
 
-        add.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/add.png"))); // NOI18N
+        add.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/add.png"))); // NOI18N
         add.setToolTipText("新增条目");
         add.setFocusable(false);
         add.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -284,7 +283,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jToolBar1.add(add);
 
-        remove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/remove.png"))); // NOI18N
+        remove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/remove.png"))); // NOI18N
         remove.setToolTipText("移除条目");
         remove.setFocusable(false);
         remove.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -305,7 +304,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolBar1.add(remove);
         jToolBar1.add(jSeparator2);
 
-        importButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/import.png"))); // NOI18N
+        importButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/import.png"))); // NOI18N
         importButton.setToolTipText("导入 zcl2 文件");
         importButton.setFocusable(false);
         importButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -325,7 +324,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jToolBar1.add(importButton);
 
-        export.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/export.png"))); // NOI18N
+        export.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/export.png"))); // NOI18N
         export.setToolTipText("导出选中的条目");
         export.setFocusable(false);
         export.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -345,7 +344,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jToolBar1.add(export);
 
-        copyToClipboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/copyToClipboard.png"))); // NOI18N
+        copyToClipboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/copyToClipboard.png"))); // NOI18N
         copyToClipboard.setToolTipText("复制到剪贴板");
         copyToClipboard.setFocusable(false);
         copyToClipboard.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -496,7 +495,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolbar2.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jToolbar2.setRollover(true);
 
-        addAttachment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/sAdd.png"))); // NOI18N
+        addAttachment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/sAdd.png"))); // NOI18N
         addAttachment.setToolTipText("导入附件");
         addAttachment.setFocusable(false);
         addAttachment.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -516,7 +515,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jToolbar2.add(addAttachment);
 
-        removeAttachment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/sRemove.png"))); // NOI18N
+        removeAttachment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/sRemove.png"))); // NOI18N
         removeAttachment.setToolTipText("移除附件");
         removeAttachment.setFocusable(false);
         removeAttachment.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -536,7 +535,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jToolbar2.add(removeAttachment);
 
-        exportAttachment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mysh/codelib2/ui/icons/sExport.png"))); // NOI18N
+        exportAttachment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/sExport.png"))); // NOI18N
         exportAttachment.setToolTipText("导出附件");
         exportAttachment.setFocusable(false);
         exportAttachment.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
