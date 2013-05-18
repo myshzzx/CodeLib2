@@ -1,37 +1,6 @@
 
 package mysh.codelib2.ui;
 
-import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.Desktop.Action;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import javax.swing.AbstractAction;
-import javax.swing.DefaultListModel;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
-
 import mysh.codelib2.model.CodeLib2Element;
 import mysh.codelib2.model.CodeLib2Element.Attachment;
 import mysh.codelib2.model.DataHeader;
@@ -45,10 +14,30 @@ import mysh.util.CompressUtil;
 import mysh.util.FileUtil;
 import mysh.util.HotKeyUtil;
 import mysh.util.UIUtil;
-
 import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.SearchContext;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.Desktop.Action;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * UI 控制器. 控制UI行为及状态.
@@ -503,7 +492,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		try {
 			this.currentKeyword = text;
-			this.searchEnging.addSearchTask(text);
+			this.searchEnging.addSearchTask(text, System.currentTimeMillis()+300);
 
 			if (this.currentKeyword.split("[\\s,]+").length > 0)
 				this.setStatusBar("正在搜索 [ " + text + " ] ...");

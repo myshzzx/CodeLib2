@@ -1,6 +1,10 @@
 
 package mysh.codelib2.model;
 
+import mysh.annotation.ThreadSafe;
+import mysh.util.ByteUtil;
+import org.apache.log4j.Logger;
+
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
@@ -8,17 +12,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import mysh.annotation.ThreadSafe;
-import mysh.util.ByteUtil;
-
-import org.apache.log4j.Logger;
-
 /**
  * 搜索引擎.<br/>
  * 一次只执行一个关键字搜索.
- * 
+ *
  * @author Allen
- * 
  */
 @ThreadSafe
 public final class SearchEngine {
@@ -26,20 +24,23 @@ public final class SearchEngine {
 	private static final Logger log = Logger.getLogger(SearchEngine.class);
 
 	/**
+	 * 搜索开始时间(毫秒).
+	 */
+	private volatile long searchStartTime;
+
+
+	/**
 	 * 搜索结果处理者.
-	 * 
+	 *
 	 * @author Allen
-	 * 
 	 */
 	public static interface ResultCatcher {
 
 		/**
 		 * 取得搜索结果.
-		 * 
-		 * @param keyword
-		 *               搜索关键字.
-		 * @param ele
-		 *               结果元素.
+		 *
+		 * @param keyword 搜索关键字.
+		 * @param ele     结果元素.
 		 */
 		void onGetSearchResult(String keyword, CodeLib2Element ele);
 
@@ -52,9 +53,8 @@ public final class SearchEngine {
 	/**
 	 * 搜索任务类.<br/>
 	 * 由它执行搜索.
-	 * 
+	 *
 	 * @author Allen
-	 * 
 	 */
 	private final class SearchTask extends Thread {
 
@@ -87,15 +87,11 @@ public final class SearchEngine {
 		 * 创建搜索任务.<br/>
 		 * 要求提供关键字分解是 关键字分解策略自由化 的考虑.<br/>
 		 * 不检查关键字分解的结果是否符合参数含义, 后果由客户端代码承担.
-		 * 
-		 * @param keyword
-		 *               关键字.
-		 * @param upperCaseKeys
-		 *               关键字 keyword 的大写分解.
-		 * @param lowerCaseKeys
-		 *               关键字 keyword 的小写分解.
-		 * @throws Exception
-		 *                创建搜索任务失败.
+		 *
+		 * @param keyword       关键字.
+		 * @param upperCaseKeys 关键字 keyword 的大写分解.
+		 * @param lowerCaseKeys 关键字 keyword 的小写分解.
+		 * @throws Exception 创建搜索任务失败.
 		 */
 		public SearchTask(String keyword, String[] upperCaseKeys, String[] lowerCaseKeys) throws Exception {
 
@@ -137,7 +133,7 @@ public final class SearchEngine {
 						// 匹配关键字
 						keyResult = this.lowerCaseKeys[keyIndex].length() == 0 ? true
 								: ele.getKeywords().toLowerCase().contains(
-										this.lowerCaseKeys[keyIndex]);
+								this.lowerCaseKeys[keyIndex]);
 
 						// 匹配内容
 						if (!keyResult) {
@@ -206,6 +202,10 @@ public final class SearchEngine {
 				while (true) {
 					keyword = taskList.take();
 
+					while (System.currentTimeMillis() < SearchEngine.this.searchStartTime) {
+						Thread.sleep(100);
+					}
+
 					while ((tempKey = taskList.poll()) != null) {
 						keyword = tempKey;
 					}
@@ -214,7 +214,9 @@ public final class SearchEngine {
 				}
 			} catch (Exception e) {
 			}
-		};
+		}
+
+		;
 	};
 
 	/**
@@ -253,21 +255,22 @@ public final class SearchEngine {
 
 	/**
 	 * 添加搜索任务. 不阻塞.
-	 * 
+	 *
 	 * @param keyword
+	 * @param startTimeLimit 若在这个时间后没有新的搜索任务, 则执行此搜索.
 	 */
-	public void addSearchTask(String keyword) {
+	public void addSearchTask(String keyword, long startTimeLimit) {
 
+		this.searchStartTime = startTimeLimit;
 		this.taskList.add(keyword);
 	}
 
 	/**
 	 * 搜索关键字.<br/>
 	 * * 表示展示全部.
-	 * 
+	 *
 	 * @param keyword
-	 * @throws Exception
-	 *                创建搜索任务失败.
+	 * @throws Exception 创建搜索任务失败.
 	 */
 	private void search(String keyword) throws Exception {
 
@@ -296,7 +299,7 @@ public final class SearchEngine {
 
 	/**
 	 * 任务完成.
-	 * 
+	 *
 	 * @param task
 	 */
 	private synchronized void onSearchTaskComplete(SearchTask task) {

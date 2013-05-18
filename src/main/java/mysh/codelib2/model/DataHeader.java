@@ -1,15 +1,12 @@
 
 package mysh.codelib2.model;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Serializable;
+import mysh.util.CompressUtil;
+import mysh.util.CompressUtil.EntryPicker;
+import mysh.util.FileUtil;
+import org.apache.log4j.Logger;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,21 +16,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.zip.ZipEntry;
 
-import mysh.util.CompressUtil;
-import mysh.util.CompressUtil.EntryPicker;
-import mysh.util.FileUtil;
-
-import org.apache.log4j.Logger;
-
 /**
  * 文件数据头部. <br/>
  * 描述数据基本信息(如是否压缩, 是否加密). <br/>
  *
  * @author Allen
- *
  */
 public class DataHeader implements Serializable {
-
 	private static final long serialVersionUID = -5817161670435220173L;
 
 	private static transient final Logger log = Logger.getLogger(DataHeader.class);
@@ -54,11 +43,9 @@ public class DataHeader implements Serializable {
 	 * 数据保存到文件.<br/>
 	 * 如果要增加加密功能, 此方法需要重写, 因为当前的数据流管道套接机制可能会使某个线程无法结束.<br/>
 	 * 要加入加密流程重写此方法, 用缓冲区连接各个处理模块, 而不是用数据流管道.
-	 * 
-	 * @param filepath
-	 *               文件名.
-	 * @param eles
-	 *               数据集.
+	 *
+	 * @param filepath 文件名.
+	 * @param eles     数据集.
 	 */
 	public void saveToFile(String filepath, Collection<CodeLib2Element> eles) throws Exception {
 
@@ -124,9 +111,8 @@ public class DataHeader implements Serializable {
 
 	/**
 	 * 从文件读取数据.
-	 * 
-	 * @param filepath
-	 *               文件路径.
+	 *
+	 * @param filepath 文件路径.
 	 * @return
 	 * @throws Exception
 	 */
@@ -177,7 +163,7 @@ public class DataHeader implements Serializable {
 
 	/**
 	 * 取压缩标记.
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isCompressed() {
@@ -187,7 +173,7 @@ public class DataHeader implements Serializable {
 
 	/**
 	 * 设置压缩标记.
-	 * 
+	 *
 	 * @param compressed
 	 */
 	public void setCompressed(boolean compressed) {
