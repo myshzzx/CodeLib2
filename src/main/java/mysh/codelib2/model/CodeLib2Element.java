@@ -1,18 +1,17 @@
 
 package mysh.codelib2.model;
 
+import mysh.util.ByteUtil;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-import mysh.util.ByteUtil;
-
 /**
  * 代码库元素.<br/>
  * 定义代码库存储单元.
- * 
+ *
  * @author Allen
- * 
  */
 public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element> {
 
@@ -30,9 +29,8 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 附件.
-	 * 
+	 *
 	 * @author Allen
-	 * 
 	 */
 	public static class Attachment implements Serializable, Comparable<Attachment> {
 
@@ -145,7 +143,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		/**
 		 * 附件名.
-		 * 
+		 *
 		 * @return
 		 */
 		public String getName() {
@@ -155,7 +153,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		/**
 		 * 附件名.
-		 * 
+		 *
 		 * @param name
 		 */
 		public Attachment setName(String name) {
@@ -202,7 +200,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		/**
 		 * 附件内容.
-		 * 
+		 *
 		 * @return
 		 */
 		public byte[] getBinaryContent() {
@@ -212,7 +210,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		/**
 		 * 附件内容.
-		 * 
+		 *
 		 * @param binaryContent
 		 */
 		public Attachment setBinaryContent(byte[] binaryContent) {
@@ -225,7 +223,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	}
 
 	/**
-	 * 关键字. (保证不为 null)
+	 * 关键字. (代码范围内保证不为 null, 但反射和反序列化仍可能导致 null)
 	 */
 	private String keywords = DefaultKeywords;
 
@@ -242,22 +240,27 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	@Override
 	public boolean equals(Object obj) {
 
-		if (obj instanceof CodeLib2Element) {
-			CodeLib2Element e = (CodeLib2Element) obj;
-			boolean flag = true;
+		if (!(obj instanceof CodeLib2Element)) return false;
 
-			if (this.keywords != null) {
-				flag &= this.keywords.equals(e.keywords);
-			} else if (e.keywords != null) {
-				return false;
-			}
+		CodeLib2Element e = (CodeLib2Element) obj;
 
-			flag &= this.content == e.content || Arrays.equals(this.content, e.content);
-
-			return flag;
+		if (this.keywords != null) {
+			if (!this.keywords.equals(e.keywords)) return false;
+		} else if (e.keywords != null) {
+			return false;
 		}
 
-		return false;
+		if (!Arrays.equals(this.content, e.content)) return false;
+
+		if (this.attachments != e.attachments) {
+			if (this.attachments != null) {
+				return this.attachments.equals(e.attachments);
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
 	}
 
 	@Override
@@ -292,7 +295,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 关键字.
-	 * 
+	 *
 	 * @return
 	 */
 	public String getKeywords() {
@@ -302,7 +305,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 关键字.
-	 * 
+	 *
 	 * @param keywords
 	 */
 	public final CodeLib2Element setKeywords(String keywords) {
@@ -331,7 +334,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 取第一个关键字.
-	 * 
+	 *
 	 * @return
 	 */
 	public String getFirstKeyword() {
@@ -341,7 +344,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 附件.
-	 * 
+	 *
 	 * @return
 	 */
 	public List<Attachment> getAttachments() {
@@ -351,7 +354,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 附件.
-	 * 
+	 *
 	 * @param attachments
 	 */
 	public void setAttachments(List<Attachment> attachments) {
@@ -361,7 +364,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 内容.
-	 * 
+	 *
 	 * @return
 	 */
 	public byte[] getContent() {
@@ -374,7 +377,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 内容.
-	 * 
+	 *
 	 * @param content
 	 * @return
 	 */

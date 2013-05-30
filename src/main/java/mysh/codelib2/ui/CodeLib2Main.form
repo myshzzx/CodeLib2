@@ -236,15 +236,15 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/icons/export.png"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x51fa;&#x9009;&#x4e2d;&#x7684;&#x6761;&#x76ee;"/>
+            <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x51fa;&#x9009;&#x4e2d;&#x6761;&#x76ee; | &#x5bfc;&#x51fa;&#x5168;&#x90e8;"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
           <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="exportMouseClicked"/>
             <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="exportMouseEntered"/>
             <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="exportMouseExited"/>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="exportActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="copyToClipboard">
@@ -389,7 +389,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="keyWordText" min="-2" pref="27" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="rTextScrollPane" pref="414" max="32767" attributes="0"/>
+                          <Component id="rTextScrollPane" pref="416" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>

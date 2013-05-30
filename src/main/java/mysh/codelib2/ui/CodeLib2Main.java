@@ -4,6 +4,7 @@
  */
 package mysh.codelib2.ui;
 
+import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -325,21 +326,19 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolBar1.add(importButton);
 
         export.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/export.png"))); // NOI18N
-        export.setToolTipText("导出选中的条目");
+        export.setToolTipText("导出选中条目 | 导出全部");
         export.setFocusable(false);
         export.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         export.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         export.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                exportMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 exportMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 exportMouseExited(evt);
-            }
-        });
-        export.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exportActionPerformed(evt);
             }
         });
         jToolBar1.add(export);
@@ -468,7 +467,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(keyWordText, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE))
+                .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
         );
 
         jSplitPane2.setTopComponent(jPanel2);
@@ -704,10 +703,6 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         this.controllor.removeItem();
     }//GEN-LAST:event_removeActionPerformed
 
-    private void exportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportActionPerformed
-        this.controllor.export();
-    }//GEN-LAST:event_exportActionPerformed
-
     private void resultListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_resultListValueChanged
         this.controllor.selectItem(this.resultList.getSelectedValue());
     }//GEN-LAST:event_resultListValueChanged
@@ -900,6 +895,17 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             this.controllor.openAttachment();
         }
     }//GEN-LAST:event_attachmentTableMouseClicked
+
+    private void exportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportMouseClicked
+        switch (evt.getButton()) {
+            case MouseEvent.BUTTON1:
+                this.controllor.export(1);
+                break;
+            case MouseEvent.BUTTON3:
+                this.controllor.export(0);
+                break;
+        }
+    }//GEN-LAST:event_exportMouseClicked
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     private javax.swing.JButton addAttachment;

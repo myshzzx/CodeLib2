@@ -7,6 +7,8 @@ import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -95,8 +97,9 @@ public final class SearchEngine {
 		 */
 		public SearchTask(String keyword, String[] upperCaseKeys, String[] lowerCaseKeys) throws Exception {
 
-			this.setDaemon(true);
 			this.setName("SearchTask Thread");
+			this.setDaemon(true);
+			this.setPriority(NORM_PRIORITY - 1);
 
 			if (upperCaseKeys.length != lowerCaseKeys.length) {
 				throw new IllegalArgumentException();
@@ -175,7 +178,6 @@ public final class SearchEngine {
 			}
 
 			SearchEngine.this.onSearchTaskComplete(this);
-			System.gc();
 		}
 	}
 
@@ -251,6 +253,14 @@ public final class SearchEngine {
 
 		this.targetLib = targetLib;
 		this.resultCatcher = resultCatcher;
+
+//		启动定时 GC
+		new Timer("gcTimer", true).schedule(new TimerTask() {
+			@Override
+			public void run() {
+				System.gc();
+			}
+		}, 30 * 1000, 10 * 1000);
 	}
 
 	/**

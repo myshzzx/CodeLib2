@@ -41,9 +41,8 @@ import java.util.regex.PatternSyntaxException;
 
 /**
  * UI 控制器. 控制UI行为及状态.
- * 
+ *
  * @author Allen
- * 
  */
 public class UIControllor implements StateObserver, ResultCatcher {
 
@@ -294,7 +293,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 在改变状态检查当前状态是否需要保存.
-	 * 
+	 *
 	 * @return 是否要继续改变状态. false 表示后面的操作不继续了.
 	 */
 	private boolean checkForSave() {
@@ -329,9 +328,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 打开文件.
-	 * 
-	 * @param openFile
-	 *               要打开的文件.
+	 *
+	 * @param openFile 要打开的文件.
 	 */
 	void openFile(File openFile) {
 
@@ -355,7 +353,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			JOptionPane.showMessageDialog(this.ui, "打开文件失败.\n" + e.getMessage(), UIControllor.AppTitle,
 					JOptionPane.ERROR_MESSAGE);
 		} finally {
-			System.gc();
 			this.setStatusBarReady();
 		}
 	}
@@ -391,7 +388,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			JOptionPane.showMessageDialog(this.ui, "保存文件失败.\\n" + e.getMessage(), UIControllor.AppTitle,
 					JOptionPane.ERROR_MESSAGE);
 		} finally {
-			System.gc();
 			this.setStatusBarReady();
 		}
 	}
@@ -436,12 +432,23 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 导出.
+	 *
+	 * @param exportType 导出类型. 1 为导出选中条目, 0 为导出全部.
 	 */
 	@SuppressWarnings("unchecked")
-	void export() {
+	void export(int exportType) {
+		List<CodeLib2Element> items = null;
 
-		List<CodeLib2Element> selectedItems;
-		if ((selectedItems = this.ui.resultList.getSelectedValuesList()).size() > 0) {
+		switch (exportType) {
+			case 0:
+				items = this.eles;
+				break;
+			case 1:
+				items = this.ui.resultList.getSelectedValuesList();
+				break;
+		}
+
+		if (items != null && items.size() > 0) {
 			File exportFile = UIUtil.getSaveFileWithOverwriteChecking(this.ui.itemExportChooser, this.ui,
 					new UIUtil.FileExtentionGetter() {
 
@@ -468,19 +475,17 @@ public class UIControllor implements StateObserver, ResultCatcher {
 								+ FileUtil.getFileNameWithoutExtention(this.file.getPath());
 					}
 
-					ExportEngine.export(info, selectedItems);
+					ExportEngine.export(info, items);
 				}
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(this.ui, "导出失败.\n" + e, AppTitle, JOptionPane.ERROR_MESSAGE);
-			} finally {
-				System.gc();
 			}
 		}
 	}
 
 	/**
 	 * 执行搜索过滤.
-	 * 
+	 *
 	 * @param text
 	 */
 	@SuppressWarnings("unchecked")
@@ -492,7 +497,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		try {
 			this.currentKeyword = text;
-			this.searchEnging.addSearchTask(text, System.currentTimeMillis()+300);
+			this.searchEnging.addSearchTask(text, System.currentTimeMillis() + 300);
 
 			if (this.currentKeyword.split("[\\s,]+").length > 0)
 				this.setStatusBar("正在搜索 [ " + text + " ] ...");
@@ -504,7 +509,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 选中结果数据条目.
-	 * 
+	 *
 	 * @param selectedValue
 	 */
 	synchronized void selectItem(final Object selectedValue) {
@@ -531,8 +536,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.clearAttachmentTable();
 			if (item.getAttachments() != null) {
 				for (Attachment attachment : item.getAttachments()) {
-					((DefaultTableModel) this.ui.attachmentTable.getModel()).addRow(new Object[] {
-							attachment, attachment.getBinaryContent().length });
+					((DefaultTableModel) this.ui.attachmentTable.getModel()).addRow(new Object[]{
+							attachment, attachment.getBinaryContent().length});
 				}
 			}
 			this.ui.attachmentTable.updateUI();
@@ -549,9 +554,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 根据语法关键字取 RSyntaxTextArea 的语法样式.
-	 * 
-	 * @param syntaxKeyword
-	 *               语法关键字.
+	 *
+	 * @param syntaxKeyword 语法关键字.
 	 * @return
 	 */
 	private String getSyntaxStyle(String syntaxKeyword) {
@@ -559,132 +563,132 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		String result = SyntaxConstants.SYNTAX_STYLE_NONE;
 
 		switch (syntaxKeyword) {
-		case "actionscript":
-		case "as":
-			result = SyntaxConstants.SYNTAX_STYLE_ACTIONSCRIPT;
-			break;
-		case "asm":
-			result = SyntaxConstants.SYNTAX_STYLE_ASSEMBLER_X86;
-			break;
-		case "bat":
-			result = SyntaxConstants.SYNTAX_STYLE_WINDOWS_BATCH;
-			break;
-		case "bbcode":
-			result = SyntaxConstants.SYNTAX_STYLE_BBCODE;
-			break;
-		case "c":
-			result = SyntaxConstants.SYNTAX_STYLE_C;
-			break;
-		case "clj":
-		case "clojure":
-			result = SyntaxConstants.SYNTAX_STYLE_CLOJURE;
-			break;
-		case "cpp":
-		case "c++":
-			result = SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS;
-			break;
-		case "cs":
-		case "c#":
-			result = SyntaxConstants.SYNTAX_STYLE_CSHARP;
-			break;
-		case "css":
-			result = SyntaxConstants.SYNTAX_STYLE_CSS;
-			break;
-		case "delphi":
-		case "pas":
-		case "pascal":
-			result = SyntaxConstants.SYNTAX_STYLE_DELPHI;
-			break;
-		case "dtd":
-			result = SyntaxConstants.SYNTAX_STYLE_DTD;
-			break;
-		case "fortran":
-			result = SyntaxConstants.SYNTAX_STYLE_FORTRAN;
-			break;
-		case "groovy":
-		case "gsp":
-			result = SyntaxConstants.SYNTAX_STYLE_GROOVY;
-			break;
-		case "htm":
-		case "html":
-			result = SyntaxConstants.SYNTAX_STYLE_HTML;
-			break;
-		case "java":
-			result = SyntaxConstants.SYNTAX_STYLE_JAVA;
-			break;
-		case "javascript":
-		case "js":
-			result = SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT;
-			break;
-		case "json":
-			result = SyntaxConstants.SYNTAX_STYLE_JSON;
-			break;
-		case "jsp":
-			result = SyntaxConstants.SYNTAX_STYLE_JSP;
-			break;
-		case "latex":
-			result = SyntaxConstants.SYNTAX_STYLE_LATEX;
-			break;
-		case "lisp":
-			result = SyntaxConstants.SYNTAX_STYLE_LISP;
-			break;
-		case "lua":
-			result = SyntaxConstants.SYNTAX_STYLE_LUA;
-			break;
-		case "makefile":
-			result = SyntaxConstants.SYNTAX_STYLE_MAKEFILE;
-			break;
-		case "mx":
-		case "mxml":
-			result = SyntaxConstants.SYNTAX_STYLE_MXML;
-			break;
-		case "nsi":
-		case "nsis":
-			result = SyntaxConstants.SYNTAX_STYLE_NSIS;
-			break;
-		case "perl":
-			result = SyntaxConstants.SYNTAX_STYLE_PERL;
-			break;
-		case "php":
-			result = SyntaxConstants.SYNTAX_STYLE_PHP;
-			break;
-		case "prolog":
-			result = SyntaxConstants.SYNTAX_STYLE_CLOJURE;
-			break;
-		case "properties":
-			result = SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE;
-			break;
-		case "py":
-		case "python":
-			result = SyntaxConstants.SYNTAX_STYLE_PYTHON;
-			break;
-		case "ruby":
-			result = SyntaxConstants.SYNTAX_STYLE_RUBY;
-			break;
-		case "sas":
-			result = SyntaxConstants.SYNTAX_STYLE_SAS;
-			break;
-		case "scala":
-			result = SyntaxConstants.SYNTAX_STYLE_SCALA;
-			break;
-		case "shell":
-			result = SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL;
-			break;
-		case "sql":
-			result = SyntaxConstants.SYNTAX_STYLE_SQL;
-			break;
-		case "tcl":
-			result = SyntaxConstants.SYNTAX_STYLE_TCL;
-			break;
-		case "vb":
-		case "vbs":
-			result = SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC;
-			break;
-		case "xml":
-		case "xsd":
-		case "xsl":
-			result = SyntaxConstants.SYNTAX_STYLE_XML;
-			break;
+			case "actionscript":
+			case "as":
+				result = SyntaxConstants.SYNTAX_STYLE_ACTIONSCRIPT;
+				break;
+			case "asm":
+				result = SyntaxConstants.SYNTAX_STYLE_ASSEMBLER_X86;
+				break;
+			case "bat":
+				result = SyntaxConstants.SYNTAX_STYLE_WINDOWS_BATCH;
+				break;
+			case "bbcode":
+				result = SyntaxConstants.SYNTAX_STYLE_BBCODE;
+				break;
+			case "c":
+				result = SyntaxConstants.SYNTAX_STYLE_C;
+				break;
+			case "clj":
+			case "clojure":
+				result = SyntaxConstants.SYNTAX_STYLE_CLOJURE;
+				break;
+			case "cpp":
+			case "c++":
+				result = SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS;
+				break;
+			case "cs":
+			case "c#":
+				result = SyntaxConstants.SYNTAX_STYLE_CSHARP;
+				break;
+			case "css":
+				result = SyntaxConstants.SYNTAX_STYLE_CSS;
+				break;
+			case "delphi":
+			case "pas":
+			case "pascal":
+				result = SyntaxConstants.SYNTAX_STYLE_DELPHI;
+				break;
+			case "dtd":
+				result = SyntaxConstants.SYNTAX_STYLE_DTD;
+				break;
+			case "fortran":
+				result = SyntaxConstants.SYNTAX_STYLE_FORTRAN;
+				break;
+			case "groovy":
+			case "gsp":
+				result = SyntaxConstants.SYNTAX_STYLE_GROOVY;
+				break;
+			case "htm":
+			case "html":
+				result = SyntaxConstants.SYNTAX_STYLE_HTML;
+				break;
+			case "java":
+				result = SyntaxConstants.SYNTAX_STYLE_JAVA;
+				break;
+			case "javascript":
+			case "js":
+				result = SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT;
+				break;
+			case "json":
+				result = SyntaxConstants.SYNTAX_STYLE_JSON;
+				break;
+			case "jsp":
+				result = SyntaxConstants.SYNTAX_STYLE_JSP;
+				break;
+			case "latex":
+				result = SyntaxConstants.SYNTAX_STYLE_LATEX;
+				break;
+			case "lisp":
+				result = SyntaxConstants.SYNTAX_STYLE_LISP;
+				break;
+			case "lua":
+				result = SyntaxConstants.SYNTAX_STYLE_LUA;
+				break;
+			case "makefile":
+				result = SyntaxConstants.SYNTAX_STYLE_MAKEFILE;
+				break;
+			case "mx":
+			case "mxml":
+				result = SyntaxConstants.SYNTAX_STYLE_MXML;
+				break;
+			case "nsi":
+			case "nsis":
+				result = SyntaxConstants.SYNTAX_STYLE_NSIS;
+				break;
+			case "perl":
+				result = SyntaxConstants.SYNTAX_STYLE_PERL;
+				break;
+			case "php":
+				result = SyntaxConstants.SYNTAX_STYLE_PHP;
+				break;
+			case "prolog":
+				result = SyntaxConstants.SYNTAX_STYLE_CLOJURE;
+				break;
+			case "properties":
+				result = SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE;
+				break;
+			case "py":
+			case "python":
+				result = SyntaxConstants.SYNTAX_STYLE_PYTHON;
+				break;
+			case "ruby":
+				result = SyntaxConstants.SYNTAX_STYLE_RUBY;
+				break;
+			case "sas":
+				result = SyntaxConstants.SYNTAX_STYLE_SAS;
+				break;
+			case "scala":
+				result = SyntaxConstants.SYNTAX_STYLE_SCALA;
+				break;
+			case "shell":
+				result = SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL;
+				break;
+			case "sql":
+				result = SyntaxConstants.SYNTAX_STYLE_SQL;
+				break;
+			case "tcl":
+				result = SyntaxConstants.SYNTAX_STYLE_TCL;
+				break;
+			case "vb":
+			case "vbs":
+				result = SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC;
+				break;
+			case "xml":
+			case "xsd":
+			case "xsl":
+				result = SyntaxConstants.SYNTAX_STYLE_XML;
+				break;
 		}
 
 		return result;
@@ -727,26 +731,26 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	public boolean onSaveStateChanged(State oldState, State newState) {
 
 		switch (newState) {
-		case NEW:
-			this.currentItem = null;
-			this.eles.clear();
-			this.file = null;
-			this.ui.setAppTitle(UIControllor.AppTitle);
-			break;
-		case MODIFIED:
-			String title = "*" + UIControllor.AppTitle;
-			if (this.file != null) {
-				title += " - " + file.getAbsolutePath();
-			}
-			this.ui.setAppTitle(title);
-			break;
-		case SAVED:
-			title = UIControllor.AppTitle;
-			if (this.file != null) {
-				title += " - " + file.getAbsolutePath();
-			}
-			this.ui.setAppTitle(title);
-			break;
+			case NEW:
+				this.currentItem = null;
+				this.eles.clear();
+				this.file = null;
+				this.ui.setAppTitle(UIControllor.AppTitle);
+				break;
+			case MODIFIED:
+				String title = "*" + UIControllor.AppTitle;
+				if (this.file != null) {
+					title += " - " + file.getAbsolutePath();
+				}
+				this.ui.setAppTitle(title);
+				break;
+			case SAVED:
+				title = UIControllor.AppTitle;
+				if (this.file != null) {
+					title += " - " + file.getAbsolutePath();
+				}
+				this.ui.setAppTitle(title);
+				break;
 		}
 		return true;
 	}
@@ -763,7 +767,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 					if (keyword == currentKeyword)
 						((DefaultListModel<CodeLib2Element>) ui.resultList.getModel()).addElement(ele);
-					// this.ui.resultList.setSelectedValue(ele, true);
 				}
 			});
 	}
@@ -801,7 +804,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 关闭前检查或询问以确定否要关闭.
-	 * 
+	 *
 	 * @return
 	 */
 	boolean doClose() {
@@ -821,7 +824,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 设置状态栏内容.
-	 * 
+	 *
 	 * @param statusText
 	 */
 	void setStatusBar(String statusText) {
@@ -839,7 +842,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 代码编辑窗口的 url 点击事件.
-	 * 
+	 *
 	 * @param url
 	 */
 	void urlClicked(URL url) {
@@ -870,8 +873,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				try {
 					if (file.length() > 1_000_000
 							&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
-									file.getName() + "\n文件超过1MB, 仍然导入?", AppTitle,
-									JOptionPane.YES_NO_OPTION)) {
+							file.getName() + "\n文件超过1MB, 仍然导入?", AppTitle,
+							JOptionPane.YES_NO_OPTION)) {
 						continue;
 					}
 
@@ -912,14 +915,14 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 将 List<Attachment> 添加到附件列表.
-	 * 
+	 *
 	 * @param attachments
 	 */
 	private void addAttachmentToTable(List<Attachment> attachments) {
 
 		DefaultTableModel dataModel = (DefaultTableModel) this.ui.attachmentTable.getModel();
 		for (Attachment attachment : attachments) {
-			dataModel.addRow(new Object[] { attachment, attachment.getBinaryContent().length });
+			dataModel.addRow(new Object[]{attachment, attachment.getBinaryContent().length});
 		}
 		this.ui.attachmentTable.updateUI();
 	}
@@ -964,8 +967,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 					if (new File(filepath).exists()
 							&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
-									"是否覆盖文件?\n" + filepath, AppTitle,
-									JOptionPane.YES_NO_OPTION)) {
+							"是否覆盖文件?\n" + filepath, AppTitle,
+							JOptionPane.YES_NO_OPTION)) {
 						continue;
 					}
 
@@ -986,40 +989,33 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		if (JFileChooser.APPROVE_OPTION == this.ui.zcl2ImportChooser.showOpenDialog(this.ui)) {
 			File[] files = this.ui.zcl2ImportChooser.getSelectedFiles();
-			// 成功导入计数.
-			int successImportCount = 0;
-			Collection<CodeLib2Element> readItems;
+			Collection<CodeLib2Element> readItems = new ArrayList<>();
 
 			this.setStatusBar("正在导入 ...");
-			for (File file : files) {
-				try {
-					readItems = DataHeader.readFromFile(file.getAbsolutePath());
-					this.eles.addAll(readItems);
-
-					for (CodeLib2Element ele : readItems)
-						((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(ele);
-
-					successImportCount++;
-				} catch (Exception e) {
-					log.error("导入 zcl2 文件失败: " + file.getAbsolutePath(), e);
+			File cFile = null;
+			try {
+				for (File tFile : files) {
+					cFile = tFile;
+					readItems.addAll(DataHeader.readFromFile(tFile.getAbsolutePath()));
 				}
-			}
-			Collections.sort(this.eles);
-			this.setStatusBarReady();
-			System.gc();
 
-			if (successImportCount > 0)
+				for (CodeLib2Element ele : readItems)
+					((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(ele);
+
+				this.eles.addAll(readItems);
+				Collections.sort(this.eles);
+
 				this.saveState.changeState(State.MODIFIED);
-
-			if (successImportCount == files.length) {
-				JOptionPane.showMessageDialog(this.ui, "导入成功: " + successImportCount + " 个文件", AppTitle,
+				this.setStatusBar("成功导入");
+			} catch (Throwable t) {
+				this.setStatusBarReady();
+				JOptionPane.showMessageDialog(this.ui, "导入失败\n失败详情请查看日志", AppTitle,
 						JOptionPane.INFORMATION_MESSAGE);
-			} else {
-				JOptionPane.showMessageDialog(this.ui, "导入成功: " + successImportCount + " 个文件\n导入失败: "
-						+ (files.length - successImportCount) + " 个文件\n失败详情查看日志", AppTitle,
-						JOptionPane.INFORMATION_MESSAGE);
+				log.error("导入 zcl2 文件失败: " + cFile.getAbsolutePath(), t);
 			}
 
+			readItems = null;
+			System.gc();
 		}
 	}
 
