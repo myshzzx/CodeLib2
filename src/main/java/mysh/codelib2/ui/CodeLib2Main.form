@@ -220,11 +220,14 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/icons/import.png"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x5165; zcl2 &#x6587;&#x4ef6;"/>
+            <Property name="toolTipText" type="java.lang.String" value="&#x5bfc;&#x5165; zcl2 &#x6587;&#x4ef6;, &#x5e76;&#x53bb;&#x9664;&#x91cd;&#x590d;&#x9879;"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
+          <AccessibilityProperties>
+            <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value="&#x5bfc;&#x5165; zcl2 &#x6587;&#x4ef6;, &#x5e76;&#x53bb;&#x9664;&#x91cd;&#x590d;&#x9879;"/>
+          </AccessibilityProperties>
           <Events>
             <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="importButtonMouseEntered"/>
             <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="importButtonMouseExited"/>

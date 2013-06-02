@@ -4,12 +4,12 @@
  */
 package mysh.codelib2.ui;
 
-import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileFilter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 
 /**
@@ -306,7 +306,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jToolBar1.add(jSeparator2);
 
         importButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/import.png"))); // NOI18N
-        importButton.setToolTipText("导入 zcl2 文件");
+        importButton.setToolTipText("导入 zcl2 文件, 并去除重复项");
         importButton.setFocusable(false);
         importButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         importButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -324,6 +324,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             }
         });
         jToolBar1.add(importButton);
+        importButton.getAccessibleContext().setAccessibleDescription("导入 zcl2 文件, 并去除重复项");
 
         export.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/export.png"))); // NOI18N
         export.setToolTipText("导出选中条目 | 导出全部");

@@ -41,10 +41,11 @@ public final class SearchEngine {
 		/**
 		 * 取得搜索结果.
 		 *
-		 * @param keyword 搜索关键字.
-		 * @param ele     结果元素.
+		 * @param keyword     搜索关键字.
+		 * @param ele         结果元素.
+		 * @param matchDegree 匹配度, 越大表示匹配程度越高.
 		 */
-		void onGetSearchResult(String keyword, CodeLib2Element ele);
+		void onGetSearchResult(String keyword, CodeLib2Element ele, int matchDegree);
 
 		/**
 		 * 搜索完成.
@@ -134,9 +135,8 @@ public final class SearchEngine {
 
 					for (keyIndex = 0, keyResult = true; keyResult && keyIndex < keyLength; keyIndex++) {
 						// 匹配关键字
-						keyResult = this.lowerCaseKeys[keyIndex].length() == 0 ? true
-								: ele.getKeywords().toLowerCase().contains(
-								this.lowerCaseKeys[keyIndex]);
+						keyResult = this.lowerCaseKeys[keyIndex].length() == 0
+								|| ele.getKeywords().toLowerCase().contains(this.lowerCaseKeys[keyIndex]);
 
 						// 匹配内容
 						if (!keyResult) {
@@ -169,7 +169,7 @@ public final class SearchEngine {
 					if (this.isInterrupted())
 						break;
 					else if (keyResult)
-						resultCatcher.onGetSearchResult(this.keyword, ele);
+						resultCatcher.onGetSearchResult(this.keyword, ele, 0);
 				} catch (IndexOutOfBoundsException outOfBoundsEx) {
 					break;
 				} catch (Exception e) {

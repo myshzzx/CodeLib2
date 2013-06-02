@@ -55,7 +55,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	static {
 //		迭代次数, 100次到达e
-		final int IterateVersion = 2;
+		final int IterateVersion = 3;
 		//版本号取 4 位小数
 		AppTitle = "CodeLib2 v" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 2.53).substring(0, 6);
 	}
@@ -765,7 +765,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public synchronized void onGetSearchResult(final String keyword, final CodeLib2Element ele) {
+	public synchronized void onGetSearchResult(final String keyword, final CodeLib2Element ele, int matchDegree) {
 
 		if (keyword == this.currentKeyword)
 			SwingUtilities.invokeLater(new Runnable() {
@@ -997,7 +997,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		if (JFileChooser.APPROVE_OPTION == this.ui.zcl2ImportChooser.showOpenDialog(this.ui)) {
 			File[] files = this.ui.zcl2ImportChooser.getSelectedFiles();
-			Collection<CodeLib2Element> readItems = new ArrayList<>();
+
+			// 这里用set保证元素不重复, 以便下面去重操作
+			Set<CodeLib2Element> readItems = new HashSet<>();
 
 			this.setStatusBar("正在导入 ...");
 			File cFile = null;
@@ -1007,15 +1009,20 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					readItems.addAll(DataHeader.readFromFile(tFile.getAbsolutePath()));
 				}
 
+//				展示导入的元素
 //				for (CodeLib2Element ele : readItems)
 //					((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(ele);
+
+				// 去除重复元素
+				readItems.addAll(this.eles);
+				this.eles.clear();
 
 				this.eles.addAll(readItems);
 				Collections.sort(this.eles);
 
 				this.saveState.changeState(State.MODIFIED);
 				this.setStatusBar("成功导入");
-				JOptionPane.showMessageDialog(this.ui, "导入成功\n共导入 " + readItems.size() + " 项", AppTitle,
+				JOptionPane.showMessageDialog(this.ui, "导入成功\n现有 " + this.eles.size() + " 项", AppTitle,
 						JOptionPane.INFORMATION_MESSAGE);
 			} catch (Throwable t) {
 				this.setStatusBarReady();
