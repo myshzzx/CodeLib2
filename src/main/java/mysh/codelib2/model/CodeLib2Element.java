@@ -244,9 +244,11 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		CodeLib2Element e = (CodeLib2Element) obj;
 
-		if (this.keywords != null) {
-			if (!this.keywords.equals(e.keywords)) return false;
-		} else if (e.keywords != null) {
+		if (this.keywords != null && e.keywords != null) {
+			if (this.keywords.hashCode() != e.keywords.hashCode()
+					&& !this.keywords.equals(e.keywords))
+				return false;
+		} else if (this.keywords != null || e.keywords != null) {
 			return false;
 		}
 

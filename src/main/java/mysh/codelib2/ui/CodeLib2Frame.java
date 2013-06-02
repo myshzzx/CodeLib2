@@ -4,9 +4,10 @@
  */
 package mysh.codelib2.ui;
 
-import java.awt.BorderLayout;
-import java.io.File;
 import mysh.util.UIUtil;
+
+import java.awt.*;
+import java.io.File;
 
 /**
  *
@@ -21,6 +22,8 @@ public class CodeLib2Frame extends javax.swing.JFrame {
      */
     public CodeLib2Frame() {
         initComponents();
+	    this.setTitle(UIControllor.AppTitle);
+
         this.getContentPane().setLayout(new BorderLayout());
         this.codeLib2Main = new CodeLib2Main().setAppTitleSetter(new CodeLib2Main.AppTitltSetter() {
 

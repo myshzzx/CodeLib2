@@ -51,7 +51,14 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 应用名.
 	 */
-	private static final String AppTitle = "CodeLib2";
+	public static final String AppTitle;
+
+	static {
+//		迭代次数, 100次到达e
+		final int IterateVersion = 2;
+		//版本号取 4 位小数
+		AppTitle = "CodeLib2 v" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 2.53).substring(0, 6);
+	}
 
 	/**
 	 * 临时目录.
@@ -755,6 +762,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		return true;
 	}
 
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized void onGetSearchResult(final String keyword, final CodeLib2Element ele) {
@@ -815,7 +823,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 将内容编辑窗的内容复制到系统剪贴板.
 	 */
-	public void copyContentToClipboard() {
+	void copyContentToClipboard() {
 
 		Clipboard sysclip = Toolkit.getDefaultToolkit().getSystemClipboard();
 		Transferable text = new StringSelection(this.ui.codeText.getText());
@@ -985,7 +993,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 导入 zcl2 文件.
 	 */
 	@SuppressWarnings("unchecked")
-	public void importZcl2() {
+	void importZcl2() {
 
 		if (JFileChooser.APPROVE_OPTION == this.ui.zcl2ImportChooser.showOpenDialog(this.ui)) {
 			File[] files = this.ui.zcl2ImportChooser.getSelectedFiles();
@@ -999,18 +1007,20 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					readItems.addAll(DataHeader.readFromFile(tFile.getAbsolutePath()));
 				}
 
-				for (CodeLib2Element ele : readItems)
-					((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(ele);
+//				for (CodeLib2Element ele : readItems)
+//					((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(ele);
 
 				this.eles.addAll(readItems);
 				Collections.sort(this.eles);
 
 				this.saveState.changeState(State.MODIFIED);
 				this.setStatusBar("成功导入");
+				JOptionPane.showMessageDialog(this.ui, "导入成功\n共导入 " + readItems.size() + " 项", AppTitle,
+						JOptionPane.INFORMATION_MESSAGE);
 			} catch (Throwable t) {
 				this.setStatusBarReady();
 				JOptionPane.showMessageDialog(this.ui, "导入失败\n失败详情请查看日志", AppTitle,
-						JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.ERROR_MESSAGE);
 				log.error("导入 zcl2 文件失败: " + cFile.getAbsolutePath(), t);
 			}
 
