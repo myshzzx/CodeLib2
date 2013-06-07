@@ -99,6 +99,8 @@ public class CodeLib2Frame extends javax.swing.JFrame {
         }
         //</editor-fold>
 
+	    UIUtil.resetFont(null);
+
         /*
          * Create and display the form
          */
@@ -109,7 +111,6 @@ public class CodeLib2Frame extends javax.swing.JFrame {
             frame.codeLib2Main.openFile(new File(args[0]));
         }
 
-        UIUtil.resetFont(null);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables

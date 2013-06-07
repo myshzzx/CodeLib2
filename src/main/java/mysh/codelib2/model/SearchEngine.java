@@ -39,11 +39,16 @@ public final class SearchEngine {
 	public static interface ResultCatcher {
 
 		/**
+		 * 初始化(最小) 搜索结果匹配度.
+		 */
+		int InitMatchDegree = 0;
+
+		/**
 		 * 取得搜索结果.
 		 *
 		 * @param keyword     搜索关键字.
 		 * @param ele         结果元素.
-		 * @param matchDegree 匹配度, 越大表示匹配程度越高.
+		 * @param matchDegree 匹配度(最小为 {@link ResultCatcher#InitMatchDegree}), 越大表示匹配程度越高.
 		 */
 		void onGetSearchResult(String keyword, CodeLib2Element ele, int matchDegree);
 
@@ -100,7 +105,7 @@ public final class SearchEngine {
 
 			this.setName("SearchTask Thread");
 			this.setDaemon(true);
-			this.setPriority(NORM_PRIORITY - 1);
+			this.setPriority(MIN_PRIORITY);
 
 			if (upperCaseKeys.length != lowerCaseKeys.length) {
 				throw new IllegalArgumentException();
@@ -215,6 +220,7 @@ public final class SearchEngine {
 					search(keyword);
 				}
 			} catch (Exception e) {
+				log.error("搜索守护线程异常退出", e);
 			}
 		}
 

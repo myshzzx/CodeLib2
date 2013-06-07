@@ -36,6 +36,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -46,6 +48,19 @@ import java.util.regex.PatternSyntaxException;
  */
 public class UIControllor implements StateObserver, ResultCatcher {
 
+	/**
+	 * 搜索结果.
+	 */
+	private static class SearchResult {
+		private CodeLib2Element ele;
+		private int matchDegree;
+
+		private SearchResult(CodeLib2Element ele, int matchDegree) {
+			this.ele = ele;
+			this.matchDegree = matchDegree;
+		}
+	}
+
 	private static final Logger log = Logger.getLogger(CompressUtil.class);
 
 	/**
@@ -55,7 +70,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	static {
 //		迭代次数, 100次到达e
-		final int IterateVersion = 3;
+		final int IterateVersion = 4;
 		//版本号取 4 位小数
 		AppTitle = "CodeLib2 v" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 2.53).substring(0, 6);
 	}
@@ -93,6 +108,11 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	private volatile String currentKeyword;
 
 	/**
+	 * 搜索结果队列.
+	 */
+	private final Queue<SearchResult> searchResults = new ConcurrentLinkedQueue<>();
+
+	/**
 	 * 当前选中的条目.
 	 */
 	private volatile CodeLib2Element currentItem;
@@ -123,13 +143,13 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 
-				UIControllor.this.filter(UIControllor.this.ui.filterText.getText());
+				UIControllor.this.search(UIControllor.this.ui.filterText.getText());
 			}
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 
-				UIControllor.this.filter(UIControllor.this.ui.filterText.getText());
+				UIControllor.this.search(UIControllor.this.ui.filterText.getText());
 			}
 
 			@Override
@@ -294,7 +314,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		if (checkForSave()) {
 			this.saveState.changeState(State.NEW);
 			this.ui.filterText.setText("");
-			this.filter("");
+			this.search("");
 		}
 	}
 
@@ -353,7 +373,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.saveState.changeState(State.SAVED);
 			this.ui.filterText.setText("");
 			this.ui.filterText.requestFocus();
-			this.filter("");
+			this.search("");
 
 			this.ui.zcl2OpenChooser.setCurrentDirectory(openFile.getParentFile());
 		} catch (Exception e) {
@@ -491,19 +511,20 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	}
 
 	/**
-	 * 执行搜索过滤.
+	 * 执行搜索.
 	 *
 	 * @param text
 	 */
 	@SuppressWarnings("unchecked")
-	private void filter(String text) {
+	private void search(String text) {
+		this.currentKeyword = text;
 
 		this.ui.resultList.clearSelection();
 		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).clear();
 		this.clearAttachmentTable();
+		this.searchResults.clear();
 
 		try {
-			this.currentKeyword = text;
 			this.searchEnging.addSearchTask(text, System.currentTimeMillis() + 300);
 
 			if (this.currentKeyword.split("[\\s,]+").length > 0)
@@ -768,25 +789,44 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	public synchronized void onGetSearchResult(final String keyword, final CodeLib2Element ele, int matchDegree) {
 
 		if (keyword == this.currentKeyword)
-			SwingUtilities.invokeLater(new Runnable() {
-
-				@Override
-				public void run() {
-
-					if (keyword == currentKeyword)
-						((DefaultListModel<CodeLib2Element>) ui.resultList.getModel()).addElement(ele);
-				}
-			});
+			this.searchResults.add(new SearchResult(ele, matchDegree));
 	}
 
 	@Override
 	public void onSearchComplete(final String keyword) {
+
+		final Object[] resultsArray = this.searchResults.toArray();
+		Arrays.sort(resultsArray, new Comparator<Object>() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				return ((SearchResult) o1).matchDegree - ((SearchResult) o2).matchDegree;
+			}
+		});
 
 		// update status bar
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
 			public void run() {
+				int dispalyLimit = 500;
+
+				if (resultsArray.length > dispalyLimit
+						&&
+						"*".equals(currentKeyword.trim().split("[\\s,]+")[0])
+						&&
+						JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(ui,
+								"结果条目 " + resultsArray.length + " 条, 建议只展示部分结果以缩短渲染时间\n" +
+										"选 \"是\" 只展示前 " + dispalyLimit + " 条, 选 \"否\" 全部展示",
+								AppTitle,
+								JOptionPane.YES_NO_OPTION)) {
+					dispalyLimit = Integer.MAX_VALUE;
+				}
+
+				int count = 1;
+				for (Object sortedResult : resultsArray) {
+					if (count++ > dispalyLimit) break;
+					((DefaultListModel<CodeLib2Element>) ui.resultList.getModel()).addElement(((SearchResult) sortedResult).ele);
+				}
 
 				String[] keywords = keyword.trim().split("[\\s,]+");
 				if (keywords.length > 0 && keywords[keywords.length - 1].trim().length() > 0) {
@@ -797,9 +837,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 				ui.resultList.repaint();
 
-				if (currentKeyword.split("[\\s,]+").length > 0) {
-					setStatusBar("搜索 [" + currentKeyword + "] 完成, 共 "
-							+ ui.resultList.getModel().getSize() + " 个结果.");
+				if (currentKeyword.trim().length() > 0 && currentKeyword.split("[\\s,]+").length > 0) {
+					setStatusBar("搜索 [" + currentKeyword + "] 完成, 展示条目/全部结果="
+							+ ui.resultList.getModel().getSize() + "/" + resultsArray.length);
 					if (ui.resultList.getModel().getSize() > 0) {
 						ui.resultList.setSelectedIndex(0);
 					}
@@ -845,7 +885,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 */
 	void setStatusBarReady() {
 
-		this.ui.statusBar.setText("就绪");
+		this.ui.statusBar.setText("就绪 (共 " + this.eles.size() + " 个条目)");
 	}
 
 	/**
