@@ -123,9 +123,11 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
         keyWordText = new javax.swing.JTextField();
+        contentTab = new javax.swing.JTabbedPane();
         rTextScrollPane = new javax.swing.JScrollPane();
         codeText = new org.fife.ui.rsyntaxtextarea.RSyntaxTextArea();
-        jSplitPane3 = new javax.swing.JSplitPane();
+        browserPanel = new javax.swing.JPanel();
+        attachmentPanel = new javax.swing.JSplitPane();
         attachmentToolPanel = new javax.swing.JPanel();
         jToolbar2 = new javax.swing.JToolBar();
         addAttachment = new javax.swing.JButton();
@@ -324,7 +326,6 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             }
         });
         jToolBar1.add(importButton);
-        importButton.getAccessibleContext().setAccessibleDescription("导入 zcl2 文件, 并去除重复项");
 
         export.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/export.png"))); // NOI18N
         export.setToolTipText("导出选中条目 | 导出全部");
@@ -427,8 +428,11 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             }
         });
 
+        contentTab.setTabPlacement(javax.swing.JTabbedPane.BOTTOM);
+
         rTextScrollPane = new org.fife.ui.rtextarea.RTextScrollPane(codeText, true);
         rTextScrollPane.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
+        codeText.setTabSize(1);
         codeText.setLineWrap(true);
         codeText.setEditable(false);
         codeText.setColumns(20);
@@ -440,7 +444,6 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         codeText.setMarkOccurrences(true);
         codeText.setNextFocusableComponent(filterText);
         codeText.setPaintMarkOccurrencesBorder(true);
-        codeText.setPaintTabLines(true);
         codeText.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 codeTextMouseEntered(evt);
@@ -456,26 +459,31 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         rTextScrollPane.setViewportView(codeText);
 
+        contentTab.addTab(" 内容 ", rTextScrollPane);
+
+        browserPanel.setLayout(new java.awt.BorderLayout());
+        contentTab.addTab(" 浏览器 ", browserPanel);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(keyWordText)
-            .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
+            .addComponent(contentTab, javax.swing.GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(keyWordText, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(rTextScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
+                .addComponent(contentTab, javax.swing.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
         );
 
         jSplitPane2.setTopComponent(jPanel2);
 
-        jSplitPane3.setDividerLocation(33);
-        jSplitPane3.setDividerSize(0);
-        jSplitPane3.setEnabled(false);
+        attachmentPanel.setDividerLocation(33);
+        attachmentPanel.setDividerSize(0);
+        attachmentPanel.setEnabled(false);
 
         attachmentToolPanel.setLayout(new java.awt.BorderLayout());
 
@@ -545,7 +553,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
 
         attachmentToolPanel.add(jToolbar2, java.awt.BorderLayout.NORTH);
 
-        jSplitPane3.setLeftComponent(attachmentToolPanel);
+        attachmentPanel.setLeftComponent(attachmentToolPanel);
 
         jScrollPane4.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
 
@@ -581,9 +589,9 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jScrollPane4.setViewportView(attachmentTable);
 
-        jSplitPane3.setRightComponent(jScrollPane4);
+        attachmentPanel.setRightComponent(jScrollPane4);
 
-        jSplitPane2.setRightComponent(jSplitPane3);
+        jSplitPane2.setRightComponent(attachmentPanel);
 
         jSplitPane1.setRightComponent(jSplitPane2);
 
@@ -892,9 +900,18 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     }//GEN-LAST:event_findTextMouseExited
 
     private void attachmentTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attachmentTableMouseClicked
-        if (evt.getClickCount() == 2) {
-            this.controllor.openAttachment();
-        }
+        final int clickCount = evt.getClickCount();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (clickCount == 1) {
+                    controllor.showAttachment();
+                } else if (clickCount == 2) {
+                    controllor.openAttachment();
+                }
+            }
+        });
+
     }//GEN-LAST:event_attachmentTableMouseClicked
 
     private void exportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportMouseClicked
@@ -912,9 +929,12 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private javax.swing.JButton addAttachment;
     javax.swing.JFileChooser attachmentExportChooser;
     javax.swing.JFileChooser attachmentImportChooser;
+    javax.swing.JSplitPane attachmentPanel;
     javax.swing.JTable attachmentTable;
     private javax.swing.JPanel attachmentToolPanel;
+    javax.swing.JPanel browserPanel;
     org.fife.ui.rsyntaxtextarea.RSyntaxTextArea codeText;
+    javax.swing.JTabbedPane contentTab;
     private javax.swing.JButton copyToClipboard;
     private javax.swing.JButton export;
     private javax.swing.JButton exportAttachment;
@@ -932,13 +952,12 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
-    private javax.swing.JSplitPane jSplitPane3;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolbar2;
     javax.swing.JTextField keyWordText;
     private javax.swing.JButton newInst;
     private javax.swing.JButton open;
-    private javax.swing.JScrollPane rTextScrollPane;
+    javax.swing.JScrollPane rTextScrollPane;
     private javax.swing.JButton remove;
     private javax.swing.JButton removeAttachment;
     javax.swing.JList resultList;

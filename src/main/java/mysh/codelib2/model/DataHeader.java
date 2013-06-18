@@ -4,7 +4,8 @@ package mysh.codelib2.model;
 import mysh.util.CompressUtil;
 import mysh.util.CompressUtil.EntryPicker;
 import mysh.util.FileUtil;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -25,8 +26,7 @@ import java.util.zip.ZipEntry;
 public class DataHeader implements Serializable {
 	private static final long serialVersionUID = -5817161670435220173L;
 
-	private static transient final Logger log = Logger.getLogger(DataHeader.class);
-
+	private static final Logger log = LoggerFactory.getLogger(DataHeader.class);
 	private static transient final String compressEntry = "zcl2";
 
 	/**

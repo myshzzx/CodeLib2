@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+<!--                                                                -->
+<configuration>
+
+	<!--http://code.google.com/p/log4jdbc/-->
+	<logger name="jdbc.sqltiming" level="DEBUG"/>
+	<logger name="jdbc.sqlonly" level="ERROR"/>
+	<logger name="jdbc.resultset" level="ERROR"/>
+	<logger name="jdbc.audit" level="ERROR"/>
+
+	<logger name="org.springframework" level="INFO"/>
+
+	<logger name="org.hibernate.cfg.Ejb3Column" level="INFO"/>
+	<logger name="org.hibernate.cfg.annotations" level="INFO"/>
+	<logger name="org.hibernate.engine.internal.TwoPhaseLoad" level="INFO"/>
+	<logger name="org.hibernate.ejb.packaging.AbstractJarVisitor" level="INFO"/>
+	<logger name="org.hibernate.loader.Loader" level="INFO"/>
+	<logger name="org.hibernate.type.BasicTypeRegistry" level="INFO"/>
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- Tests run on modern PCs show that buffering related property -->
+		<!-- "ImmediateFlush" has negligible impact and will be ignored.  -->
+		<encoder>
+			<pattern>%d [%-5level] [%thread] %logger: %msg%n</pattern>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>DEBUG</level>
+		</filter>
+	</appender>
+
+	<appender name="DebugFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+		<Append>true</Append>
+		<File>logs/debug.html</File>
+		<layout class="ch.qos.logback.classic.html.HTMLLayout">
+			<!--See http://logback.qos.ch/manual/layouts.html#ClassicHTMLLayout-->
+			<!--for documentation-->
+			<LocationInfo>true</LocationInfo>
+			<Pattern>%relative%thread%mdc%level%logger%msg</Pattern>
+		</layout>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>DEBUG</level>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<maxIndex>50</maxIndex>
+			<FileNamePattern>logs/debug.%i.html</FileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>4MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+
+	<appender name="ErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+		<Append>true</Append>
+		<File>logs/error.html</File>
+		<layout class="ch.qos.logback.classic.html.HTMLLayout">
+			<!--See http://logback.qos.ch/manual/layouts.html#ClassicHTMLLayout-->
+			<!--for documentation-->
+			<LocationInfo>true</LocationInfo>
+			<Pattern>%relative%thread%mdc%level%logger%msg</Pattern>
+		</layout>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>WARN</level>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<maxIndex>50</maxIndex>
+			<FileNamePattern>logs/error.%i.html</FileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>2MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+
+
+	<root level="debug">
+		<appender-ref ref="console"/>
+		<!--<appender-ref ref="DebugFile"/>-->
+		<!--<appender-ref ref="ErrorFile"/>-->
+	</root>
+
+</configuration>
+

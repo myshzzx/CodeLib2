@@ -1,6 +1,11 @@
 
 package mysh.codelib2.ui;
 
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import mysh.codelib2.model.CodeLib2Element;
 import mysh.codelib2.model.CodeLib2Element.Attachment;
 import mysh.codelib2.model.DataHeader;
@@ -10,13 +15,13 @@ import mysh.codelib2.model.SearchEngine;
 import mysh.codelib2.model.SearchEngine.ResultCatcher;
 import mysh.codelib2.ui.SaveStateManager.State;
 import mysh.codelib2.ui.SaveStateManager.StateObserver;
-import mysh.util.CompressUtil;
 import mysh.util.FileUtil;
 import mysh.util.HotKeyUtil;
 import mysh.util.UIUtil;
-import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.SearchContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -25,8 +30,12 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.Desktop.Action;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -38,6 +47,8 @@ import java.util.*;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -47,6 +58,7 @@ import java.util.regex.PatternSyntaxException;
  * @author Allen
  */
 public class UIControllor implements StateObserver, ResultCatcher {
+	private static final Logger log = LoggerFactory.getLogger(UIControllor.class);
 
 	/**
 	 * 搜索结果.
@@ -61,7 +73,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		}
 	}
 
-	private static final Logger log = Logger.getLogger(CompressUtil.class);
 
 	/**
 	 * 应用名.
@@ -70,7 +81,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	static {
 //		迭代次数, 100次到达e
-		final int IterateVersion = 4;
+		final int IterateVersion = 7;
 		//版本号取 4 位小数
 		AppTitle = "CodeLib2 v" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 2.53).substring(0, 6);
 	}
@@ -81,6 +92,11 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	private static final String TempDir = System.getProperty("java.io.tmpdir") + AppTitle + File.separatorChar;
 
 	private final CodeLib2Main ui;
+
+	/**
+	 * 浏览器引擎.
+	 */
+	private WebEngine browserEngine;
 
 	/**
 	 * 数据集.
@@ -211,6 +227,41 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		this.findContext.setWholeWord(false);
 
 		// this.testData();
+
+		this.ui.attachmentPanel.setDropTarget(new DropTarget() {
+			@Override
+			public synchronized void drop(DropTargetDropEvent evt) {
+				try {
+					Transferable transferable = evt.getTransferable();
+					if (currentItem != null
+							&&
+							Arrays.asList(transferable.getTransferDataFlavors()).contains(DataFlavor.javaFileListFlavor)) {
+						evt.acceptDrop(DnDConstants.ACTION_COPY);
+						List<File> transferData = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+						addAttachment(currentItem, transferData);
+					} else {
+						evt.rejectDrop();
+					}
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
+				}
+			}
+		});
+
+		// 浏览器初始化
+		final JFXPanel fxPanel = new JFXPanel();
+		this.ui.browserPanel.add(fxPanel);
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				WebView browser = new WebView();
+				Scene scene = new Scene(browser);
+				fxPanel.setScene(scene);
+				browserEngine = browser.getEngine();
+				browserEngine.loadContent(AppTitle);
+				fxPanel.setFont(UIUtil.DefaultFont);
+			}
+		});
 	}
 
 	/**
@@ -543,6 +594,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	synchronized void selectItem(final Object selectedValue) {
 
 		this.currentItem = null;
+		this.ui.contentTab.setSelectedComponent(this.ui.rTextScrollPane);
 
 		if (selectedValue instanceof CodeLib2Element && this.ui.resultList.getSelectedIndices().length == 1) {
 
@@ -554,6 +606,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				this.ui.codeText.setText(new String(item.getContent(), CodeLib2Element.DefaultCharsetEncode));
 				this.ui.codeText.setCaretPosition(0);
 				this.ui.codeText.setEditable(true);
+
+				this.setBrowserContent(AppTitle);
 
 				this.findText();
 			} catch (UnsupportedEncodingException e) {
@@ -576,6 +630,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.ui.keyWordText.setEditable(false);
 			this.ui.codeText.setText("");
 			this.ui.codeText.setEditable(false);
+
+			this.setBrowserContent(AppTitle);
+
 			((DefaultTableModel) this.ui.attachmentTable.getModel()).getDataVector().removeAllElements();
 		}
 	}
@@ -866,7 +923,12 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	void copyContentToClipboard() {
 
 		Clipboard sysclip = Toolkit.getDefaultToolkit().getSystemClipboard();
-		Transferable text = new StringSelection(this.ui.codeText.getText());
+		String contentText = "";
+		if (this.ui.rTextScrollPane == this.ui.contentTab.getSelectedComponent())
+			contentText = this.ui.codeText.getText();
+		else if (this.ui.browserPanel == this.ui.contentTab.getSelectedComponent())
+			contentText = this.browserEngine.getDocument().getDocumentElement().getTextContent();
+		Transferable text = new StringSelection(contentText);
 		sysclip.setContents(text, null);
 	}
 
@@ -914,42 +976,53 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		if (attachToItem != null
 				&& JFileChooser.APPROVE_OPTION == this.ui.attachmentImportChooser.showOpenDialog(this.ui)) {
 			File[] files = this.ui.attachmentImportChooser.getSelectedFiles();
+			this.addAttachment(attachToItem, Arrays.asList(files));
+		}
+	}
 
-			final List<Attachment> attachments = new ArrayList<>();
+	/**
+	 * 将文件作为附件加入条目元素.
+	 *
+	 * @param attachToItem
+	 * @param files
+	 */
+	private void addAttachment(CodeLib2Element attachToItem, List<File> files) {
+		if (attachToItem == null || files == null)
+			return;
 
-			for (File file : files) {
-				try {
-					if (file.length() > 1_000_000
-							&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
-							file.getName() + "\n文件超过1MB, 仍然导入?", AppTitle,
-							JOptionPane.YES_NO_OPTION)) {
-						continue;
-					}
+		final List<Attachment> attachments = new ArrayList<>();
 
-					attachments.add(new Attachment().setName(file.getName()).setBinaryContent(
-							FileUtil.readFileToByteArray(file.getAbsolutePath(), Integer.MAX_VALUE)));
-				} catch (Exception e) {
-					log.error("导入附件失败. " + file.getAbsolutePath(), e);
-					JOptionPane.showMessageDialog(this.ui, "导入附件失败.\n" + file.getName(), AppTitle,
-							JOptionPane.ERROR_MESSAGE);
+		for (File file : files) {
+			try {
+				if (file.length() > 1_000_000
+						&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
+						file.getName() + "\n文件超过1MB, 仍然导入?", AppTitle,
+						JOptionPane.YES_NO_OPTION)) {
+					continue;
 				}
+
+				attachments.add(new Attachment().setName(file.getName()).setBinaryContent(
+						FileUtil.readFileToByteArray(file.getAbsolutePath(), Integer.MAX_VALUE)));
+			} catch (Exception e) {
+				log.error("导入附件失败. " + file.getAbsolutePath(), e);
+				JOptionPane.showMessageDialog(this.ui, "导入附件失败.\n" + file.getName(), AppTitle,
+						JOptionPane.ERROR_MESSAGE);
 			}
-
-			if (attachments.size() > 0) {
-				if (attachToItem.getAttachments() == null)
-					attachToItem.setAttachments(new ArrayList<Attachment>());
-
-				attachToItem.getAttachments().addAll(attachments);
-				Collections.sort(attachToItem.getAttachments());
-
-				this.saveState.changeState(State.MODIFIED);
-				this.ui.resultList.repaint();
-			}
-
-			if (attachToItem == this.currentItem)
-				this.addAttachmentToTable(attachments);
 		}
 
+		if (attachments.size() > 0) {
+			if (attachToItem.getAttachments() == null)
+				attachToItem.setAttachments(new ArrayList<>());
+
+			attachToItem.getAttachments().addAll(attachments);
+			Collections.sort(attachToItem.getAttachments());
+
+			this.saveState.changeState(State.MODIFIED);
+			this.ui.resultList.repaint();
+		}
+
+		if (attachToItem == this.currentItem)
+			this.addAttachmentToTable(attachments);
 	}
 
 	/**
@@ -1077,7 +1150,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	}
 
 	/**
-	 * 查找(代码框).
+	 * 查找(代码框和浏览器).
 	 */
 	private void findText() {
 
@@ -1093,6 +1166,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		boolean findResult = false;
 		if (text.length() > 0) {
+
 			this.findContext.setSearchFor(text);
 
 			int oldCaretPosition = this.ui.codeText.getCaretPosition();
@@ -1106,6 +1180,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				findResult = org.fife.ui.rtextarea.SearchEngine.find(this.ui.codeText, this.findContext);
 			}
 
+			findResult |= this.searchBrowser();
 			if (findResult) {
 				this.ui.findText.setForeground(Color.BLACK);
 			} else {
@@ -1136,6 +1211,80 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		this.findContext.setSearchForward(true);
 		this.findText();
+	}
+
+	/**
+	 * 搜索浏览器(搜索字段高亮显示).
+	 * 有匹配则返回 true.
+	 */
+	private boolean searchBrowser() {
+		return false;
+	}
+
+	/**
+	 * 设置浏览器展示的内容(异步).
+	 *
+	 * @param content
+	 */
+	private void setBrowserContent(final String content) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				browserEngine.loadContent(content);
+			}
+		});
+	}
+
+	/**
+	 * 浏览器执行脚本.
+	 *
+	 * @param js js 脚本.
+	 * @return 执行结果.
+	 */
+	private Object executeBrowserScript(final String js) {
+		final CountDownLatch latch = new CountDownLatch(1);
+		final AtomicReference<Object> result = new AtomicReference<>();
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					result.set(browserEngine.executeScript(js));
+					System.out.println(browserEngine.getDocument().getDocumentElement().getTextContent());
+				} catch (Throwable t) {
+					log.error("js execute failed.", t);
+				} finally {
+					latch.countDown();
+				}
+			}
+		});
+
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			return null;
+		}
+		return result.get();
+	}
+
+	/**
+	 * 展示附件.
+	 */
+	void showAttachment() {
+
+		int selectedRow = ui.attachmentTable.getSelectedRow();
+		if (selectedRow > -1) {
+			Attachment attachment = (Attachment) ui.attachmentTable.getValueAt(selectedRow, 0);
+			if (attachment.getContentType() != Attachment.ContentType.Binary
+					&& attachment.getBinaryContent() != null) {
+				ui.contentTab.setSelectedComponent(ui.browserPanel);
+				try {
+					this.setBrowserContent(new String(attachment.getBinaryContent(),
+							attachment.getContentType().getTextEncode()));
+				} catch (Exception e) {
+					this.setBrowserContent(e.toString());
+				}
+			}
+		}
 	}
 
 	/**

@@ -3,7 +3,8 @@ package mysh.codelib2.model;
 
 import mysh.annotation.ThreadSafe;
 import mysh.util.ByteUtil;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Queue;
@@ -14,6 +15,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static mysh.codelib2.model.CodeLib2Element.Attachment;
+
 /**
  * 搜索引擎.<br/>
  * 一次只执行一个关键字搜索.
@@ -23,8 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @ThreadSafe
 public final class SearchEngine {
 
-	private static final Logger log = Logger.getLogger(SearchEngine.class);
-
+	private static final Logger log = LoggerFactory.getLogger(SearchEngine.class);
 	/**
 	 * 搜索开始时间(毫秒).
 	 */
@@ -132,49 +134,53 @@ public final class SearchEngine {
 
 			CodeLib2Element ele = null;
 			int keyIndex;
-			boolean keyResult; // 单个 key 匹配结果.
+			boolean isSingleKeyMatches; // 单个 key 匹配结果.
 			while (!this.isInterrupted() && searchTargetIndex.get() < targetLib.size()) {
 
 				try {
 					ele = targetLib.get(searchTargetIndex.getAndIncrement());
 
-					for (keyIndex = 0, keyResult = true; keyResult && keyIndex < keyLength; keyIndex++) {
+					// 单个 key 匹配
+					for (keyIndex = 0, isSingleKeyMatches = true; isSingleKeyMatches && keyIndex < keyLength; keyIndex++) {
 						// 匹配关键字
-						keyResult = this.lowerCaseKeys[keyIndex].length() == 0
+						isSingleKeyMatches = this.lowerCaseKeys[keyIndex].length() == 0
 								|| ele.getKeywords().toLowerCase().contains(this.lowerCaseKeys[keyIndex]);
 
 						// 匹配内容
-						if (!keyResult) {
-							keyResult = ByteUtil.findStringIndexIgnoreCase(ele.getContent(), 0,
+						if (!isSingleKeyMatches) {
+							isSingleKeyMatches = ByteUtil.findStringIndexIgnoreCase(ele.getContent(), 0,
 									this.upperKeysByteArray[keyIndex],
 									this.lowerKeysByteArray[keyIndex]) > -1;
 
-							// // 匹配附件
-							// if ((ele.getAttachments() != null) &&
-							// !keyResult) {
-							// String attachementEncode;
-							// for (Attachment attachment :
-							// ele.getAttachments()) {
-							// attachementEncode =
-							// attachment.getContentType().getTextEncode();
-							// if (attachementEncode != null) {
-							// keyResult = ByteUtil.findStringIndexIgnoreCase(
-							// ele.getContent(),
-							// attachementEncode, 0,
-							// this.lowerCaseKeys[keyIndex]) > -1;
-							//
-							// if (keyResult)
-							// break;
-							// }
-							// }
-							// }
+							// 匹配附件
+							if ((ele.getAttachments() != null) && !isSingleKeyMatches) {
+								String attachementEncode;
+								for (Attachment attachment : ele.getAttachments()) {
+									// 附件名
+									isSingleKeyMatches = attachment.getName().toLowerCase().contains(
+											this.lowerCaseKeys[keyIndex]);
+
+									// 附件内容
+									attachementEncode = attachment.getContentType().getTextEncode();
+									if (attachementEncode != null && !isSingleKeyMatches) {
+										isSingleKeyMatches = ByteUtil.findStringIndexIgnoreCase(
+												attachment.getBinaryContent(), attachementEncode, 0, this.lowerCaseKeys[keyIndex])
+												> -1;
+
+										if (isSingleKeyMatches)
+											break;
+									}
+								}
+							}
 						}
 					}
 
 					if (this.isInterrupted())
 						break;
-					else if (keyResult)
-						resultCatcher.onGetSearchResult(this.keyword, ele, 0);
+					else if (isSingleKeyMatches)
+						resultCatcher.onGetSearchResult(this.keyword, ele,
+								countMatchDegree(ele, this.lowerKeysByteArray, this.upperKeysByteArray)
+						);
 				} catch (IndexOutOfBoundsException outOfBoundsEx) {
 					break;
 				} catch (Exception e) {
@@ -184,6 +190,19 @@ public final class SearchEngine {
 
 			SearchEngine.this.onSearchTaskComplete(this);
 		}
+	}
+
+	/**
+	 * 计算条目的关键字匹配度.
+	 *
+	 * @param ele                条目
+	 * @param lowerKeysByteArray 小写关键字字节数组
+	 * @param upperKeysByteArray 小写关键字字节数组
+	 * @return 匹配度
+	 */
+	private static int countMatchDegree(CodeLib2Element ele, byte[][] lowerKeysByteArray, byte[][] upperKeysByteArray) {
+		//todo
+		return 0;
 	}
 
 	/**

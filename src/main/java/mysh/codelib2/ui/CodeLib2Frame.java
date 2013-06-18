@@ -4,6 +4,7 @@
  */
 package mysh.codelib2.ui;
 
+import mysh.codelib2.model.CodeLib2Element;
 import mysh.util.UIUtil;
 
 import java.awt.*;
@@ -23,6 +24,7 @@ public class CodeLib2Frame extends javax.swing.JFrame {
     public CodeLib2Frame() {
         initComponents();
 	    this.setTitle(UIControllor.AppTitle);
+	    System.setProperty("file.encoding", CodeLib2Element.DefaultCharsetEncode);
 
         this.getContentPane().setLayout(new BorderLayout());
         this.codeLib2Main = new CodeLib2Main().setAppTitleSetter(new CodeLib2Main.AppTitltSetter() {
