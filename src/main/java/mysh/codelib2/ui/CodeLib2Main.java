@@ -58,11 +58,11 @@ public final class CodeLib2Main extends javax.swing.JPanel {
      * @return
      */
     boolean doClose() {
-        return this.controllor.doClose();
+        return this.controllor.uiDoClose();
     }
 
     public void openFile(File file) {
-        this.controllor.openFile(file);
+        this.controllor.uiOpenFile(file);
     }
 
     public static interface AppTitltSetter {
@@ -575,7 +575,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        attachmentTable.setToolTipText("附件列表, 双击打开文件");
+        attachmentTable.setToolTipText("附件列表, 单击在浏览器中展示附件, 双击打开文件");
         attachmentTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 attachmentTableMouseClicked(evt);
@@ -693,174 +693,174 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void newInstActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newInstActionPerformed
-        this.controllor.newInst();
+        this.controllor.uiNewInst();
     }//GEN-LAST:event_newInstActionPerformed
 
     private void openActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openActionPerformed
-        this.controllor.open();
+        this.controllor.uiOpen();
     }//GEN-LAST:event_openActionPerformed
 
     private void saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveActionPerformed
-        this.controllor.save();
+        this.controllor.uiSave();
     }//GEN-LAST:event_saveActionPerformed
 
     private void addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addActionPerformed
-        this.controllor.addItem();
+        this.controllor.itemAdd();
     }//GEN-LAST:event_addActionPerformed
 
     private void removeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeActionPerformed
-        this.controllor.removeItem();
+        this.controllor.itemRemove();
     }//GEN-LAST:event_removeActionPerformed
 
     private void resultListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_resultListValueChanged
-        this.controllor.selectItem(this.resultList.getSelectedValue());
+        this.controllor.itemSelect(this.resultList.getSelectedValue());
     }//GEN-LAST:event_resultListValueChanged
 
     private void copyToClipboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyToClipboardActionPerformed
-        this.controllor.copyContentToClipboard();
+        this.controllor.uiCopyContentToClipboard();
     }//GEN-LAST:event_copyToClipboardActionPerformed
 
     private void codeTextHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_codeTextHyperlinkUpdate
 
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            this.controllor.urlClicked(evt.getURL());
+            this.controllor.onUrlClicked(evt.getURL());
         }
     }//GEN-LAST:event_codeTextHyperlinkUpdate
 
     private void addAttachmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addAttachmentActionPerformed
-        this.controllor.addAttachment();
+        this.controllor.attachmentAdd();
     }//GEN-LAST:event_addAttachmentActionPerformed
 
     private void removeAttachmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeAttachmentActionPerformed
-        this.controllor.removeAttachment();
+        this.controllor.attachmentRemove();
     }//GEN-LAST:event_removeAttachmentActionPerformed
 
     private void exportAttachmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportAttachmentActionPerformed
-        this.controllor.exportAttachment();
+        this.controllor.attachmentExport();
     }//GEN-LAST:event_exportAttachmentActionPerformed
 
     private void keyWordTextMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_keyWordTextMouseEntered
-        this.controllor.setStatusBar(this.keyWordText.getToolTipText());
+        this.controllor.uiSetStatusBar(this.keyWordText.getToolTipText());
     }//GEN-LAST:event_keyWordTextMouseEntered
 
     private void filterTextMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_filterTextMouseEntered
-        this.controllor.setStatusBar(this.filterText.getToolTipText());
+        this.controllor.uiSetStatusBar(this.filterText.getToolTipText());
     }//GEN-LAST:event_filterTextMouseEntered
 
     private void copyToClipboardMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_copyToClipboardMouseEntered
-        this.controllor.setStatusBar(this.copyToClipboard.getToolTipText());
+        this.controllor.uiSetStatusBar(this.copyToClipboard.getToolTipText());
     }//GEN-LAST:event_copyToClipboardMouseEntered
 
     private void keyWordTextMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_keyWordTextMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_keyWordTextMouseExited
 
     private void filterTextMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_filterTextMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_filterTextMouseExited
 
     private void copyToClipboardMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_copyToClipboardMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_copyToClipboardMouseExited
 
     private void exportMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportMouseEntered
-        this.controllor.setStatusBar(this.export.getToolTipText());
+        this.controllor.uiSetStatusBar(this.export.getToolTipText());
     }//GEN-LAST:event_exportMouseEntered
 
     private void removeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_removeMouseEntered
-        this.controllor.setStatusBar(this.remove.getToolTipText());
+        this.controllor.uiSetStatusBar(this.remove.getToolTipText());
     }//GEN-LAST:event_removeMouseEntered
 
     private void addMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addMouseEntered
-        this.controllor.setStatusBar(this.add.getToolTipText());
+        this.controllor.uiSetStatusBar(this.add.getToolTipText());
     }//GEN-LAST:event_addMouseEntered
 
     private void saveMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_saveMouseEntered
-        this.controllor.setStatusBar(this.save.getToolTipText());
+        this.controllor.uiSetStatusBar(this.save.getToolTipText());
     }//GEN-LAST:event_saveMouseEntered
 
     private void openMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_openMouseEntered
-        this.controllor.setStatusBar(this.open.getToolTipText());
+        this.controllor.uiSetStatusBar(this.open.getToolTipText());
     }//GEN-LAST:event_openMouseEntered
 
     private void newInstMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_newInstMouseEntered
-        this.controllor.setStatusBar(this.newInst.getToolTipText());
+        this.controllor.uiSetStatusBar(this.newInst.getToolTipText());
     }//GEN-LAST:event_newInstMouseEntered
 
     private void codeTextMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_codeTextMouseEntered
-        this.controllor.setStatusBar("eclipse 有哪些快捷键呢?");
+        this.controllor.uiSetStatusBar("eclipse 有哪些快捷键呢?");
     }//GEN-LAST:event_codeTextMouseEntered
 
     private void addAttachmentMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addAttachmentMouseEntered
-        this.controllor.setStatusBar(this.addAttachment.getToolTipText());
+        this.controllor.uiSetStatusBar(this.addAttachment.getToolTipText());
     }//GEN-LAST:event_addAttachmentMouseEntered
 
     private void removeAttachmentMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_removeAttachmentMouseEntered
-        this.controllor.setStatusBar(this.removeAttachment.getToolTipText());
+        this.controllor.uiSetStatusBar(this.removeAttachment.getToolTipText());
     }//GEN-LAST:event_removeAttachmentMouseEntered
 
     private void exportAttachmentMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportAttachmentMouseEntered
-        this.controllor.setStatusBar(this.exportAttachment.getToolTipText());
+        this.controllor.uiSetStatusBar(this.exportAttachment.getToolTipText());
     }//GEN-LAST:event_exportAttachmentMouseEntered
 
     private void newInstMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_newInstMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_newInstMouseExited
 
     private void openMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_openMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_openMouseExited
 
     private void saveMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_saveMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_saveMouseExited
 
     private void addMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_addMouseExited
 
     private void removeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_removeMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_removeMouseExited
 
     private void exportMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_exportMouseExited
 
     private void codeTextMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_codeTextMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_codeTextMouseExited
 
     private void addAttachmentMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addAttachmentMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_addAttachmentMouseExited
 
     private void removeAttachmentMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_removeAttachmentMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_removeAttachmentMouseExited
 
     private void exportAttachmentMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportAttachmentMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_exportAttachmentMouseExited
 
     private void attachmentTableMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attachmentTableMouseEntered
-        this.controllor.setStatusBar(this.attachmentTable.getToolTipText());
+        this.controllor.uiSetStatusBar(this.attachmentTable.getToolTipText());
     }//GEN-LAST:event_attachmentTableMouseEntered
 
     private void attachmentTableMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attachmentTableMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_attachmentTableMouseExited
 
     private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
-        this.controllor.importZcl2();
+        this.controllor.uiImportZcl2();
     }//GEN-LAST:event_importButtonActionPerformed
 
     private void importButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_importButtonMouseEntered
-        this.controllor.setStatusBar(this.importButton.getToolTipText());
+        this.controllor.uiSetStatusBar(this.importButton.getToolTipText());
     }//GEN-LAST:event_importButtonMouseEntered
 
     private void importButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_importButtonMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_importButtonMouseExited
 
     private void findTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findTextActionPerformed
@@ -876,27 +876,27 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     }//GEN-LAST:event_findNextBtnActionPerformed
 
     private void findPreviousBtnMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findPreviousBtnMouseEntered
-        this.controllor.setStatusBar(this.findPreviousBtn.getToolTipText());
+        this.controllor.uiSetStatusBar(this.findPreviousBtn.getToolTipText());
     }//GEN-LAST:event_findPreviousBtnMouseEntered
 
     private void findNextBtnMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findNextBtnMouseEntered
-        this.controllor.setStatusBar(this.findNextBtn.getToolTipText());
+        this.controllor.uiSetStatusBar(this.findNextBtn.getToolTipText());
     }//GEN-LAST:event_findNextBtnMouseEntered
 
     private void findTextMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findTextMouseEntered
-        this.controllor.setStatusBar(this.findText.getToolTipText());
+        this.controllor.uiSetStatusBar(this.findText.getToolTipText());
     }//GEN-LAST:event_findTextMouseEntered
 
     private void findPreviousBtnMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findPreviousBtnMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_findPreviousBtnMouseExited
 
     private void findNextBtnMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findNextBtnMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_findNextBtnMouseExited
 
     private void findTextMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_findTextMouseExited
-        this.controllor.setStatusBarReady();
+        this.controllor.uiSetStatusBarReady();
     }//GEN-LAST:event_findTextMouseExited
 
     private void attachmentTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_attachmentTableMouseClicked
@@ -905,9 +905,9 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             @Override
             public void run() {
                 if (clickCount == 1) {
-                    controllor.showAttachment();
+                    controllor.attachmentShow();
                 } else if (clickCount == 2) {
-                    controllor.openAttachment();
+                    controllor.attachmentOpen();
                 }
             }
         });
@@ -917,10 +917,10 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private void exportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportMouseClicked
         switch (evt.getButton()) {
             case MouseEvent.BUTTON1:
-                this.controllor.export(1);
+                this.controllor.uiExport(1);
                 break;
             case MouseEvent.BUTTON3:
-                this.controllor.export(0);
+                this.controllor.uiExport(0);
                 break;
         }
     }//GEN-LAST:event_exportMouseClicked

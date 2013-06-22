@@ -609,7 +609,7 @@
                             <Column editable="false" title="&#x9644;&#x4ef6;&#x5927;&#x5c0f;(&#x5b57;&#x8282;)" type="java.lang.Object"/>
                           </Table>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="&#x9644;&#x4ef6;&#x5217;&#x8868;, &#x53cc;&#x51fb;&#x6253;&#x5f00;&#x6587;&#x4ef6;"/>
+                        <Property name="toolTipText" type="java.lang.String" value="&#x9644;&#x4ef6;&#x5217;&#x8868;, &#x5355;&#x51fb;&#x5728;&#x6d4f;&#x89c8;&#x5668;&#x4e2d;&#x5c55;&#x793a;&#x9644;&#x4ef6;, &#x53cc;&#x51fb;&#x6253;&#x5f00;&#x6587;&#x4ef6;"/>
                         <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                           <TableColumnModel selectionModel="0">
                             <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">

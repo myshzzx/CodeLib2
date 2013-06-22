@@ -1,27 +1,25 @@
 
 package mysh.codelib2.model;
 
+import mysh.util.FileUtil;
+import org.apache.commons.codec.binary.Base64;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
-import mysh.util.FileUtil;
-
-import org.apache.commons.codec.binary.Base64;
-
 /**
  * 导出引擎.
- * 
+ *
  * @author Allen
- * 
  */
 public class ExportEngine {
 
 	/**
 	 * 导出信息.
-	 * 
+	 *
 	 * @author Allen
 	 */
 	public static class ExportInfo {
@@ -39,11 +37,9 @@ public class ExportEngine {
 
 	/**
 	 * 导出数据.
-	 * 
-	 * @param filepath
-	 *               文件路径.
-	 * @param eles
-	 *               要导出的元素.
+	 *
+	 * @param info 导出信息.
+	 * @param eles 要导出的元素.
 	 * @return 不支持的导出类型返回 false.
 	 * @throws Exception
 	 */
@@ -54,23 +50,22 @@ public class ExportEngine {
 		String extention = FileUtil.getFileExtention(info.filepath);
 
 		switch (extention) {
-		case "zcl2":
-			toZul2(info, eles);
-			break;
-		case "html":
-			toHtml(info, eles);
-			break;
-		default:
-			throw new RuntimeException("不支持的导出类型: " + extention);
+			case "zcl2":
+				toZul2(info, eles);
+				break;
+			case "html":
+				toHtml(info, eles);
+				break;
+			default:
+				throw new RuntimeException("不支持的导出类型: " + extention);
 		}
 
 	}
 
 	/**
 	 * 导出为 zul2 文件.
-	 * 
+	 *
 	 * @param filepath
-	 * 
 	 * @param eles
 	 * @throws Exception
 	 */
@@ -81,9 +76,8 @@ public class ExportEngine {
 
 	/**
 	 * 导出为 html 文件.
-	 * 
+	 *
 	 * @param filepath
-	 * 
 	 * @param eles
 	 * @throws IOException
 	 */
@@ -131,7 +125,7 @@ public class ExportEngine {
 			while ((tempLen = tempInput.read(tempBuf)) > 0) {
 				htmlOut.write(tempBuf, 0, tempLen);
 			}
-			
+
 			htmlOut.flush();
 		}
 	}

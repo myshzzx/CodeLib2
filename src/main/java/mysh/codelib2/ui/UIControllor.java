@@ -39,9 +39,7 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
@@ -84,6 +82,20 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		final int IterateVersion = 7;
 		//版本号取 4 位小数
 		AppTitle = "CodeLib2 v" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 2.53).substring(0, 6);
+
+		// 加载浏览器默认页面.
+		try (InputStream browserHomePageIn = UIControllor.class.getResourceAsStream("/html/minimized/browserHome.html")) {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			byte[] buf = new byte[70_000];
+			int len;
+			while ((len = browserHomePageIn.read(buf)) != -1) {
+				out.write(buf, 0, len);
+			}
+			DefaultBrowserContent = new String(out.toByteArray(), "utf-8");
+		} catch (Exception e) {
+			log.error("取 Google 页面失败.", e);
+			DefaultBrowserContent = AppTitle;
+		}
 	}
 
 	/**
@@ -97,6 +109,11 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 浏览器引擎.
 	 */
 	private WebEngine browserEngine;
+
+	/**
+	 * 浏览器默认页面.
+	 */
+	private static String DefaultBrowserContent;
 
 	/**
 	 * 数据集.
@@ -159,13 +176,13 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 
-				UIControllor.this.search(UIControllor.this.ui.filterText.getText());
+				UIControllor.this.uiSearch(UIControllor.this.ui.filterText.getText());
 			}
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 
-				UIControllor.this.search(UIControllor.this.ui.filterText.getText());
+				UIControllor.this.uiSearch(UIControllor.this.ui.filterText.getText());
 			}
 
 			@Override
@@ -218,7 +235,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		});
 
 		// 注册热键.
-		this.registHotKey();
+		this.initRegistHotKey();
 
 		// 代码框文本搜索.
 		this.findContext.setMatchCase(false);
@@ -228,6 +245,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		// this.testData();
 
+		// 附件列表文件拖入事件
 		this.ui.attachmentPanel.setDropTarget(new DropTarget() {
 			@Override
 			public synchronized void drop(DropTargetDropEvent evt) {
@@ -251,16 +269,13 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		// 浏览器初始化
 		final JFXPanel fxPanel = new JFXPanel();
 		this.ui.browserPanel.add(fxPanel);
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				WebView browser = new WebView();
-				Scene scene = new Scene(browser);
-				fxPanel.setScene(scene);
-				browserEngine = browser.getEngine();
-				browserEngine.loadContent(AppTitle);
-				fxPanel.setFont(UIUtil.DefaultFont);
-			}
+		Platform.runLater(() -> {
+			WebView browser = new WebView();
+			Scene scene = new Scene(browser);
+			fxPanel.setScene(scene);
+			browserEngine = browser.getEngine();
+			browserEngine.loadContent(DefaultBrowserContent);
+			browserEngine.setOnAlert((evt) -> (JOptionPane.showMessageDialog(ui, evt.getData())));
 		});
 	}
 
@@ -315,7 +330,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 注册热键.
 	 */
-	private void registHotKey() {
+	private void initRegistHotKey() {
 
 		// 注册 esc 热键.
 		HotKeyUtil.registHotKey(KeyEvent.VK_ESCAPE, 0, new AbstractAction("escPressedAction") {
@@ -350,8 +365,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
-				save();
+				uiSave();
 			}
 		});
 
@@ -360,12 +374,12 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 新建.
 	 */
-	void newInst() {
+	void uiNewInst() {
 
 		if (checkForSave()) {
 			this.saveState.changeState(State.NEW);
 			this.ui.filterText.setText("");
-			this.search("");
+			this.uiSearch("");
 		}
 	}
 
@@ -380,7 +394,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			int op = JOptionPane.showConfirmDialog(this.ui, "是否保存修改?", UIControllor.AppTitle,
 					JOptionPane.YES_NO_CANCEL_OPTION);
 			if (op == JOptionPane.YES_OPTION) {
-				this.save();
+				this.uiSave();
 			} else if (op == JOptionPane.CANCEL_OPTION) {
 				return false;
 			}
@@ -392,14 +406,14 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 打开.
 	 */
-	void open() {
+	void uiOpen() {
 
 		if (this.checkForSave()) {
 
 			// this.fileChooser.setDialogTitle("打开");
 			if (this.ui.zcl2OpenChooser.showOpenDialog(this.ui) == JFileChooser.APPROVE_OPTION) {
 				File openFile = this.ui.zcl2OpenChooser.getSelectedFile();
-				this.openFile(openFile);
+				this.uiOpenFile(openFile);
 			}
 		}
 	}
@@ -409,10 +423,10 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 *
 	 * @param openFile 要打开的文件.
 	 */
-	void openFile(File openFile) {
+	void uiOpenFile(File openFile) {
 
 		try {
-			this.setStatusBar("正在打开文件 ...");
+			this.uiSetStatusBar("正在打开文件 ...");
 			Collection<CodeLib2Element> datas = DataHeader.readFromFile(openFile.getAbsolutePath());
 
 			this.eles.clear();
@@ -424,21 +438,21 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.saveState.changeState(State.SAVED);
 			this.ui.filterText.setText("");
 			this.ui.filterText.requestFocus();
-			this.search("");
+			this.uiSearch("");
 
 			this.ui.zcl2OpenChooser.setCurrentDirectory(openFile.getParentFile());
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "打开文件失败.\n" + e.getMessage(), UIControllor.AppTitle,
 					JOptionPane.ERROR_MESSAGE);
 		} finally {
-			this.setStatusBarReady();
+			this.uiSetStatusBarReady();
 		}
 	}
 
 	/**
 	 * 保存.
 	 */
-	void save() {
+	void uiSave() {
 
 		File saveFile = this.file;
 
@@ -457,7 +471,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		}
 
 		try {
-			this.setStatusBar("正在保存 ...");
+			this.uiSetStatusBar("正在保存 ...");
 			new DataHeader().saveToFile(saveFile.getAbsolutePath(), this.eles);
 
 			this.file = saveFile;
@@ -466,7 +480,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			JOptionPane.showMessageDialog(this.ui, "保存文件失败.\\n" + e.getMessage(), UIControllor.AppTitle,
 					JOptionPane.ERROR_MESSAGE);
 		} finally {
-			this.setStatusBarReady();
+			this.uiSetStatusBarReady();
 		}
 	}
 
@@ -474,7 +488,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 新增条目.
 	 */
 	@SuppressWarnings("unchecked")
-	void addItem() {
+	void itemAdd() {
 
 		final CodeLib2Element newEle = new CodeLib2Element();
 		this.eles.add(newEle);
@@ -490,7 +504,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 移除条目.
 	 */
 	@SuppressWarnings("unchecked")
-	synchronized void removeItem() {
+	synchronized void itemRemove() {
 
 		final List<CodeLib2Element> selectedItems = (List<CodeLib2Element>) this.ui.resultList.getSelectedValuesList();
 		if (selectedItems.size() > 0) {
@@ -514,7 +528,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * @param exportType 导出类型. 1 为导出选中条目, 0 为导出全部.
 	 */
 	@SuppressWarnings("unchecked")
-	void export(int exportType) {
+	void uiExport(int exportType) {
 		List<CodeLib2Element> items = null;
 
 		switch (exportType) {
@@ -567,19 +581,19 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * @param text
 	 */
 	@SuppressWarnings("unchecked")
-	private void search(String text) {
+	private void uiSearch(String text) {
 		this.currentKeyword = text;
 
 		this.ui.resultList.clearSelection();
 		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).clear();
-		this.clearAttachmentTable();
+		this.attachmentClearTable();
 		this.searchResults.clear();
 
 		try {
 			this.searchEnging.addSearchTask(text, System.currentTimeMillis() + 300);
 
 			if (this.currentKeyword.split("[\\s,]+").length > 0)
-				this.setStatusBar("正在搜索 [ " + text + " ] ...");
+				this.uiSetStatusBar("正在搜索 [ " + text + " ] ...");
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "创建搜索任务失败.\n关键字: [" + text + "]\n错误:\n" + e, AppTitle,
 					JOptionPane.ERROR_MESSAGE);
@@ -591,7 +605,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 *
 	 * @param selectedValue
 	 */
-	synchronized void selectItem(final Object selectedValue) {
+	synchronized void itemSelect(final Object selectedValue) {
 
 		this.currentItem = null;
 		this.ui.contentTab.setSelectedComponent(this.ui.rTextScrollPane);
@@ -607,7 +621,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				this.ui.codeText.setCaretPosition(0);
 				this.ui.codeText.setEditable(true);
 
-				this.setBrowserContent(AppTitle);
+				this.browserSetContent(DefaultBrowserContent);
 
 				this.findText();
 			} catch (UnsupportedEncodingException e) {
@@ -615,7 +629,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				JOptionPane.showMessageDialog(this.ui, e.getMessage(), AppTitle, JOptionPane.ERROR_MESSAGE);
 			}
 
-			this.clearAttachmentTable();
+			this.attachmentClearTable();
 			if (item.getAttachments() != null) {
 				for (Attachment attachment : item.getAttachments()) {
 					((DefaultTableModel) this.ui.attachmentTable.getModel()).addRow(new Object[]{
@@ -631,7 +645,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.ui.codeText.setText("");
 			this.ui.codeText.setEditable(false);
 
-			this.setBrowserContent(AppTitle);
+			this.browserSetContent(DefaultBrowserContent);
 
 			((DefaultTableModel) this.ui.attachmentTable.getModel()).getDataVector().removeAllElements();
 		}
@@ -853,56 +867,47 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	public void onSearchComplete(final String keyword) {
 
 		final Object[] resultsArray = this.searchResults.toArray();
-		Arrays.sort(resultsArray, new Comparator<Object>() {
-			@Override
-			public int compare(Object o1, Object o2) {
-				return ((SearchResult) o1).matchDegree - ((SearchResult) o2).matchDegree;
-			}
-		});
+		Arrays.sort(resultsArray, (o1, o2) -> ((SearchResult) o1).matchDegree - ((SearchResult) o2).matchDegree);
 
 		// update status bar
-		SwingUtilities.invokeLater(new Runnable() {
+		SwingUtilities.invokeLater(() -> {
+			int dispalyLimit = 500;
 
-			@Override
-			public void run() {
-				int dispalyLimit = 500;
+			if (resultsArray.length > dispalyLimit
+					&&
+					"*".equals(currentKeyword.trim().split("[\\s,]+")[0])
+					&&
+					JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(ui,
+							"结果条目 " + resultsArray.length + " 条, 建议只展示部分结果以缩短渲染时间\n" +
+									"选 \"是\" 只展示前 " + dispalyLimit + " 条, 选 \"否\" 全部展示",
+							AppTitle,
+							JOptionPane.YES_NO_OPTION)) {
+				dispalyLimit = Integer.MAX_VALUE;
+			}
 
-				if (resultsArray.length > dispalyLimit
-						&&
-						"*".equals(currentKeyword.trim().split("[\\s,]+")[0])
-						&&
-						JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(ui,
-								"结果条目 " + resultsArray.length + " 条, 建议只展示部分结果以缩短渲染时间\n" +
-										"选 \"是\" 只展示前 " + dispalyLimit + " 条, 选 \"否\" 全部展示",
-								AppTitle,
-								JOptionPane.YES_NO_OPTION)) {
-					dispalyLimit = Integer.MAX_VALUE;
+			int count = 1;
+			for (Object sortedResult : resultsArray) {
+				if (count++ > dispalyLimit) break;
+				((DefaultListModel<CodeLib2Element>) ui.resultList.getModel()).addElement(((SearchResult) sortedResult).ele);
+			}
+
+			String[] keywords = keyword.trim().split("[\\s,]+");
+			if (keywords.length > 0 && keywords[keywords.length - 1].trim().length() > 0) {
+				ui.findText.setText(keywords[keywords.length - 1].trim());
+			} else {
+				ui.findText.setText(null);
+			}
+
+			ui.resultList.repaint();
+
+			if (currentKeyword.trim().length() > 0 && currentKeyword.split("[\\s,]+").length > 0) {
+				uiSetStatusBar("搜索 [" + currentKeyword + "] 完成, 展示条目/全部结果="
+						+ ui.resultList.getModel().getSize() + "/" + resultsArray.length);
+				if (ui.resultList.getModel().getSize() > 0) {
+					ui.resultList.setSelectedIndex(0);
 				}
-
-				int count = 1;
-				for (Object sortedResult : resultsArray) {
-					if (count++ > dispalyLimit) break;
-					((DefaultListModel<CodeLib2Element>) ui.resultList.getModel()).addElement(((SearchResult) sortedResult).ele);
-				}
-
-				String[] keywords = keyword.trim().split("[\\s,]+");
-				if (keywords.length > 0 && keywords[keywords.length - 1].trim().length() > 0) {
-					ui.findText.setText(keywords[keywords.length - 1].trim());
-				} else {
-					ui.findText.setText(null);
-				}
-
-				ui.resultList.repaint();
-
-				if (currentKeyword.trim().length() > 0 && currentKeyword.split("[\\s,]+").length > 0) {
-					setStatusBar("搜索 [" + currentKeyword + "] 完成, 展示条目/全部结果="
-							+ ui.resultList.getModel().getSize() + "/" + resultsArray.length);
-					if (ui.resultList.getModel().getSize() > 0) {
-						ui.resultList.setSelectedIndex(0);
-					}
-				} else {
-					setStatusBarReady();
-				}
+			} else {
+				uiSetStatusBarReady();
 			}
 		});
 	}
@@ -912,7 +917,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 *
 	 * @return
 	 */
-	boolean doClose() {
+	boolean uiDoClose() {
 
 		return this.checkForSave();
 	}
@@ -920,14 +925,15 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 将内容编辑窗的内容复制到系统剪贴板.
 	 */
-	void copyContentToClipboard() {
+	void uiCopyContentToClipboard() {
 
 		Clipboard sysclip = Toolkit.getDefaultToolkit().getSystemClipboard();
 		String contentText = "";
 		if (this.ui.rTextScrollPane == this.ui.contentTab.getSelectedComponent())
 			contentText = this.ui.codeText.getText();
-		else if (this.ui.browserPanel == this.ui.contentTab.getSelectedComponent())
-			contentText = this.browserEngine.getDocument().getDocumentElement().getTextContent();
+		else if (this.ui.browserPanel == this.ui.contentTab.getSelectedComponent()) {
+			contentText = this.browserEngine.getDocument().getDocumentElement().getLastChild().getTextContent();
+		}
 		Transferable text = new StringSelection(contentText);
 		sysclip.setContents(text, null);
 	}
@@ -937,7 +943,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 *
 	 * @param statusText
 	 */
-	void setStatusBar(String statusText) {
+	void uiSetStatusBar(String statusText) {
 
 		this.ui.statusBar.setText(statusText);
 	}
@@ -945,7 +951,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 重置状态栏.
 	 */
-	void setStatusBarReady() {
+	void uiSetStatusBarReady() {
 
 		this.ui.statusBar.setText("就绪 (共 " + this.eles.size() + " 个条目)");
 	}
@@ -955,7 +961,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 *
 	 * @param url
 	 */
-	void urlClicked(URL url) {
+	void onUrlClicked(URL url) {
 
 		java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
 		if (desktop.isSupported(Action.BROWSE)) {
@@ -970,7 +976,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 导入附件.
 	 */
-	void addAttachment() {
+	void attachmentAdd() {
 
 		CodeLib2Element attachToItem = this.currentItem;
 		if (attachToItem != null
@@ -1028,7 +1034,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 清空附件列表.
 	 */
-	private void clearAttachmentTable() {
+	private void attachmentClearTable() {
 
 		((DefaultTableModel) this.ui.attachmentTable.getModel()).getDataVector().clear();
 		this.ui.attachmentTable.updateUI();
@@ -1051,7 +1057,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 移除选定的附件.
 	 */
-	void removeAttachment() {
+	void attachmentRemove() {
 
 		int[] selectedRows = this.ui.attachmentTable.getSelectedRows();
 		if (selectedRows.length > 0) {
@@ -1072,7 +1078,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 导出附件.
 	 */
-	void exportAttachment() {
+	void attachmentExport() {
 
 		int[] selectedRows = this.ui.attachmentTable.getSelectedRows();
 		Attachment attachment;
@@ -1106,7 +1112,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 导入 zcl2 文件.
 	 */
 	@SuppressWarnings("unchecked")
-	void importZcl2() {
+	void uiImportZcl2() {
 
 		if (JFileChooser.APPROVE_OPTION == this.ui.zcl2ImportChooser.showOpenDialog(this.ui)) {
 			File[] files = this.ui.zcl2ImportChooser.getSelectedFiles();
@@ -1114,7 +1120,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			// 这里用set保证元素不重复, 以便下面去重操作
 			Set<CodeLib2Element> readItems = new HashSet<>();
 
-			this.setStatusBar("正在导入 ...");
+			this.uiSetStatusBar("正在导入 ...");
 			File cFile = null;
 			try {
 				for (File tFile : files) {
@@ -1134,11 +1140,11 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				Collections.sort(this.eles);
 
 				this.saveState.changeState(State.MODIFIED);
-				this.setStatusBar("成功导入");
+				this.uiSetStatusBar("成功导入");
 				JOptionPane.showMessageDialog(this.ui, "导入成功\n现有 " + this.eles.size() + " 项", AppTitle,
 						JOptionPane.INFORMATION_MESSAGE);
 			} catch (Throwable t) {
-				this.setStatusBarReady();
+				this.uiSetStatusBarReady();
 				JOptionPane.showMessageDialog(this.ui, "导入失败\n失败详情请查看日志", AppTitle,
 						JOptionPane.ERROR_MESSAGE);
 				log.error("导入 zcl2 文件失败: " + cFile.getAbsolutePath(), t);
@@ -1180,7 +1186,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				findResult = org.fife.ui.rtextarea.SearchEngine.find(this.ui.codeText, this.findContext);
 			}
 
-			findResult |= this.searchBrowser();
+			findResult |= this.browserSearch();
 			if (findResult) {
 				this.ui.findText.setForeground(Color.BLACK);
 			} else {
@@ -1217,7 +1223,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 搜索浏览器(搜索字段高亮显示).
 	 * 有匹配则返回 true.
 	 */
-	private boolean searchBrowser() {
+	private boolean browserSearch() {
 		return false;
 	}
 
@@ -1226,13 +1232,17 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 *
 	 * @param content
 	 */
-	private void setBrowserContent(final String content) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				browserEngine.loadContent(content);
-			}
-		});
+	private void browserSetContent(final String content) {
+		Platform.runLater(() -> browserEngine.loadContent(content));
+	}
+
+	/**
+	 * 设置浏览器展示的页面(异步).
+	 *
+	 * @param url
+	 */
+	private void browserSetUrl(final String url) {
+		Platform.runLater(() -> browserEngine.load(url));
 	}
 
 	/**
@@ -1241,20 +1251,17 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * @param js js 脚本.
 	 * @return 执行结果.
 	 */
-	private Object executeBrowserScript(final String js) {
+	private Object browserExecuteScript(final String js) {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final AtomicReference<Object> result = new AtomicReference<>();
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					result.set(browserEngine.executeScript(js));
-					System.out.println(browserEngine.getDocument().getDocumentElement().getTextContent());
-				} catch (Throwable t) {
-					log.error("js execute failed.", t);
-				} finally {
-					latch.countDown();
-				}
+		Platform.runLater(() -> {
+			try {
+				result.set(browserEngine.executeScript(js));
+				System.out.println(browserEngine.getDocument().getDocumentElement().getTextContent());
+			} catch (Throwable t) {
+				log.error("js execute failed.", t);
+			} finally {
+				latch.countDown();
 			}
 		});
 
@@ -1269,7 +1276,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 展示附件.
 	 */
-	void showAttachment() {
+	void attachmentShow() {
 
 		int selectedRow = ui.attachmentTable.getSelectedRow();
 		if (selectedRow > -1) {
@@ -1278,10 +1285,21 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					&& attachment.getBinaryContent() != null) {
 				ui.contentTab.setSelectedComponent(ui.browserPanel);
 				try {
-					this.setBrowserContent(new String(attachment.getBinaryContent(),
-							attachment.getContentType().getTextEncode()));
+					String fileExtention = FileUtil.getFileExtention(attachment.getName());
+					String content = new String(attachment.getBinaryContent(),
+							attachment.getContentType().getTextEncode());
+					if (!"html".equals(fileExtention) && !"htm".equals(fileExtention)) {
+						StringBuilder html = new StringBuilder("<html><head><meta http-equiv='Content-Type' content='text/html; charset=");
+						html.append(attachment.getContentType().getTextEncode());
+						html.append("'/></head><body>");
+						html.append(content.replaceAll("(\\r\\n)|(\\r)|(\\n)", "<br/>").replaceAll("\\t", "&nbsp;&nbsp;&nbsp;&nbsp;"));
+						html.append("</body></html>");
+						this.browserSetContent(html.toString());
+					} else {
+						this.browserSetContent(content);
+					}
 				} catch (Exception e) {
-					this.setBrowserContent(e.toString());
+					this.browserSetContent(e.toString());
 				}
 			}
 		}
@@ -1290,7 +1308,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 打开附件.
 	 */
-	void openAttachment() {
+	void attachmentOpen() {
 
 		int selectedRow = this.ui.attachmentTable.getSelectedRow();
 		if (selectedRow > -1) {
