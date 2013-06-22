@@ -1292,7 +1292,11 @@ public class UIControllor implements StateObserver, ResultCatcher {
 						StringBuilder html = new StringBuilder("<html><head><meta http-equiv='Content-Type' content='text/html; charset=");
 						html.append(attachment.getContentType().getTextEncode());
 						html.append("'/></head><body>");
-						html.append(content.replaceAll("(\\r\\n)|(\\r)|(\\n)", "<br/>").replaceAll("\\t", "&nbsp;&nbsp;&nbsp;&nbsp;"));
+						html.append(content.replaceAll("&", "&amp;").
+								replaceAll("\"", "&quot;").replaceAll("'", "&#39;").
+								replaceAll("<", "&lt;").replaceAll(">", "&gt;").
+								replaceAll("(\\r\\n)|(\\r)|(\\n)", "<br/>").
+								replaceAll(" ", "&nbsp;").replaceAll("\\t", "&nbsp;&nbsp;&nbsp;&nbsp;"));
 						html.append("</body></html>");
 						this.browserSetContent(html.toString());
 					} else {

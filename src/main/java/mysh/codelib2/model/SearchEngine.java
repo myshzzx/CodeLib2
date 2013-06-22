@@ -202,9 +202,9 @@ public final class SearchEngine {
 	private static int countMatchDegree(CodeLib2Element ele, byte[][] upperKeysByteArray, byte[][] lowerKeysByteArray) {
 		final int KeyWeight = 100;
 		final int ContentWeightP = 5;
-		final int AttachementNameWeight = 25;
+		final int AttachementNameWeight = 50;
 
-		int tMatchIndex, tLimit;
+		int tMatchIndex;
 		byte[] tSearchContent;
 		int degree = 0;
 
@@ -219,23 +219,23 @@ public final class SearchEngine {
 
 				// content
 				tMatchIndex = -1;
-				tLimit = 10;
+				int tContentLimit = 10;
 				while ((tMatchIndex = ByteUtil.findStringIndexIgnoreCase(ele.getContent(), tMatchIndex + 1,
 						upperKeysByteArray[i], lowerKeysByteArray[i])) > -1) {
 					degree += ContentWeightP;
-					if (--tLimit < 1) break;
+					if (--tContentLimit < 1) break;
 				}
 
 				//attachment name
-				tLimit = 3;
+				int attachmentMatchCount = 0;
 				if (ele.getAttachments() != null) {
 					for (Attachment attachment : ele.getAttachments()) {
-						if (ByteUtil.findStringIndexIgnoreCase(attachment.getName().getBytes(CodeLib2Element
-								.DefaultCharsetEncode), 0, upperKeysByteArray[i], lowerKeysByteArray[i]) > -1) {
-							degree += AttachementNameWeight;
-							if (--tLimit < 1) break;
+						if (ByteUtil.findStringIndexIgnoreCase(attachment.getName().getBytes(CodeLib2Element.DefaultCharsetEncode),
+								0, upperKeysByteArray[i], lowerKeysByteArray[i]) > -1) {
+							attachmentMatchCount++;
 						}
 					}
+					degree += AttachementNameWeight * attachmentMatchCount / ele.getAttachments().size();
 				}
 			}
 		} catch (Exception e) {
