@@ -242,7 +242,7 @@ public final class SearchEngine {
 			log.error("匹配度计算失败.", e);
 		}
 
-		log.debug(ele.getKeywords() + " : " + degree);
+//		log.debug(ele.getKeywords() + " : " + degree);
 		return degree;
 	}
 
