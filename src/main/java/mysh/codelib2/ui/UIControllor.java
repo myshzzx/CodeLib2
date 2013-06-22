@@ -867,7 +867,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	public void onSearchComplete(final String keyword) {
 
 		final Object[] resultsArray = this.searchResults.toArray();
-		Arrays.sort(resultsArray, (o1, o2) -> ((SearchResult) o1).matchDegree - ((SearchResult) o2).matchDegree);
+		Arrays.sort(resultsArray, (o1, o2) -> ((SearchResult) o2).matchDegree - ((SearchResult) o1).matchDegree);
 
 		// update status bar
 		SwingUtilities.invokeLater(() -> {

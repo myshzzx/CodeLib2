@@ -179,8 +179,7 @@ public final class SearchEngine {
 						break;
 					else if (isSingleKeyMatches)
 						resultCatcher.onGetSearchResult(this.keyword, ele,
-								countMatchDegree(ele, this.lowerKeysByteArray, this.upperKeysByteArray)
-						);
+								countMatchDegree(ele, this.upperKeysByteArray, this.lowerKeysByteArray));
 				} catch (IndexOutOfBoundsException outOfBoundsEx) {
 					break;
 				} catch (Exception e) {
@@ -196,13 +195,55 @@ public final class SearchEngine {
 	 * 计算条目的关键字匹配度.
 	 *
 	 * @param ele                条目
+	 * @param upperKeysByteArray 大写关键字字节数组
 	 * @param lowerKeysByteArray 小写关键字字节数组
-	 * @param upperKeysByteArray 小写关键字字节数组
 	 * @return 匹配度
 	 */
-	private static int countMatchDegree(CodeLib2Element ele, byte[][] lowerKeysByteArray, byte[][] upperKeysByteArray) {
-		//todo
-		return 0;
+	private static int countMatchDegree(CodeLib2Element ele, byte[][] upperKeysByteArray, byte[][] lowerKeysByteArray) {
+		final int KeyWeight = 100;
+		final int ContentWeightP = 5;
+		final int AttachementNameWeight = 25;
+
+		int tMatchIndex, tLimit;
+		byte[] tSearchContent;
+		int degree = 0;
+
+		try {
+			for (int i = 0; i < upperKeysByteArray.length && upperKeysByteArray[i].length > 0; i++) {
+				// key
+				tSearchContent = ele.getKeywords().getBytes(CodeLib2Element.DefaultCharsetEncode);
+				tMatchIndex = ByteUtil.findStringIndexIgnoreCase(tSearchContent, 0, upperKeysByteArray[i], lowerKeysByteArray[i]);
+				if (tMatchIndex > -1) {
+					degree += KeyWeight * (tSearchContent.length - tMatchIndex) / tSearchContent.length;
+				}
+
+				// content
+				tMatchIndex = -1;
+				tLimit = 10;
+				while ((tMatchIndex = ByteUtil.findStringIndexIgnoreCase(ele.getContent(), tMatchIndex + 1,
+						upperKeysByteArray[i], lowerKeysByteArray[i])) > -1) {
+					degree += ContentWeightP;
+					if (--tLimit < 1) break;
+				}
+
+				//attachment name
+				tLimit = 3;
+				if (ele.getAttachments() != null) {
+					for (Attachment attachment : ele.getAttachments()) {
+						if (ByteUtil.findStringIndexIgnoreCase(attachment.getName().getBytes(CodeLib2Element
+								.DefaultCharsetEncode), 0, upperKeysByteArray[i], lowerKeysByteArray[i]) > -1) {
+							degree += AttachementNameWeight;
+							if (--tLimit < 1) break;
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			log.error("匹配度计算失败.", e);
+		}
+
+		log.debug(ele.getKeywords() + " : " + degree);
+		return degree;
 	}
 
 	/**
