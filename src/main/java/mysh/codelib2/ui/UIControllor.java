@@ -737,6 +737,11 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			case "makefile":
 				result = SyntaxConstants.SYNTAX_STYLE_MAKEFILE;
 				break;
+			case "mq4":
+			case "mq5":
+			case "mqh":
+				result = SyntaxConstants.SYNTAX_STYLE_C;
+				break;
 			case "mx":
 			case "mxml":
 				result = SyntaxConstants.SYNTAX_STYLE_MXML;
@@ -769,6 +774,11 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				break;
 			case "scala":
 				result = SyntaxConstants.SYNTAX_STYLE_SCALA;
+				break;
+			case "scheme":
+			case "scm":
+			case "ss":
+				result = SyntaxConstants.SYNTAX_STYLE_LISP;
 				break;
 			case "shell":
 				result = SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL;

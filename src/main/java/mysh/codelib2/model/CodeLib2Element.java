@@ -59,9 +59,9 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			 */
 			private static final List<String> textExt = Arrays.asList("as", "asm", "asp", "bat", "bbcode",
 					"c", "clj", "clojure", "cpp", "cs", "css", "d", "f", "for", "fortran", "groovy", "gsp",
-					"h", "htm", "html", "ini", "java", "js", "jsp", "lisp", "log", "lua", "mx", "mxml",
-					"pas", "php", "pl", "properties", "py", "r", "rb", "ruby", "sas", "scala", "sh", "sql",
-					"tcl", "txt", "vb", "vbs", "xml", "xsd", "xsl");
+					"h", "htm", "html", "ini", "java", "js", "jsp", "lisp", "log", "lua", "mq4", "mq5", "mqh", "mx",
+					"mxml", "pas", "php", "pl", "properties", "py", "r", "rb", "ruby", "sas", "scala", "scheme",
+					"scm", "sh", "sql", "ss", "tcl", "txt", "vb", "vbs", "xml", "xsd", "xsl");
 
 			/**
 			 * 取文本编码类型. 若非文本, 返回 null.
@@ -93,8 +93,9 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		/**
 		 * 附件内容类型.
+		 * 不持久化是为了将来支持新的文件类型时, 内容类型可以被正确设置.
 		 */
-		private ContentType contentType = ContentType.Binary;
+		private transient ContentType contentType;
 
 		@Override
 		public boolean equals(Object obj) {
