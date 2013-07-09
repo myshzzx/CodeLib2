@@ -79,7 +79,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	static {
 //		迭代次数, 100次到达e
-		final int IterateVersion = 7;
+		final int IterateVersion = 8;
 		//版本号取 4 位小数
 		AppTitle = "CodeLib2 v" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 2.53).substring(0, 6);
 
@@ -339,8 +339,20 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
-				ui.filterText.setText("");
+				String keywords = ui.filterText.getText().trim();
+				int lastSeprIndex = keywords.length();
+				for (int i = keywords.length() - 1; i > -1; i--) {
+					if (keywords.charAt(i) != ' ' && keywords.charAt(i) != ',') {
+						lastSeprIndex = i;
+						break;
+					}
+				}
+				lastSeprIndex = Math.max(keywords.lastIndexOf(' ', lastSeprIndex), keywords.lastIndexOf(',', lastSeprIndex));
+				if (lastSeprIndex == -1) {
+					ui.filterText.setText("");
+				} else {
+					ui.filterText.setText(keywords.substring(0, lastSeprIndex + 1));
+				}
 				ui.filterText.requestFocus();
 			}
 		});

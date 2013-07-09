@@ -372,15 +372,20 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jPanel1.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
 
         filterText.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
-        filterText.setToolTipText("空格或逗号分隔搜索关键字, * 展示全部, ESC 复位");
+        filterText.setToolTipText("空格或逗号分隔搜索关键字, * 展示全部, ESC 移除最后一个关键字");
         filterText.setFocusTraversalPolicyProvider(true);
         filterText.setNextFocusableComponent(resultList);
         filterText.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                filterTextMouseExited(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 filterTextMouseEntered(evt);
             }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                filterTextMouseExited(evt);
+        });
+        filterText.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterTextActionPerformed(evt);
             }
         });
 
@@ -924,6 +929,11 @@ public final class CodeLib2Main extends javax.swing.JPanel {
                 break;
         }
     }//GEN-LAST:event_exportMouseClicked
+
+    private void filterTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterTextActionPerformed
+        this.controllor.findNext();
+    }//GEN-LAST:event_filterTextActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     private javax.swing.JButton addAttachment;
