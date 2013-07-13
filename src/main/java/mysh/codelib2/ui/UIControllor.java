@@ -81,7 +81,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 //		迭代次数, 100次到达e
 		final int IterateVersion = 8;
 		//版本号取 4 位小数
-		AppTitle = "CodeLib2 v" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 2.53).substring(0, 6);
+		AppTitle = "CodeLib2 b" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 0.53).substring(2, 6);
 
 		// 加载浏览器默认页面.
 		try (InputStream browserHomePageIn = UIControllor.class.getResourceAsStream("/html/minimized/browserHome.html")) {
@@ -93,7 +93,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			}
 			DefaultBrowserContent = new String(out.toByteArray(), "utf-8");
 		} catch (Exception e) {
-			log.error("取 Google 页面失败.", e);
+			log.error("取默认页面失败.", e);
 			DefaultBrowserContent = AppTitle;
 		}
 	}
@@ -252,8 +252,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				try {
 					Transferable transferable = evt.getTransferable();
 					if (currentItem != null
-							&&
-							Arrays.asList(transferable.getTransferDataFlavors()).contains(DataFlavor.javaFileListFlavor)) {
+									&&
+									Arrays.asList(transferable.getTransferDataFlavors()).contains(DataFlavor.javaFileListFlavor)) {
 						evt.acceptDrop(DnDConstants.ACTION_COPY);
 						List<File> transferData = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 						addAttachment(currentItem, transferData);
@@ -339,6 +339,11 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (!ui.filterText.isFocusOwner()) {
+					ui.filterText.requestFocus();
+					return;
+				}
+
 				String keywords = ui.filterText.getText().trim();
 				int lastSeprIndex = keywords.length();
 				for (int i = keywords.length() - 1; i > -1; i--) {
@@ -404,7 +409,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		if (this.saveState.getState() == State.MODIFIED) {
 			int op = JOptionPane.showConfirmDialog(this.ui, "是否保存修改?", UIControllor.AppTitle,
-					JOptionPane.YES_NO_CANCEL_OPTION);
+							JOptionPane.YES_NO_CANCEL_OPTION);
 			if (op == JOptionPane.YES_OPTION) {
 				this.uiSave();
 			} else if (op == JOptionPane.CANCEL_OPTION) {
@@ -455,7 +460,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.ui.zcl2OpenChooser.setCurrentDirectory(openFile.getParentFile());
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "打开文件失败.\n" + e.getMessage(), UIControllor.AppTitle,
-					JOptionPane.ERROR_MESSAGE);
+							JOptionPane.ERROR_MESSAGE);
 		} finally {
 			this.uiSetStatusBarReady();
 		}
@@ -470,14 +475,14 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		if (saveFile == null) {
 			saveFile = UIUtil.getSaveFileWithOverwriteChecking(this.ui.zcl2OpenChooser, this.ui,
-					new UIUtil.FileExtentionGetter() {
+							new UIUtil.FileExtentionGetter() {
 
-						@Override
-						public String getFileExtention() {
+								@Override
+								public String getFileExtention() {
 
-							return UIControllor.Extention;
-						}
-					});
+									return UIControllor.Extention;
+								}
+							});
 			if (saveFile == null)
 				return;
 		}
@@ -490,7 +495,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.saveState.changeState(State.SAVED);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "保存文件失败.\\n" + e.getMessage(), UIControllor.AppTitle,
-					JOptionPane.ERROR_MESSAGE);
+							JOptionPane.ERROR_MESSAGE);
 		} finally {
 			this.uiSetStatusBarReady();
 		}
@@ -522,7 +527,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		if (selectedItems.size() > 0) {
 
 			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui, "删除确认?", AppTitle,
-					JOptionPane.YES_NO_OPTION)) {
+							JOptionPane.YES_NO_OPTION)) {
 
 				this.eles.removeAll(selectedItems);
 
@@ -554,17 +559,17 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		if (items != null && items.size() > 0) {
 			File exportFile = UIUtil.getSaveFileWithOverwriteChecking(this.ui.itemExportChooser, this.ui,
-					new UIUtil.FileExtentionGetter() {
+							new UIUtil.FileExtentionGetter() {
 
-						@Override
-						public String getFileExtention() {
+								@Override
+								public String getFileExtention() {
 
-							String ext = ui.itemExportChooser.getFileFilter().getDescription();
-							if (!ext.startsWith("."))
-								ext = "";
-							return ext;
-						}
-					});
+									String ext = ui.itemExportChooser.getFileFilter().getDescription();
+									if (!ext.startsWith("."))
+										ext = "";
+									return ext;
+								}
+							});
 
 			try {
 				if (exportFile != null) {
@@ -573,10 +578,10 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					info.filepath = exportFile.getPath();
 					if (this.file == null) {
 						info.title = AppTitle + " - "
-								+ FileUtil.getFileNameWithoutExtention(info.filepath);
+										+ FileUtil.getFileNameWithoutExtention(info.filepath);
 					} else {
 						info.title = AppTitle + " - "
-								+ FileUtil.getFileNameWithoutExtention(this.file.getPath());
+										+ FileUtil.getFileNameWithoutExtention(this.file.getPath());
 					}
 
 					ExportEngine.export(info, items);
@@ -608,7 +613,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				this.uiSetStatusBar("正在搜索 [ " + text + " ] ...");
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "创建搜索任务失败.\n关键字: [" + text + "]\n错误:\n" + e, AppTitle,
-					JOptionPane.ERROR_MESSAGE);
+							JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -645,7 +650,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			if (item.getAttachments() != null) {
 				for (Attachment attachment : item.getAttachments()) {
 					((DefaultTableModel) this.ui.attachmentTable.getModel()).addRow(new Object[]{
-							attachment, attachment.getBinaryContent().length});
+									attachment, attachment.getBinaryContent().length});
 				}
 			}
 			this.ui.attachmentTable.updateUI();
@@ -840,7 +845,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				this.saveState.changeState(State.MODIFIED);
 
 				byte[] newContent = this.ui.codeText.getText().getBytes(
-						CodeLib2Element.DefaultCharsetEncode);
+								CodeLib2Element.DefaultCharsetEncode);
 				this.currentItem.setContent(newContent);
 			}
 		} catch (UnsupportedEncodingException e) {
@@ -896,14 +901,14 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			int dispalyLimit = 500;
 
 			if (resultsArray.length > dispalyLimit
-					&&
-					"*".equals(currentKeyword.trim().split("[\\s,]+")[0])
-					&&
-					JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(ui,
-							"结果条目 " + resultsArray.length + " 条, 建议只展示部分结果以缩短渲染时间\n" +
-									"选 \"是\" 只展示前 " + dispalyLimit + " 条, 选 \"否\" 全部展示",
-							AppTitle,
-							JOptionPane.YES_NO_OPTION)) {
+							&&
+							"*".equals(currentKeyword.trim().split("[\\s,]+")[0])
+							&&
+							JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(ui,
+											"结果条目 " + resultsArray.length + " 条, 建议只展示部分结果以缩短渲染时间\n" +
+															"选 \"是\" 只展示前 " + dispalyLimit + " 条, 选 \"否\" 全部展示",
+											AppTitle,
+											JOptionPane.YES_NO_OPTION)) {
 				dispalyLimit = Integer.MAX_VALUE;
 			}
 
@@ -924,7 +929,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 			if (currentKeyword.trim().length() > 0 && currentKeyword.split("[\\s,]+").length > 0) {
 				uiSetStatusBar("搜索 [" + currentKeyword + "] 完成, 展示条目/全部结果="
-						+ ui.resultList.getModel().getSize() + "/" + resultsArray.length);
+								+ ui.resultList.getModel().getSize() + "/" + resultsArray.length);
 				if (ui.resultList.getModel().getSize() > 0) {
 					ui.resultList.setSelectedIndex(0);
 				}
@@ -1002,7 +1007,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		CodeLib2Element attachToItem = this.currentItem;
 		if (attachToItem != null
-				&& JFileChooser.APPROVE_OPTION == this.ui.attachmentImportChooser.showOpenDialog(this.ui)) {
+						&& JFileChooser.APPROVE_OPTION == this.ui.attachmentImportChooser.showOpenDialog(this.ui)) {
 			File[] files = this.ui.attachmentImportChooser.getSelectedFiles();
 			this.addAttachment(attachToItem, Arrays.asList(files));
 		}
@@ -1023,18 +1028,18 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		for (File file : files) {
 			try {
 				if (file.length() > 1_000_000
-						&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
-						file.getName() + "\n文件超过1MB, 仍然导入?", AppTitle,
-						JOptionPane.YES_NO_OPTION)) {
+								&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
+								file.getName() + "\n文件超过1MB, 仍然导入?", AppTitle,
+								JOptionPane.YES_NO_OPTION)) {
 					continue;
 				}
 
 				attachments.add(new Attachment().setName(file.getName()).setBinaryContent(
-						FileUtil.readFileToByteArray(file.getAbsolutePath(), Integer.MAX_VALUE)));
+								FileUtil.readFileToByteArray(file.getAbsolutePath(), Integer.MAX_VALUE)));
 			} catch (Exception e) {
 				log.error("导入附件失败. " + file.getAbsolutePath(), e);
 				JOptionPane.showMessageDialog(this.ui, "导入附件失败.\n" + file.getName(), AppTitle,
-						JOptionPane.ERROR_MESSAGE);
+								JOptionPane.ERROR_MESSAGE);
 			}
 		}
 
@@ -1084,10 +1089,10 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		int[] selectedRows = this.ui.attachmentTable.getSelectedRows();
 		if (selectedRows.length > 0) {
 			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui, "确认移除附件?", AppTitle,
-					JOptionPane.YES_NO_OPTION)) {
+							JOptionPane.YES_NO_OPTION)) {
 				for (int i = selectedRows.length - 1; i > -1; i--) {
 					this.currentItem.getAttachments().remove(
-							this.ui.attachmentTable.getValueAt(selectedRows[i], 0));
+									this.ui.attachmentTable.getValueAt(selectedRows[i], 0));
 					((DefaultTableModel) this.ui.attachmentTable.getModel()).removeRow(selectedRows[i]);
 				}
 				this.saveState.changeState(State.MODIFIED);
@@ -1105,7 +1110,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		int[] selectedRows = this.ui.attachmentTable.getSelectedRows();
 		Attachment attachment;
 		if (selectedRows.length > 0
-				&& JFileChooser.APPROVE_OPTION == this.ui.attachmentExportChooser.showSaveDialog(this.ui)) {
+						&& JFileChooser.APPROVE_OPTION == this.ui.attachmentExportChooser.showSaveDialog(this.ui)) {
 			File dir = this.ui.attachmentExportChooser.getSelectedFile();
 			String filepath;
 			for (int row : selectedRows) {
@@ -1115,15 +1120,15 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					filepath = dirPath + '/' + attachment.getName();
 
 					if (new File(filepath).exists()
-							&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
-							"是否覆盖文件?\n" + filepath, AppTitle,
-							JOptionPane.YES_NO_OPTION)) {
+									&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
+									"是否覆盖文件?\n" + filepath, AppTitle,
+									JOptionPane.YES_NO_OPTION)) {
 						continue;
 					}
 
 					if (!FileUtil.writeFile(filepath, attachment.getBinaryContent())) {
 						JOptionPane.showMessageDialog(this.ui, "导出失败.\n" + attachment.getName(),
-								AppTitle, JOptionPane.ERROR_MESSAGE);
+										AppTitle, JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
@@ -1164,11 +1169,11 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				this.saveState.changeState(State.MODIFIED);
 				this.uiSetStatusBar("成功导入");
 				JOptionPane.showMessageDialog(this.ui, "导入成功\n现有 " + this.eles.size() + " 项", AppTitle,
-						JOptionPane.INFORMATION_MESSAGE);
+								JOptionPane.INFORMATION_MESSAGE);
 			} catch (Throwable t) {
 				this.uiSetStatusBarReady();
 				JOptionPane.showMessageDialog(this.ui, "导入失败\n失败详情请查看日志", AppTitle,
-						JOptionPane.ERROR_MESSAGE);
+								JOptionPane.ERROR_MESSAGE);
 				log.error("导入 zcl2 文件失败: " + cFile.getAbsolutePath(), t);
 			}
 
@@ -1304,21 +1309,21 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		if (selectedRow > -1) {
 			Attachment attachment = (Attachment) ui.attachmentTable.getValueAt(selectedRow, 0);
 			if (attachment.getContentType() != Attachment.ContentType.Binary
-					&& attachment.getBinaryContent() != null) {
+							&& attachment.getBinaryContent() != null) {
 				ui.contentTab.setSelectedComponent(ui.browserPanel);
 				try {
 					String fileExtention = FileUtil.getFileExtention(attachment.getName());
 					String content = new String(attachment.getBinaryContent(),
-							attachment.getContentType().getTextEncode());
+									attachment.getContentType().getTextEncode());
 					if (!"html".equals(fileExtention) && !"htm".equals(fileExtention)) {
 						StringBuilder html = new StringBuilder("<html><head><meta http-equiv='Content-Type' content='text/html; charset=");
 						html.append(attachment.getContentType().getTextEncode());
 						html.append("'/></head><body>");
 						html.append(content.replaceAll("&", "&amp;").
-								replaceAll("\"", "&quot;").replaceAll("'", "&#39;").
-								replaceAll("<", "&lt;").replaceAll(">", "&gt;").
-								replaceAll("(\\r\\n)|(\\r)|(\\n)", "<br/>").
-								replaceAll(" ", "&nbsp;").replaceAll("\\t", "&nbsp;&nbsp;&nbsp;&nbsp;"));
+										replaceAll("\"", "&quot;").replaceAll("'", "&#39;").
+										replaceAll("<", "&lt;").replaceAll(">", "&gt;").
+										replaceAll("(\\r\\n)|(\\r)|(\\n)", "<br/>").
+										replaceAll(" ", "&nbsp;").replaceAll("\\t", "&nbsp;&nbsp;&nbsp;&nbsp;"));
 						html.append("</body></html>");
 						this.browserSetContent(html.toString());
 					} else {
@@ -1349,7 +1354,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				Desktop.getDesktop().open(tempFile);
 			} catch (IOException e) {
 				if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui,
-						"打开文件失败, 要尝试用文本方式打开吗?\n" + oriFilePath, "打开文件", JOptionPane.YES_NO_OPTION)) {
+								"打开文件失败, 要尝试用文本方式打开吗?\n" + oriFilePath, "打开文件", JOptionPane.YES_NO_OPTION)) {
 					File textFile = FileUtil.getWritableFile(oriFilePath + ".txt");
 					if (tempFile.renameTo(textFile)) {
 						textFile.deleteOnExit();
@@ -1357,8 +1362,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 							Desktop.getDesktop().open(textFile);
 						} catch (IOException e1) {
 							JOptionPane.showMessageDialog(this.ui,
-									textFile.getAbsolutePath() + e1.getMessage(),
-									"打开文本文件失败.", JOptionPane.ERROR_MESSAGE);
+											textFile.getAbsolutePath() + e1.getMessage(),
+											"打开文本文件失败.", JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}

@@ -24,19 +24,21 @@ public class CodeLib2Frame extends javax.swing.JFrame {
     public CodeLib2Frame() {
         initComponents();
 	    this.setTitle(UIControllor.AppTitle);
+	    this.setIconImage(Toolkit.getDefaultToolkit().getImage(
+					    this.getClass().getClassLoader().getResource("icons/CodeLib2.png")));
 	    System.setProperty("file.encoding", CodeLib2Element.DefaultCharsetEncode);
 
-        this.getContentPane().setLayout(new BorderLayout());
-        this.codeLib2Main = new CodeLib2Main().setAppTitleSetter(new CodeLib2Main.AppTitltSetter() {
+      this.getContentPane().setLayout(new BorderLayout());
+      this.codeLib2Main = new CodeLib2Main().setAppTitleSetter(new CodeLib2Main.AppTitltSetter() {
 
-            @Override
-            public void setTitle(String title) {
-                CodeLib2Frame.this.setTitle(title);
-            }
-        });
-        this.getContentPane().add(this.codeLib2Main, BorderLayout.CENTER);
+          @Override
+          public void setTitle(String title) {
+              CodeLib2Frame.this.setTitle(title);
+          }
+      });
+      this.getContentPane().add(this.codeLib2Main, BorderLayout.CENTER);
 
-        this.setLocationRelativeTo(null);
+      this.setLocationRelativeTo(null);
     }
 
     /**
