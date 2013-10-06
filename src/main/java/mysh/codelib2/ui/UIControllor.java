@@ -333,7 +333,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	private void initRegistHotKey() {
 
 		// 注册 esc 热键.
-		HotKeyUtil.registHotKey(KeyEvent.VK_ESCAPE, 0, new AbstractAction("escPressedAction") {
+		HotKeyUtil.registerHotKey(KeyEvent.VK_ESCAPE, 0, new AbstractAction("escPressedAction") {
 
 			private static final long serialVersionUID = -8642328380866972006L;
 
@@ -363,7 +363,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		});
 
 		// 注册 Ctrl+F 热键.
-		HotKeyUtil.registHotKey(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK, new AbstractAction("saveAction") {
+		HotKeyUtil.registerHotKey(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK, new AbstractAction("saveAction") {
 
 			private static final long serialVersionUID = -6294554898524200651L;
 
@@ -376,7 +376,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		});
 
 		// 注册 Ctrl+S 热键.
-		HotKeyUtil.registHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, new AbstractAction("saveAction") {
+		HotKeyUtil.registerHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, new AbstractAction("saveAction") {
 
 			private static final long serialVersionUID = -6294554898524200651L;
 

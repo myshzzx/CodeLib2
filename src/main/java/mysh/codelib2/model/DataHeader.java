@@ -88,6 +88,7 @@ public class DataHeader implements Serializable {
 				};
 
 				compressFutureResult = exec.submit(compressThread);
+				exec.shutdown();
 			}
 
 			// write codeData obj, use try-with to ensure objOutput close
