@@ -268,8 +268,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 		// 浏览器初始化
 		final JFXPanel fxPanel = new JFXPanel();
-		this.ui.browserPanel.add(fxPanel);
 		Platform.runLater(() -> {
+			ui.browserPanel.add(fxPanel);
 			WebView browser = new WebView();
 			Scene scene = new Scene(browser);
 			fxPanel.setScene(scene);
