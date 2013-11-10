@@ -1203,14 +1203,16 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			this.findContext.setSearchFor(text);
 
 			int oldCaretPosition = this.ui.codeText.getCaretPosition();
-			findResult = org.fife.ui.rtextarea.SearchEngine.find(this.ui.codeText, this.findContext);
+			findResult = org.fife.ui.rtextarea.
+							SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
 			if (!findResult) {
 				if (this.findContext.getSearchForward()) {
 					this.ui.codeText.setCaretPosition(0);
 				} else {
 					this.ui.codeText.setCaretPosition(this.ui.codeText.getText().length());
 				}
-				findResult = org.fife.ui.rtextarea.SearchEngine.find(this.ui.codeText, this.findContext);
+				findResult = org.fife.ui.rtextarea.
+								SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
 			}
 
 			findResult |= this.browserSearch();
