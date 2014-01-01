@@ -58,15 +58,13 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			 * 支持的文本类型扩展名.
 			 */
 			private static final List<String> textExt = Arrays.asList("as", "asm", "asp", "bat", "bbcode",
-					"c", "clj", "clojure", "cpp", "cs", "css", "d", "f", "for", "fortran", "groovy", "gsp",
-					"h", "htm", "html", "ini", "java", "js", "jsp", "lisp", "log", "lua", "mq4", "mq5", "mqh", "mx",
-					"mxml", "pas", "php", "pl", "properties", "py", "r", "rb", "ruby", "sas", "scala", "scheme",
-					"scm", "sh", "sql", "ss", "tcl", "txt", "vb", "vbs", "xml", "xsd", "xsl");
+							"c", "clj", "clojure", "cpp", "cs", "css", "d", "f", "for", "fortran", "groovy", "gsp",
+							"h", "htm", "html", "ini", "java", "js", "jsp", "lisp", "log", "lua", "mq4", "mq5", "mqh", "mx",
+							"mxml", "pas", "php", "pl", "properties", "py", "r", "rb", "ruby", "sas", "scala", "scheme",
+							"scm", "sh", "sql", "ss", "tcl", "txt", "vb", "vbs", "xml", "xsd", "xsl");
 
 			/**
 			 * 取文本编码类型. 若非文本, 返回 null.
-			 *
-			 * @return
 			 */
 			public String getTextEncode() {
 
@@ -143,8 +141,6 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		/**
 		 * 附件名.
-		 *
-		 * @return
 		 */
 		public String getName() {
 
@@ -153,8 +149,6 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		/**
 		 * 附件名.
-		 *
-		 * @param name
 		 */
 		public Attachment setName(String name) {
 
@@ -165,8 +159,6 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		/**
 		 * 内容类型.
-		 *
-		 * @return
 		 */
 		public ContentType getContentType() {
 			if (this.contentType == null) {
@@ -183,7 +175,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			this.contentType = ContentType.Binary;
 
 			if (this.binaryContent != null && this.binaryContent.length > 0
-					&& this.name != null && this.name.length() > 0) {
+							&& this.name != null && this.name.length() > 0) {
 				int pointPos = this.name.lastIndexOf('.');
 				if (pointPos > -1 && pointPos < this.name.length() - 1) {
 					String ext = this.name.substring(pointPos + 1, this.name.length()).toLowerCase();
@@ -201,8 +193,6 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		/**
 		 * 附件内容.
-		 *
-		 * @return
 		 */
 		public byte[] getBinaryContent() {
 
@@ -211,8 +201,6 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		/**
 		 * 附件内容.
-		 *
-		 * @param binaryContent
 		 */
 		public Attachment setBinaryContent(byte[] binaryContent) {
 
@@ -247,7 +235,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 		if (this.keywords != null && e.keywords != null) {
 			if (this.keywords.hashCode() != e.keywords.hashCode()
-					&& !this.keywords.equals(e.keywords))
+							&& !this.keywords.equals(e.keywords))
 				return false;
 		} else if (this.keywords != null || e.keywords != null) {
 			return false;
@@ -256,11 +244,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		if (!Arrays.equals(this.content, e.content)) return false;
 
 		if (this.attachments != e.attachments) {
-			if (this.attachments != null) {
-				return this.attachments.equals(e.attachments);
-			} else {
-				return false;
-			}
+			return this.attachments != null && this.attachments.equals(e.attachments);
 		} else {
 			return true;
 		}
@@ -298,8 +282,6 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 关键字.
-	 *
-	 * @return
 	 */
 	public String getKeywords() {
 
@@ -308,8 +290,6 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 关键字.
-	 *
-	 * @param keywords
 	 */
 	public final CodeLib2Element setKeywords(String keywords) {
 
@@ -337,8 +317,6 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 取第一个关键字.
-	 *
-	 * @return
 	 */
 	public String getFirstKeyword() {
 
@@ -347,8 +325,6 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 附件.
-	 *
-	 * @return
 	 */
 	public List<Attachment> getAttachments() {
 
@@ -357,8 +333,6 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 附件.
-	 *
-	 * @param attachments
 	 */
 	public void setAttachments(List<Attachment> attachments) {
 
@@ -367,8 +341,6 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 内容.
-	 *
-	 * @return
 	 */
 	public byte[] getContent() {
 
@@ -380,9 +352,6 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 
 	/**
 	 * 内容.
-	 *
-	 * @param content
-	 * @return
 	 */
 	public void setContent(byte[] content) {
 

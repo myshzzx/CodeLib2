@@ -2,7 +2,6 @@
 package mysh.codelib2.model;
 
 import mysh.util.CompressUtil;
-import mysh.util.CompressUtil.EntryPicker;
 import mysh.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.zip.ZipEntry;
 
 /**
  * 文件数据头部. <br/>
@@ -70,7 +68,7 @@ public class DataHeader implements Serializable {
 			if (this.compressed) {
 				PipedOutputStream serialDataOut = new PipedOutputStream();
 				final PipedInputStream compressIn = new PipedInputStream(serialDataOut,
-						CompressUtil.DEFAULT_BUF_SIZE);
+								CompressUtil.DEFAULT_BUF_SIZE);
 				codeDataSerialOut = new ObjectOutputStream(serialDataOut);
 
 				// compress thread
@@ -82,8 +80,8 @@ public class DataHeader implements Serializable {
 					public Boolean call() throws Exception {
 
 						return CompressUtil.compress(DataHeader.compressEntry,
-								compressIn, Long.MAX_VALUE,
-								this.compressOut, 0);
+										compressIn, Long.MAX_VALUE,
+										this.compressOut, 0);
 					}
 				};
 
@@ -94,8 +92,6 @@ public class DataHeader implements Serializable {
 			// write codeData obj, use try-with to ensure objOutput close
 			try (ObjectOutputStream tempCodeDataSerialOut = codeDataSerialOut) {
 				tempCodeDataSerialOut.writeObject(eles);
-			} catch (Exception e) {
-				throw e;
 			}
 
 			if (this.compressed && compressThread != null) {
@@ -114,7 +110,6 @@ public class DataHeader implements Serializable {
 	 * 从文件读取数据.
 	 *
 	 * @param filepath 文件路径.
-	 * @return
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
@@ -132,19 +127,15 @@ public class DataHeader implements Serializable {
 
 			if (header.compressed) {
 				final List<Collection<CodeLib2Element>> result = new ArrayList<>();
-				boolean deCompressResult = CompressUtil.deCompress(new EntryPicker() {
+				boolean deCompressResult = CompressUtil.deCompress((entry, in) -> {
 
-					@Override
-					public void getEntry(ZipEntry entry, InputStream in) {
-
-						try {
-							ObjectInputStream objIn = new ObjectInputStream(in);
-							if (DataHeader.compressEntry.equals(entry.getName())) {
-								result.add((Collection<CodeLib2Element>) objIn.readObject());
-							}
-						} catch (Exception e) {
-							throw new RuntimeException("解压失败: " + e);
+					try {
+						ObjectInputStream objIn = new ObjectInputStream(in);
+						if (DataHeader.compressEntry.equals(entry.getName())) {
+							result.add((Collection<CodeLib2Element>) objIn.readObject());
 						}
+					} catch (Exception e) {
+						throw new RuntimeException("解压失败: " + e);
 					}
 				}, fileIn);
 
@@ -164,8 +155,6 @@ public class DataHeader implements Serializable {
 
 	/**
 	 * 取压缩标记.
-	 *
-	 * @return
 	 */
 	public boolean isCompressed() {
 
@@ -174,8 +163,6 @@ public class DataHeader implements Serializable {
 
 	/**
 	 * 设置压缩标记.
-	 *
-	 * @param compressed
 	 */
 	public void setCompressed(boolean compressed) {
 

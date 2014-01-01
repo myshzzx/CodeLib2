@@ -6,9 +6,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 描述及通知UI的保存状态.
- * 
+ *
  * @author Allen
- * 
  */
 public class SaveStateManager {
 
@@ -21,9 +20,8 @@ public class SaveStateManager {
 
 	/**
 	 * 状态描述符.
-	 * 
+	 *
 	 * @author Allen
-	 * 
 	 */
 	public static enum State {
 
@@ -41,24 +39,19 @@ public class SaveStateManager {
 
 	/**
 	 * 状态观察者. 接收状态更新.
-	 * 
+	 *
 	 * @author Allen
-	 * 
 	 */
 	public static interface StateObserver {
 
 		/**
 		 * 观察者被通知状态更新, 观察者返回是否允许此次更新.
-		 * 
-		 * @return
 		 */
 		boolean onSaveStateChanged(State oldState, State newState);
 	}
 
 	/**
 	 * 构造器.
-	 * 
-	 * @param initState
 	 */
 	public SaveStateManager(State initState) {
 
@@ -72,8 +65,6 @@ public class SaveStateManager {
 
 	/**
 	 * 取当前瞬时状态.
-	 * 
-	 * @return
 	 */
 	public State getState() {
 
@@ -82,8 +73,6 @@ public class SaveStateManager {
 
 	/**
 	 * 状态变更. 返回操作结果.
-	 * 
-	 * @param newState
 	 */
 	public boolean changeState(State newState) {
 
@@ -105,8 +94,6 @@ public class SaveStateManager {
 
 	/**
 	 * 注册状态观察者.
-	 * 
-	 * @param o
 	 */
 	public void registStateObserver(StateObserver o) {
 

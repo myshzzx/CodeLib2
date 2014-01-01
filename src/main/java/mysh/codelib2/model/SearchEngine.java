@@ -144,13 +144,13 @@ public final class SearchEngine {
 					for (keyIndex = 0, isSingleKeyMatches = true; isSingleKeyMatches && keyIndex < keyLength; keyIndex++) {
 						// 匹配关键字
 						isSingleKeyMatches = this.lowerCaseKeys[keyIndex].length() == 0
-								|| ele.getKeywords().toLowerCase().contains(this.lowerCaseKeys[keyIndex]);
+										|| ele.getKeywords().toLowerCase().contains(this.lowerCaseKeys[keyIndex]);
 
 						// 匹配内容
 						if (!isSingleKeyMatches) {
 							isSingleKeyMatches = ByteUtil.findStringIndexIgnoreCase(ele.getContent(), 0,
-									this.upperKeysByteArray[keyIndex],
-									this.lowerKeysByteArray[keyIndex]) > -1;
+											this.upperKeysByteArray[keyIndex],
+											this.lowerKeysByteArray[keyIndex]) > -1;
 
 							// 匹配附件
 							if ((ele.getAttachments() != null) && !isSingleKeyMatches) {
@@ -158,14 +158,14 @@ public final class SearchEngine {
 								for (Attachment attachment : ele.getAttachments()) {
 									// 附件名
 									isSingleKeyMatches = attachment.getName().toLowerCase().contains(
-											this.lowerCaseKeys[keyIndex]);
+													this.lowerCaseKeys[keyIndex]);
 
 									// 附件内容
 									attachementEncode = attachment.getContentType().getTextEncode();
 									if (attachementEncode != null && !isSingleKeyMatches) {
 										isSingleKeyMatches = ByteUtil.findStringIndexIgnoreCase(
-												attachment.getBinaryContent(), attachementEncode, 0, this.lowerCaseKeys[keyIndex])
-												> -1;
+														attachment.getBinaryContent(), attachementEncode, 0, this.lowerCaseKeys[keyIndex])
+														> -1;
 
 										if (isSingleKeyMatches)
 											break;
@@ -179,7 +179,7 @@ public final class SearchEngine {
 						break;
 					else if (isSingleKeyMatches)
 						resultCatcher.onGetSearchResult(this.keyword, ele,
-								countMatchDegree(ele, this.upperKeysByteArray, this.lowerKeysByteArray));
+										countMatchDegree(ele, this.upperKeysByteArray, this.lowerKeysByteArray));
 				} catch (IndexOutOfBoundsException outOfBoundsEx) {
 					break;
 				} catch (Exception e) {
@@ -221,7 +221,7 @@ public final class SearchEngine {
 				tMatchIndex = -1;
 				int tContentLimit = 10;
 				while ((tMatchIndex = ByteUtil.findStringIndexIgnoreCase(ele.getContent(), tMatchIndex + 1,
-						upperKeysByteArray[i], lowerKeysByteArray[i])) > -1) {
+								upperKeysByteArray[i], lowerKeysByteArray[i])) > -1) {
 					degree += ContentWeightP;
 					if (--tContentLimit < 1) break;
 				}
@@ -231,7 +231,7 @@ public final class SearchEngine {
 				if (ele.getAttachments() != null) {
 					for (Attachment attachment : ele.getAttachments()) {
 						if (ByteUtil.findStringIndexIgnoreCase(attachment.getName().getBytes(CodeLib2Element.DefaultCharsetEncode),
-								0, upperKeysByteArray[i], lowerKeysByteArray[i]) > -1) {
+										0, upperKeysByteArray[i], lowerKeysByteArray[i]) > -1) {
 							attachmentMatchCount++;
 						}
 					}
@@ -284,7 +284,6 @@ public final class SearchEngine {
 			}
 		}
 
-		;
 	};
 
 	/**
@@ -332,7 +331,7 @@ public final class SearchEngine {
 	/**
 	 * 添加搜索任务. 不阻塞.
 	 *
-	 * @param keyword
+	 * @param keyword        搜索关键字.
 	 * @param startTimeLimit 若在这个时间后没有新的搜索任务, 则执行此搜索.
 	 */
 	public void addSearchTask(String keyword, long startTimeLimit) {
@@ -345,7 +344,7 @@ public final class SearchEngine {
 	 * 搜索关键字.<br/>
 	 * * 表示展示全部.
 	 *
-	 * @param keyword
+	 * @param keyword 搜索关键字.
 	 * @throws Exception 创建搜索任务失败.
 	 */
 	private void search(String keyword) throws Exception {
@@ -355,7 +354,7 @@ public final class SearchEngine {
 		String[] upperCaseKeys = keyword.trim().toUpperCase().split("[\\s,]+");
 		String[] lowerCaseKeys = keyword.trim().toLowerCase().split("[\\s,]+");
 		if (lowerCaseKeys == null || keyword.length() == 0 || lowerCaseKeys.length == 0
-				|| lowerCaseKeys[0].length() == 0) {
+						|| lowerCaseKeys[0].length() == 0) {
 			// throw new IllegalArgumentException("无效关键字: " + keyword);
 			this.resultCatcher.onSearchComplete(keyword);
 			return;
@@ -375,8 +374,6 @@ public final class SearchEngine {
 
 	/**
 	 * 任务完成.
-	 *
-	 * @param task
 	 */
 	private synchronized void onSearchTaskComplete(SearchTask task) {
 

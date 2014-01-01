@@ -275,7 +275,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			fxPanel.setScene(scene);
 			browserEngine = browser.getEngine();
 			browserEngine.loadContent(DefaultBrowserContent);
-			browserEngine.setOnAlert((evt) -> (JOptionPane.showMessageDialog(ui, evt.getData())));
+			browserEngine.setOnAlert(evt -> JOptionPane.showMessageDialog(ui, evt.getData()));
 		});
 	}
 
@@ -474,15 +474,8 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		File saveFile = this.file;
 
 		if (saveFile == null) {
-			saveFile = UIUtil.getSaveFileWithOverwriteChecking(this.ui.zcl2OpenChooser, this.ui,
-							new UIUtil.FileExtentionGetter() {
-
-								@Override
-								public String getFileExtention() {
-
-									return UIControllor.Extention;
-								}
-							});
+			saveFile = UIUtil.getSaveFileWithOverwriteChecking(
+							this.ui.zcl2OpenChooser, this.ui, () -> UIControllor.Extention);
 			if (saveFile == null)
 				return;
 		}
@@ -558,17 +551,13 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		}
 
 		if (items != null && items.size() > 0) {
-			File exportFile = UIUtil.getSaveFileWithOverwriteChecking(this.ui.itemExportChooser, this.ui,
-							new UIUtil.FileExtentionGetter() {
-
-								@Override
-								public String getFileExtention() {
-
-									String ext = ui.itemExportChooser.getFileFilter().getDescription();
-									if (!ext.startsWith("."))
-										ext = "";
-									return ext;
-								}
+			File exportFile = UIUtil.getSaveFileWithOverwriteChecking(
+							this.ui.itemExportChooser, this.ui,
+							() -> {
+								String ext = ui.itemExportChooser.getFileFilter().getDescription();
+								if (!ext.startsWith("."))
+									ext = "";
+								return ext;
 							});
 
 			try {
@@ -594,8 +583,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 执行搜索.
-	 *
-	 * @param text
 	 */
 	@SuppressWarnings("unchecked")
 	private void uiSearch(String text) {
@@ -619,8 +606,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 选中结果数据条目.
-	 *
-	 * @param selectedValue
 	 */
 	synchronized void itemSelect(final Object selectedValue) {
 
@@ -672,7 +657,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	 * 根据语法关键字取 RSyntaxTextArea 的语法样式.
 	 *
 	 * @param syntaxKeyword 语法关键字.
-	 * @return
 	 */
 	private String getSyntaxStyle(String syntaxKeyword) {
 
@@ -941,8 +925,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 关闭前检查或询问以确定否要关闭.
-	 *
-	 * @return
 	 */
 	boolean uiDoClose() {
 
@@ -967,8 +949,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 设置状态栏内容.
-	 *
-	 * @param statusText
 	 */
 	void uiSetStatusBar(String statusText) {
 
@@ -985,17 +965,15 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 代码编辑窗口的 url 点击事件.
-	 *
-	 * @param url
 	 */
 	void onUrlClicked(URL url) {
 
 		java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
 		if (desktop.isSupported(Action.BROWSE)) {
 			try {
-
 				desktop.browse(url.toURI());
 			} catch (Exception e) {
+				log.error("URL 打开失败. " + url, e);
 			}
 		}
 	}
@@ -1174,10 +1152,9 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				this.uiSetStatusBarReady();
 				JOptionPane.showMessageDialog(this.ui, "导入失败\n失败详情请查看日志", AppTitle,
 								JOptionPane.ERROR_MESSAGE);
-				log.error("导入 zcl2 文件失败: " + cFile.getAbsolutePath(), t);
+				log.error("导入 zcl2 文件失败: " + cFile, t);
 			}
 
-			readItems = null;
 			System.gc();
 		}
 	}
@@ -1258,8 +1235,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 设置浏览器展示的内容(异步).
-	 *
-	 * @param content
 	 */
 	private void browserSetContent(final String content) {
 		Platform.runLater(() -> browserEngine.loadContent(content));
@@ -1267,8 +1242,6 @@ public class UIControllor implements StateObserver, ResultCatcher {
 
 	/**
 	 * 设置浏览器展示的页面(异步).
-	 *
-	 * @param url
 	 */
 	private void browserSetUrl(final String url) {
 		Platform.runLater(() -> browserEngine.load(url));
@@ -1318,16 +1291,16 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					String content = new String(attachment.getBinaryContent(),
 									attachment.getContentType().getTextEncode());
 					if (!"html".equals(fileExtention) && !"htm".equals(fileExtention)) {
-						StringBuilder html = new StringBuilder("<html><head><meta http-equiv='Content-Type' content='text/html; charset=");
-						html.append(attachment.getContentType().getTextEncode());
-						html.append("'/></head><body>");
-						html.append(content.replaceAll("&", "&amp;").
+						String html = "<html><head><meta http-equiv='Content-Type' content='text/html; charset="
+										+ attachment.getContentType().getTextEncode()
+										+ "'/></head><body>"
+										+ content.replaceAll("&", "&amp;").
 										replaceAll("\"", "&quot;").replaceAll("'", "&#39;").
 										replaceAll("<", "&lt;").replaceAll(">", "&gt;").
 										replaceAll("(\\r\\n)|(\\r)|(\\n)", "<br/>").
-										replaceAll(" ", "&nbsp;").replaceAll("\\t", "&nbsp;&nbsp;&nbsp;&nbsp;"));
-						html.append("</body></html>");
-						this.browserSetContent(html.toString());
+										replaceAll(" ", "&nbsp;").replaceAll("\\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+										+ "</body></html>";
+						this.browserSetContent(html);
 					} else {
 						this.browserSetContent(content);
 					}

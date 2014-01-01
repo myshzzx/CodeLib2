@@ -40,8 +40,7 @@ public class ExportEngine {
 	 *
 	 * @param info 导出信息.
 	 * @param eles 要导出的元素.
-	 * @return 不支持的导出类型返回 false.
-	 * @throws Exception
+	 * @throws Exception 不支持的导出类型返回 .
 	 */
 	public static void export(ExportInfo info, List<CodeLib2Element> eles) throws Exception {
 
@@ -64,10 +63,6 @@ public class ExportEngine {
 
 	/**
 	 * 导出为 zul2 文件.
-	 *
-	 * @param filepath
-	 * @param eles
-	 * @throws Exception
 	 */
 	private static void toZul2(ExportInfo info, List<CodeLib2Element> eles) throws Exception {
 
@@ -76,10 +71,6 @@ public class ExportEngine {
 
 	/**
 	 * 导出为 html 文件.
-	 *
-	 * @param filepath
-	 * @param eles
-	 * @throws IOException
 	 */
 	private static void toHtml(ExportInfo info, List<CodeLib2Element> eles) throws IOException {
 
@@ -100,7 +91,7 @@ public class ExportEngine {
 
 				htmlOut.write('\'');
 				htmlOut.write(Base64.encodeBase64(ele.getKeywords().getBytes(
-						CodeLib2Element.DefaultCharsetEncode)));
+								CodeLib2Element.DefaultCharsetEncode)));
 				htmlOut.write('\'');
 			}
 
