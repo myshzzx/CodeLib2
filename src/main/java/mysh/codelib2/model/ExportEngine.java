@@ -46,7 +46,7 @@ public class ExportEngine {
 
 		Collections.sort(eles);
 
-		String extention = FileUtil.getFileExtention(info.filepath);
+		String extention = FileUtil.getFileExtension(info.filepath);
 
 		switch (extention) {
 			case "zcl2":

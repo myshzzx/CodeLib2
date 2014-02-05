@@ -1287,7 +1287,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 							&& attachment.getBinaryContent() != null) {
 				ui.contentTab.setSelectedComponent(ui.browserPanel);
 				try {
-					String fileExtention = FileUtil.getFileExtention(attachment.getName());
+					String fileExtention = FileUtil.getFileExtension(attachment.getName());
 					String content = new String(attachment.getBinaryContent(),
 									attachment.getContentType().getTextEncode());
 					if (!"html".equals(fileExtention) && !"htm".equals(fileExtention)) {
