@@ -2,7 +2,7 @@
 package mysh.codelib2.model;
 
 import mysh.util.ByteUtil;
-import mysh.util.TextEncodeUtil;
+import mysh.util.EncodingUtil;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -181,7 +181,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 					String ext = this.name.substring(pointPos + 1, this.name.length()).toLowerCase();
 
 					if (ContentType.textExt.contains(ext)) {
-						if (TextEncodeUtil.isUTF8Bytes(this.binaryContent)) {
+						if (EncodingUtil.isUTF8Bytes(this.binaryContent)) {
 							this.contentType = ContentType.UTF8Text;
 						} else {
 							this.contentType = ContentType.NonUTF8Text;
