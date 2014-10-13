@@ -781,6 +781,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			case "ss":
 				result = SyntaxConstants.SYNTAX_STYLE_LISP;
 				break;
+			case "sh":
 			case "shell":
 				result = SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL;
 				break;
@@ -1114,10 +1115,10 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	}
 
 	/**
-	 * 导入 zcl2 文件.
+	 * 导入文件.
 	 */
 	@SuppressWarnings("unchecked")
-	void uiImportZcl2() {
+	void uiImportFile() {
 
 		if (JFileChooser.APPROVE_OPTION == this.ui.zcl2ImportChooser.showOpenDialog(this.ui)) {
 			File[] files = this.ui.zcl2ImportChooser.getSelectedFiles();
@@ -1126,11 +1127,17 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			Set<CodeLib2Element> readItems = new HashSet<>();
 
 			this.uiSetStatusBar("正在导入 ...");
-			File cFile = null;
 			try {
 				for (File tFile : files) {
-					cFile = tFile;
-					readItems.addAll(DataHeader.readFromFile(tFile.getAbsolutePath()));
+					String fileExt = FileUtil.getFileExtension(tFile.getName());
+					if (UIControllor.Extention.equals('.' + fileExt))
+						readItems.addAll(DataHeader.readFromFile(tFile.getAbsolutePath()));
+					else {
+						CodeLib2Element ele = new CodeLib2Element();
+						ele.setKeywords(fileExt + ", " + FileUtil.getFileNameWithoutExtention(tFile.getName()));
+						ele.setContent(FileUtil.readFileToByteArray(tFile.getAbsolutePath(), 1_000_000));
+						readItems.add(ele);
+					}
 				}
 
 //				展示导入的元素
@@ -1152,7 +1159,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				this.uiSetStatusBarReady();
 				JOptionPane.showMessageDialog(this.ui, "导入失败\n失败详情请查看日志", AppTitle,
 								JOptionPane.ERROR_MESSAGE);
-				log.error("导入 zcl2 文件失败: " + cFile, t);
+				log.error("导入失败: ", t);
 			}
 
 			System.gc();

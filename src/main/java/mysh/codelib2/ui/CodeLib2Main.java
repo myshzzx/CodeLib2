@@ -194,9 +194,8 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         attachmentExportChooser.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
 
         zcl2ImportChooser.setApproveButtonText("导入");
-        zcl2ImportChooser.setDialogTitle("选择 zcl2 文件(可多选)");
+        zcl2ImportChooser.setDialogTitle("选择导入文件(可多选)");
         zcl2ImportChooser.setMultiSelectionEnabled(true);
-        zcl2ImportChooser.setFileFilter(this.zcl2Filter);
 
         setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
 
@@ -372,7 +371,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jPanel1.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
 
         filterText.setFont(new java.awt.Font("Microsoft YaHei", 0, 12)); // NOI18N
-        filterText.setToolTipText("空格或逗号分隔搜索关键字, * 展示全部, ESC 移除最后一个关键字");
+        filterText.setToolTipText("空格或逗号分隔搜索关键字, * 展示全部, ESC 复位");
         filterText.setFocusTraversalPolicyProvider(true);
         filterText.setNextFocusableComponent(resultList);
         filterText.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -857,7 +856,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     }//GEN-LAST:event_attachmentTableMouseExited
 
     private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
-        this.controllor.uiImportZcl2();
+        this.controllor.uiImportFile();
     }//GEN-LAST:event_importButtonActionPerformed
 
     private void importButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_importButtonMouseEntered

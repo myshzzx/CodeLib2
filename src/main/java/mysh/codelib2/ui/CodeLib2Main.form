@@ -46,11 +46,10 @@
     <Component class="javax.swing.JFileChooser" name="zcl2ImportChooser">
       <Properties>
         <Property name="approveButtonText" type="java.lang.String" value="&#x5bfc;&#x5165;"/>
-        <Property name="dialogTitle" type="java.lang.String" value="&#x9009;&#x62e9; zcl2 &#x6587;&#x4ef6;(&#x53ef;&#x591a;&#x9009;)"/>
+        <Property name="dialogTitle" type="java.lang.String" value="&#x9009;&#x62e9;&#x5bfc;&#x5165;&#x6587;&#x4ef6;(&#x53ef;&#x591a;&#x9009;)"/>
         <Property name="multiSelectionEnabled" type="boolean" value="true"/>
       </Properties>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="zcl2ImportChooser.setFileFilter(this.zcl2Filter);"/>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
       </AuxValues>
     </Component>
