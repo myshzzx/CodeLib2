@@ -41,6 +41,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 import java.util.Queue;
@@ -1014,7 +1016,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 				}
 
 				attachments.add(new Attachment().setName(file.getName()).setBinaryContent(
-								FileUtil.readFileToByteArray(file.getAbsolutePath(), Integer.MAX_VALUE)));
+								Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
 			} catch (Exception e) {
 				log.error("导入附件失败. " + file.getAbsolutePath(), e);
 				JOptionPane.showMessageDialog(this.ui, "导入附件失败.\n" + file.getName(), AppTitle,
@@ -1105,7 +1107,10 @@ public class UIControllor implements StateObserver, ResultCatcher {
 						continue;
 					}
 
-					if (!FileUtil.writeFile(filepath, attachment.getBinaryContent())) {
+					try {
+						FileUtil.writeFile(filepath, attachment.getBinaryContent());
+					} catch (IOException ex) {
+						log.error("export error.", ex);
 						JOptionPane.showMessageDialog(this.ui, "导出失败.\n" + attachment.getName(),
 										AppTitle, JOptionPane.ERROR_MESSAGE);
 					}
@@ -1135,7 +1140,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 					else {
 						CodeLib2Element ele = new CodeLib2Element();
 						ele.setKeywords(fileExt + ", " + FileUtil.getFileNameWithoutExtention(tFile.getName()));
-						ele.setContent(FileUtil.readFileToByteArray(tFile.getAbsolutePath(), 1_000_000));
+						ele.setContent(Files.readAllBytes(Paths.get(tFile.getAbsolutePath())));
 						readItems.add(ele);
 					}
 				}
@@ -1328,7 +1333,12 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			Attachment attachment = (Attachment) this.ui.attachmentTable.getValueAt(selectedRow, 0);
 			final String oriFilePath = TempDir + attachment.getName();
 			String filePath = FileUtil.getWritableFile(oriFilePath).getPath();
-			FileUtil.writeFile(filePath, attachment.getBinaryContent());
+			try {
+				FileUtil.writeFile(filePath, attachment.getBinaryContent());
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(this.ui, "写入临时文件失败.", "打开文件", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 
 			File tempFile = new File(filePath);
 			try {

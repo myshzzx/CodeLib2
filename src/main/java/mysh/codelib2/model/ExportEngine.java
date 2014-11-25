@@ -74,7 +74,7 @@ public class ExportEngine {
 	 */
 	private static void toHtml(ExportInfo info, List<CodeLib2Element> eles) throws IOException {
 
-		try (FileOutputStream htmlOut = FileUtil.getFileOutputStream(info.filepath)) {
+		try (FileOutputStream htmlOut = new FileOutputStream(info.filepath)) {
 			htmlOut.write("<!DOCTYPE html><html><head><meta charset='".getBytes(CodeLib2Element.DefaultCharsetEncode));
 			htmlOut.write(CodeLib2Element.DefaultCharsetEncode.getBytes(CodeLib2Element.DefaultCharsetEncode));
 			htmlOut.write("' /><script>var title = '".getBytes(CodeLib2Element.DefaultCharsetEncode));

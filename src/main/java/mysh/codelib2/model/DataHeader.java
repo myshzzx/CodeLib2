@@ -2,7 +2,6 @@
 package mysh.codelib2.model;
 
 import mysh.util.CompressUtil;
-import mysh.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +38,6 @@ public class DataHeader implements Serializable {
 
 	/**
 	 * 数据保存到文件.<br/>
-	 * 如果要增加加密功能, 此方法需要重写, 因为当前的数据流管道套接机制可能会使某个线程无法结束.<br/>
-	 * 要加入加密流程重写此方法, 用缓冲区连接各个处理模块, 而不是用数据流管道.
 	 *
 	 * @param filepath 文件名.
 	 * @param eles     数据集.
@@ -48,11 +45,7 @@ public class DataHeader implements Serializable {
 	public void saveToFile(String filepath, Collection<CodeLib2Element> eles) throws Exception {
 
 		ObjectOutputStream codeDataSerialOut;
-		try (final FileOutputStream fileOut = FileUtil.getFileOutputStream(filepath)) {
-
-			if (fileOut == null) {
-				throw new Exception("文件写入失败: " + filepath);
-			}
+		try (final FileOutputStream fileOut = new FileOutputStream(filepath)) {
 
 			// write header to file
 			ObjectOutputStream fileObjOut = new ObjectOutputStream(fileOut);
@@ -115,9 +108,7 @@ public class DataHeader implements Serializable {
 	@SuppressWarnings("unchecked")
 	public static Collection<CodeLib2Element> readFromFile(String filepath) throws Exception {
 
-		try (final FileInputStream fileIn = FileUtil.getFileInputStream(filepath)) {
-			if (fileIn == null)
-				throw new Exception("读取文件失败: " + filepath);
+		try (final FileInputStream fileIn = new FileInputStream(filepath)) {
 
 			ObjectInputStream headerInput = new ObjectInputStream(fileIn);
 			DataHeader header = (DataHeader) headerInput.readObject();
