@@ -696,6 +696,12 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			case "css":
 				result = SyntaxConstants.SYNTAX_STYLE_CSS;
 				break;
+			case "d":
+				result = SyntaxConstants.SYNTAX_STYLE_D;
+				break;
+			case "dart":
+				result = SyntaxConstants.SYNTAX_STYLE_DART;
+				break;
 			case "delphi":
 			case "pas":
 			case "pascal":
