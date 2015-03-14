@@ -74,7 +74,7 @@ public class CodeLib2Frame extends javax.swing.JFrame {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         if (this.codeLib2Main.doClose()) {
-            System.exit(0);
+            this.dispose();
         }
     }//GEN-LAST:event_formWindowClosing
 
