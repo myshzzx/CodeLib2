@@ -8,6 +8,7 @@ import mysh.codelib2.model.CodeLib2Element;
 import mysh.util.UIUtil;
 
 import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.io.File;
 
 /**
@@ -108,7 +109,7 @@ public class CodeLib2Frame extends javax.swing.JFrame {
         /*
          * Create and display the form
          */
-        CodeLib2Frame frame = new CodeLib2Frame();
+        frame = new CodeLib2Frame();
         frame.setVisible(true);
 
         if (args.length > 0) {
@@ -118,4 +119,10 @@ public class CodeLib2Frame extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+
+    private static CodeLib2Frame frame;
+    public static void shutdown(){
+        WindowEvent we = new WindowEvent(frame, WindowEvent.WINDOW_CLOSING);
+        frame.dispatchEvent(we);
+    }
 }

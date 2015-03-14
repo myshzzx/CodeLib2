@@ -125,7 +125,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 	/**
 	 * 搜索引擎.
 	 */
-	private final SearchEngine searchEnging = new SearchEngine(this.eles, this);
+	private final SearchEngine searchEngine = new SearchEngine(this.eles, this);
 
 	/**
 	 * 保存状态管理器.
@@ -419,6 +419,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 			}
 		}
 
+		this.searchEngine.close();
 		return true;
 	}
 
@@ -596,7 +597,7 @@ public class UIControllor implements StateObserver, ResultCatcher {
 		this.searchResults.clear();
 
 		try {
-			this.searchEnging.addSearchTask(text, System.currentTimeMillis() + 300);
+			this.searchEngine.addSearchTask(text, System.currentTimeMillis() + 300);
 
 			if (this.currentKeyword.split("[\\s,]+").length > 0)
 				this.uiSetStatusBar("正在搜索 [ " + text + " ] ...");

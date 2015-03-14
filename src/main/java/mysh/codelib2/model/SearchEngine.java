@@ -6,10 +6,9 @@ import mysh.util.ByteUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.Queue;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -24,7 +23,7 @@ import static mysh.codelib2.model.CodeLib2Element.Attachment;
  * @author Allen
  */
 @ThreadSafe
-public final class SearchEngine {
+public final class SearchEngine implements Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(SearchEngine.class);
 	/**
@@ -191,6 +190,11 @@ public final class SearchEngine {
 		}
 	}
 
+	@Override
+	public void close() {
+		taskScheduler.interrupt();
+	}
+
 	/**
 	 * 计算条目的关键字匹配度.
 	 *
@@ -279,11 +283,11 @@ public final class SearchEngine {
 
 					search(keyword);
 				}
+			} catch (InterruptedException e) {
 			} catch (Exception e) {
 				log.error("搜索守护线程异常退出", e);
 			}
 		}
-
 	};
 
 	/**
@@ -318,14 +322,6 @@ public final class SearchEngine {
 
 		this.targetLib = targetLib;
 		this.resultCatcher = resultCatcher;
-
-//		启动定时 GC
-		new Timer("gcTimer", true).schedule(new TimerTask() {
-			@Override
-			public void run() {
-				System.gc();
-			}
-		}, 30 * 1000, 10 * 1000);
 	}
 
 	/**
