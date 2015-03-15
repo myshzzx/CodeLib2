@@ -24,7 +24,7 @@ public class CodeLib2Frame extends javax.swing.JFrame {
      */
     public CodeLib2Frame() {
         initComponents();
-	    this.setTitle(UIControllor.AppTitle);
+	    this.setTitle(UIController.AppTitle);
 	    this.setIconImage(Toolkit.getDefaultToolkit().getImage(
 					    this.getClass().getClassLoader().getResource("icons/CodeLib2.png")));
 	    System.setProperty("file.encoding", CodeLib2Element.DefaultCharsetEncode);

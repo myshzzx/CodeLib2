@@ -18,13 +18,13 @@ import java.io.File;
  */
 public final class CodeLib2Main extends javax.swing.JPanel {
 
-    private UIControllor controllor;
+    private UIController controllor;
     private AppTitltSetter appTitltSetter;
     private FileFilter zcl2Filter = new FileFilter() {
         @Override
         public boolean accept(File f) {
 
-            if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {
+            if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIController.Extention)) {
                 return true;
             }
             return false;
@@ -76,7 +76,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     public CodeLib2Main() {
         initComponents();
 
-        this.controllor = new UIControllor(this);
+        this.controllor = new UIController(this);
     }
 
     public CodeLib2Main setAppTitleSetter(AppTitltSetter appTitltSetter) {
@@ -152,7 +152,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             @Override
             public boolean accept(File f) {
 
-                if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {
+                if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIController.Extention)) {
                     return true;
                 }
                 return false;
