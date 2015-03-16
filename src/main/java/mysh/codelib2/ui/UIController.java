@@ -439,6 +439,11 @@ public class UIController implements StateObserver, ResultCatcher {
 
 		this.unRegisterHotKey();
 		this.searchEngine.close();
+		try {
+			ClassLoader cl = CodeLib2Frame.class.getClassLoader();
+			if (cl instanceof Closeable) ((Closeable) cl).close();
+		} catch (Exception e) {
+		}
 		return true;
 	}
 
