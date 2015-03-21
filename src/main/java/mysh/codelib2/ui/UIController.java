@@ -437,13 +437,6 @@ public class UIController implements StateObserver, ResultCatcher {
 			}
 		}
 
-		this.unRegisterHotKey();
-		this.searchEngine.close();
-		try {
-			ClassLoader cl = CodeLib2Frame.class.getClassLoader();
-			if (cl instanceof Closeable) ((Closeable) cl).close();
-		} catch (Exception e) {
-		}
 		return true;
 	}
 
@@ -961,8 +954,17 @@ public class UIController implements StateObserver, ResultCatcher {
 	 * 关闭前检查或询问以确定否要关闭.
 	 */
 	boolean uiDoClose() {
-
-		return this.checkForSave();
+		if (this.checkForSave()) {
+			this.unRegisterHotKey();
+			this.searchEngine.close();
+			try {
+				ClassLoader cl = CodeLib2Frame.class.getClassLoader();
+				if (cl instanceof Closeable) ((Closeable) cl).close();
+			} catch (Exception e) {
+			}
+			return true;
+		} else
+			return false;
 	}
 
 	/**
