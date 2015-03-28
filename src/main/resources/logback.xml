@@ -38,52 +38,29 @@
 	<appender name="DebugFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
 		<Append>true</Append>
-		<File>logs/debug.html</File>
-		<layout class="ch.qos.logback.classic.html.HTMLLayout">
+		<File>${java.io.tmpdir}/debug.log</File>
+		<layout class="ch.qos.logback.classic.PatternLayout">
 			<!--See http://logback.qos.ch/manual/layouts.html#ClassicHTMLLayout-->
 			<!--for documentation-->
 			<LocationInfo>true</LocationInfo>
-			<Pattern>%relative%thread%mdc%level%logger%msg</Pattern>
+			<pattern>●%date{MM-dd HH:mm:ss} %msg ~%logger{5}-%L [%thread] %level%n</pattern>
 		</layout>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>DEBUG</level>
 		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<maxIndex>50</maxIndex>
-			<FileNamePattern>logs/debug.%i.html</FileNamePattern>
+			<FileNamePattern>debug.%i.html</FileNamePattern>
 		</rollingPolicy>
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
 			<MaxFileSize>4MB</MaxFileSize>
 		</triggeringPolicy>
 	</appender>
 
-	<appender name="ErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
-		<Append>true</Append>
-		<File>logs/error.html</File>
-		<layout class="ch.qos.logback.classic.html.HTMLLayout">
-			<!--See http://logback.qos.ch/manual/layouts.html#ClassicHTMLLayout-->
-			<!--for documentation-->
-			<LocationInfo>true</LocationInfo>
-			<Pattern>%relative%thread%mdc%level%logger%msg</Pattern>
-		</layout>
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>WARN</level>
-		</filter>
-		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-			<maxIndex>50</maxIndex>
-			<FileNamePattern>logs/error.%i.html</FileNamePattern>
-		</rollingPolicy>
-		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<MaxFileSize>2MB</MaxFileSize>
-		</triggeringPolicy>
-	</appender>
-
 
 	<root level="debug">
 		<appender-ref ref="console"/>
-		<!--<appender-ref ref="DebugFile"/>-->
-		<!--<appender-ref ref="ErrorFile"/>-->
+		<appender-ref ref="DebugFile"/>
 	</root>
 
 </configuration>
