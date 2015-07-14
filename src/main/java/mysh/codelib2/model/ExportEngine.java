@@ -1,7 +1,7 @@
 
 package mysh.codelib2.model;
 
-import mysh.util.FileUtil;
+import mysh.util.FilesUtil;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.FileOutputStream;
@@ -46,7 +46,7 @@ public class ExportEngine {
 
 		Collections.sort(eles);
 
-		String extention = FileUtil.getFileExtension(info.filepath);
+		String extention = FilesUtil.getFileExtension(info.filepath);
 
 		switch (extention) {
 			case "zcl2":

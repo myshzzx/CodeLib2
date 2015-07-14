@@ -1,7 +1,7 @@
 
 package mysh.codelib2.model;
 
-import mysh.util.CompressUtil;
+import mysh.util.Compresses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +61,7 @@ public class DataHeader implements Serializable {
 			if (this.compressed) {
 				PipedOutputStream serialDataOut = new PipedOutputStream();
 				final PipedInputStream compressIn = new PipedInputStream(serialDataOut,
-								CompressUtil.DEFAULT_BUF_SIZE);
+								Compresses.DEFAULT_BUF_SIZE);
 				codeDataSerialOut = new ObjectOutputStream(serialDataOut);
 
 				// compress thread
@@ -72,9 +72,9 @@ public class DataHeader implements Serializable {
 					@Override
 					public Boolean call() throws Exception {
 
-						return CompressUtil.compress(DataHeader.compressEntry,
-										compressIn, Long.MAX_VALUE,
-										this.compressOut, 0);
+						return Compresses.compress(DataHeader.compressEntry,
+								compressIn, Long.MAX_VALUE,
+								this.compressOut, 0);
 					}
 				};
 
@@ -118,7 +118,7 @@ public class DataHeader implements Serializable {
 
 			if (header.compressed) {
 				final List<Collection<CodeLib2Element>> result = new ArrayList<>();
-				boolean deCompressResult = CompressUtil.deCompress((entry, in) -> {
+				boolean deCompressResult = Compresses.deCompress((entry, in) -> {
 
 					try {
 						ObjectInputStream objIn = new ObjectInputStream(in);

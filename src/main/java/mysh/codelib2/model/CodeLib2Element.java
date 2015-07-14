@@ -1,8 +1,8 @@
 
 package mysh.codelib2.model;
 
-import mysh.util.ByteUtil;
-import mysh.util.EncodingUtil;
+import mysh.util.Bytes;
+import mysh.util.Encodings;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -21,7 +21,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	/**
 	 * 默认文本编码格式.
 	 */
-	public static final String DefaultCharsetEncode = ByteUtil.DefaultEncode;
+	public static final String DefaultCharsetEncode = Bytes.DefaultEncode;
 
 	/**
 	 * 默认关键字.
@@ -181,7 +181,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 					String ext = this.name.substring(pointPos + 1, this.name.length()).toLowerCase();
 
 					if (ContentType.textExt.contains(ext)) {
-						if (EncodingUtil.isUTF8Bytes(this.binaryContent)) {
+						if (Encodings.isUTF8Bytes(this.binaryContent)) {
 							this.contentType = ContentType.UTF8Text;
 						} else {
 							this.contentType = ContentType.NonUTF8Text;

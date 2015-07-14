@@ -15,9 +15,9 @@ import mysh.codelib2.model.SearchEngine;
 import mysh.codelib2.model.SearchEngine.ResultCatcher;
 import mysh.codelib2.ui.SaveStateManager.State;
 import mysh.codelib2.ui.SaveStateManager.StateObserver;
-import mysh.util.FileUtil;
-import mysh.util.HotKeyUtil;
-import mysh.util.UIUtil;
+import mysh.util.FilesUtil;
+import mysh.util.HotKeys;
+import mysh.util.UIs;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.SearchContext;
 import org.slf4j.Logger;
@@ -41,7 +41,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
@@ -385,13 +384,13 @@ public class UIController implements StateObserver, ResultCatcher {
 	 */
 	private void registerHotKey() {
 		// 注册 esc 热键.
-		HotKeyUtil.registerHotKey(KeyEvent.VK_ESCAPE, 0, escAction);
+		HotKeys.registerHotKey(KeyEvent.VK_ESCAPE, 0, escAction);
 
 		// 注册 Ctrl+F 热键.
-		HotKeyUtil.registerHotKey(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK, findAction);
+		HotKeys.registerHotKey(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK, findAction);
 
 		// 注册 Ctrl+S 热键.
-		HotKeyUtil.registerHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, saveAction);
+		HotKeys.registerHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, saveAction);
 	}
 
 	/**
@@ -399,13 +398,13 @@ public class UIController implements StateObserver, ResultCatcher {
 	 */
 	private void unRegisterHotKey() {
 		// 注册 esc 热键.
-		HotKeyUtil.unRegisterHotKey(KeyEvent.VK_ESCAPE, 0, escAction);
+		HotKeys.unRegisterHotKey(KeyEvent.VK_ESCAPE, 0, escAction);
 
 		// 注册 Ctrl+F 热键.
-		HotKeyUtil.unRegisterHotKey(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK, findAction);
+		HotKeys.unRegisterHotKey(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK, findAction);
 
 		// 注册 Ctrl+S 热键.
-		HotKeyUtil.unRegisterHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, saveAction);
+		HotKeys.unRegisterHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, saveAction);
 	}
 
 	/**
@@ -494,8 +493,8 @@ public class UIController implements StateObserver, ResultCatcher {
 		File saveFile = this.file;
 
 		if (saveFile == null) {
-			saveFile = UIUtil.getSaveFileWithOverwriteChecking(
-							this.ui.zcl2OpenChooser, this.ui, () -> UIController.Extention);
+			saveFile = UIs.getSaveFileWithOverwriteChecking(
+					this.ui.zcl2OpenChooser, this.ui, () -> UIController.Extention);
 			if (saveFile == null)
 				return;
 		}
@@ -571,14 +570,14 @@ public class UIController implements StateObserver, ResultCatcher {
 		}
 
 		if (items != null && items.size() > 0) {
-			File exportFile = UIUtil.getSaveFileWithOverwriteChecking(
-							this.ui.itemExportChooser, this.ui,
-							() -> {
-								String ext = ui.itemExportChooser.getFileFilter().getDescription();
-								if (!ext.startsWith("."))
-									ext = "";
-								return ext;
-							});
+			File exportFile = UIs.getSaveFileWithOverwriteChecking(
+					this.ui.itemExportChooser, this.ui,
+					() -> {
+						String ext = ui.itemExportChooser.getFileFilter().getDescription();
+						if (!ext.startsWith("."))
+							ext = "";
+						return ext;
+					});
 
 			try {
 				if (exportFile != null) {
@@ -587,10 +586,10 @@ public class UIController implements StateObserver, ResultCatcher {
 					info.filepath = exportFile.getPath();
 					if (this.file == null) {
 						info.title = AppTitle + " - "
-										+ FileUtil.getFileNameWithoutExtention(info.filepath);
+										+ FilesUtil.getFileNameWithoutExtention(info.filepath);
 					} else {
 						info.title = AppTitle + " - "
-										+ FileUtil.getFileNameWithoutExtention(this.file.getPath());
+										+ FilesUtil.getFileNameWithoutExtention(this.file.getPath());
 					}
 
 					ExportEngine.export(info, items);
@@ -1049,7 +1048,7 @@ public class UIController implements StateObserver, ResultCatcher {
 				}
 
 				attachments.add(new Attachment().setName(file.getName()).setBinaryContent(
-								Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
+								java.nio.file.Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
 			} catch (Exception e) {
 				log.error("导入附件失败. " + file.getAbsolutePath(), e);
 				JOptionPane.showMessageDialog(this.ui, "导入附件失败.\n" + file.getName(), AppTitle,
@@ -1141,7 +1140,7 @@ public class UIController implements StateObserver, ResultCatcher {
 					}
 
 					try {
-						FileUtil.writeFile(filepath, attachment.getBinaryContent());
+						FilesUtil.writeFile(filepath, attachment.getBinaryContent());
 					} catch (IOException ex) {
 						log.error("export error.", ex);
 						JOptionPane.showMessageDialog(this.ui, "导出失败.\n" + attachment.getName(),
@@ -1167,13 +1166,13 @@ public class UIController implements StateObserver, ResultCatcher {
 			this.uiSetStatusBar("正在导入 ...");
 			try {
 				for (File tFile : files) {
-					String fileExt = FileUtil.getFileExtension(tFile.getName());
+					String fileExt = FilesUtil.getFileExtension(tFile.getName());
 					if (UIController.Extention.equals('.' + fileExt))
 						readItems.addAll(DataHeader.readFromFile(tFile.getAbsolutePath()));
 					else {
 						CodeLib2Element ele = new CodeLib2Element();
-						ele.setKeywords(fileExt + ", " + FileUtil.getFileNameWithoutExtention(tFile.getName()));
-						ele.setContent(Files.readAllBytes(Paths.get(tFile.getAbsolutePath())));
+						ele.setKeywords(fileExt + ", " + FilesUtil.getFileNameWithoutExtention(tFile.getName()));
+						ele.setContent(java.nio.file.Files.readAllBytes(Paths.get(tFile.getAbsolutePath())));
 						readItems.add(ele);
 					}
 				}
@@ -1332,7 +1331,7 @@ public class UIController implements StateObserver, ResultCatcher {
 							&& attachment.getBinaryContent() != null) {
 				ui.contentTab.setSelectedComponent(ui.browserPanel);
 				try {
-					String fileExtention = FileUtil.getFileExtension(attachment.getName());
+					String fileExtention = FilesUtil.getFileExtension(attachment.getName());
 					String content = new String(attachment.getBinaryContent(),
 									attachment.getContentType().getTextEncode());
 					if (!"html".equals(fileExtention) && !"htm".equals(fileExtention)) {
@@ -1365,9 +1364,9 @@ public class UIController implements StateObserver, ResultCatcher {
 		if (selectedRow > -1) {
 			Attachment attachment = (Attachment) this.ui.attachmentTable.getValueAt(selectedRow, 0);
 			final String oriFilePath = TempDir + attachment.getName();
-			String filePath = FileUtil.getWritableFile(oriFilePath).getPath();
+			String filePath = FilesUtil.getWritableFile(oriFilePath).getPath();
 			try {
-				FileUtil.writeFile(filePath, attachment.getBinaryContent());
+				FilesUtil.writeFile(filePath, attachment.getBinaryContent());
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this.ui, "写入临时文件失败.", "打开文件", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -1380,7 +1379,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			} catch (IOException e) {
 				if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui,
 								"打开文件失败, 要尝试用文本方式打开吗?\n" + oriFilePath, "打开文件", JOptionPane.YES_NO_OPTION)) {
-					File textFile = FileUtil.getWritableFile(oriFilePath + ".txt");
+					File textFile = FilesUtil.getWritableFile(oriFilePath + ".txt");
 					if (tempFile.renameTo(textFile)) {
 						textFile.deleteOnExit();
 						try {

@@ -2,7 +2,7 @@
 package mysh.codelib2.model;
 
 import mysh.annotation.ThreadSafe;
-import mysh.util.ByteUtil;
+import mysh.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,9 +147,9 @@ public final class SearchEngine implements Closeable {
 
 						// 匹配内容
 						if (!isSingleKeyMatches) {
-							isSingleKeyMatches = ByteUtil.findStringIndexIgnoreCase(ele.getContent(), 0,
-											this.upperKeysByteArray[keyIndex],
-											this.lowerKeysByteArray[keyIndex]) > -1;
+							isSingleKeyMatches = Bytes.findStringIndexIgnoreCase(ele.getContent(), 0,
+									this.upperKeysByteArray[keyIndex],
+									this.lowerKeysByteArray[keyIndex]) > -1;
 
 							// 匹配附件
 							if ((ele.getAttachments() != null) && !isSingleKeyMatches) {
@@ -162,8 +162,8 @@ public final class SearchEngine implements Closeable {
 									// 附件内容
 									attachementEncode = attachment.getContentType().getTextEncode();
 									if (attachementEncode != null && !isSingleKeyMatches) {
-										isSingleKeyMatches = ByteUtil.findStringIndexIgnoreCase(
-														attachment.getBinaryContent(), attachementEncode, 0, this.lowerCaseKeys[keyIndex])
+										isSingleKeyMatches = Bytes.findStringIndexIgnoreCase(
+												attachment.getBinaryContent(), attachementEncode, 0, this.lowerCaseKeys[keyIndex])
 														> -1;
 
 										if (isSingleKeyMatches)
@@ -216,7 +216,7 @@ public final class SearchEngine implements Closeable {
 			for (int i = 0; i < upperKeysByteArray.length && upperKeysByteArray[i].length > 0; i++) {
 				// key
 				tSearchContent = ele.getKeywords().getBytes(CodeLib2Element.DefaultCharsetEncode);
-				tMatchIndex = ByteUtil.findStringIndexIgnoreCase(tSearchContent, 0, upperKeysByteArray[i], lowerKeysByteArray[i]);
+				tMatchIndex = Bytes.findStringIndexIgnoreCase(tSearchContent, 0, upperKeysByteArray[i], lowerKeysByteArray[i]);
 				if (tMatchIndex > -1) {
 					degree += KeyWeight * (tSearchContent.length - tMatchIndex) / tSearchContent.length;
 				}
@@ -224,8 +224,8 @@ public final class SearchEngine implements Closeable {
 				// content
 				tMatchIndex = -1;
 				int tContentLimit = 10;
-				while ((tMatchIndex = ByteUtil.findStringIndexIgnoreCase(ele.getContent(), tMatchIndex + 1,
-								upperKeysByteArray[i], lowerKeysByteArray[i])) > -1) {
+				while ((tMatchIndex = Bytes.findStringIndexIgnoreCase(ele.getContent(), tMatchIndex + 1,
+						upperKeysByteArray[i], lowerKeysByteArray[i])) > -1) {
 					degree += ContentWeightP;
 					if (--tContentLimit < 1) break;
 				}
@@ -234,8 +234,8 @@ public final class SearchEngine implements Closeable {
 				int attachmentMatchCount = 0;
 				if (ele.getAttachments() != null) {
 					for (Attachment attachment : ele.getAttachments()) {
-						if (ByteUtil.findStringIndexIgnoreCase(attachment.getName().getBytes(CodeLib2Element.DefaultCharsetEncode),
-										0, upperKeysByteArray[i], lowerKeysByteArray[i]) > -1) {
+						if (Bytes.findStringIndexIgnoreCase(attachment.getName().getBytes(CodeLib2Element.DefaultCharsetEncode),
+								0, upperKeysByteArray[i], lowerKeysByteArray[i]) > -1) {
 							attachmentMatchCount++;
 						}
 					}
