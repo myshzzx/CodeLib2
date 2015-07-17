@@ -43,7 +43,7 @@
 			<!--See http://logback.qos.ch/manual/layouts.html#ClassicHTMLLayout-->
 			<!--for documentation-->
 			<LocationInfo>true</LocationInfo>
-			<pattern>●%date{MM-dd HH:mm:ss} %msg ~%logger{5}-L%L [%thread] %level%n</pattern>
+			<pattern>●%date{MM-dd HH:mm:ss} %msg ~%logger{5}-%L [%thread] %level%n</pattern>
 		</layout>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>DEBUG</level>
