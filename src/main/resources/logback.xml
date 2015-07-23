@@ -50,7 +50,7 @@
 		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<maxIndex>50</maxIndex>
-			<FileNamePattern>debug.%i.html</FileNamePattern>
+			<FileNamePattern>debug.%i.log</FileNamePattern>
 		</rollingPolicy>
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
 			<MaxFileSize>4MB</MaxFileSize>
