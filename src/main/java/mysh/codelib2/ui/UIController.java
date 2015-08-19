@@ -494,7 +494,7 @@ public class UIController implements StateObserver, ResultCatcher {
 
 		if (saveFile == null) {
 			saveFile = UIs.getSaveFileWithOverwriteChecking(
-					this.ui.zcl2OpenChooser, this.ui, () -> UIController.Extention);
+							this.ui.zcl2OpenChooser, this.ui, () -> UIController.Extention);
 			if (saveFile == null)
 				return;
 		}
@@ -571,13 +571,13 @@ public class UIController implements StateObserver, ResultCatcher {
 
 		if (items != null && items.size() > 0) {
 			File exportFile = UIs.getSaveFileWithOverwriteChecking(
-					this.ui.itemExportChooser, this.ui,
-					() -> {
-						String ext = ui.itemExportChooser.getFileFilter().getDescription();
-						if (!ext.startsWith("."))
-							ext = "";
-						return ext;
-					});
+							this.ui.itemExportChooser, this.ui,
+							() -> {
+								String ext = ui.itemExportChooser.getFileFilter().getDescription();
+								if (!ext.startsWith("."))
+									ext = "";
+								return ext;
+							});
 
 			try {
 				if (exportFile != null) {
@@ -1236,7 +1236,7 @@ public class UIController implements StateObserver, ResultCatcher {
 								SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
 			}
 
-			findResult |= this.browserSearch();
+			findResult |= this.browserSearch(text);
 			if (findResult) {
 				this.ui.findText.setForeground(Color.BLACK);
 			} else {
@@ -1273,7 +1273,8 @@ public class UIController implements StateObserver, ResultCatcher {
 	 * 搜索浏览器(搜索字段高亮显示).
 	 * 有匹配则返回 true.
 	 */
-	private boolean browserSearch() {
+	private boolean browserSearch(String text) {
+		Platform.runLater(() -> browserEngine.executeScript("search('" + text + "')"));
 		return false;
 	}
 
@@ -1320,6 +1321,27 @@ public class UIController implements StateObserver, ResultCatcher {
 	}
 
 	/**
+	 * 页面搜索高亮脚本.
+	 */
+	private String pageSearchJs;
+
+	private String getPageSearchJs() throws IOException {
+		if (pageSearchJs == null) {
+			try (BufferedReader in = new BufferedReader(new InputStreamReader(
+							UIController.class.getResourceAsStream("/js/pageSearchCompress.js")))) {
+				StringBuilder sbjs = new StringBuilder();
+				int len;
+				char[] buf = new char[100_000];
+				while ((len = in.read(buf)) > 0) {
+					sbjs.append(buf, 0, len);
+				}
+				pageSearchJs = sbjs.toString();
+			}
+		}
+		return pageSearchJs;
+	}
+
+	/**
 	 * 展示附件.
 	 */
 	void attachmentShow() {
@@ -1338,15 +1360,25 @@ public class UIController implements StateObserver, ResultCatcher {
 						String html = "<html><head><meta http-equiv='Content-Type' content='text/html; charset="
 										+ attachment.getContentType().getTextEncode()
 										+ "'/></head><body>"
-										+ content.replaceAll("&", "&amp;").
-										replaceAll("\"", "&quot;").replaceAll("'", "&#39;").
-										replaceAll("<", "&lt;").replaceAll(">", "&gt;").
-										replaceAll("(\\r\\n)|(\\r)|(\\n)", "<br/>").
-										replaceAll(" ", "&nbsp;").replaceAll("\\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+										+ content.replace("&", "&amp;")
+										.replace("\"", "&quot;").replace("'", "&#39;")
+										.replace("<", "&lt;").replace(">", "&gt;")
+										.replace("\r\n", "<br/>")
+										.replace("\r", "<br/>")
+										.replace("\n", "<br/>")
+										.replace(" ", "&nbsp;").replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+										+ "<script>" + getPageSearchJs() + "</script>"
 										+ "</body></html>";
 						this.browserSetContent(html);
 					} else {
-						this.browserSetContent(content);
+						int endIdx = content.lastIndexOf("</html>");
+						if (endIdx < 0)
+							this.browserSetContent(content);
+						else {
+							String sb = content.substring(0, endIdx)
+											+ "<script>" + getPageSearchJs() + "</script></html>";
+							this.browserSetContent(sb);
+						}
 					}
 				} catch (Exception e) {
 					this.browserSetContent(e.toString());
