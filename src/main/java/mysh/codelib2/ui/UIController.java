@@ -754,6 +754,9 @@ public class UIController implements StateObserver, ResultCatcher {
 			case "latex":
 				result = SyntaxConstants.SYNTAX_STYLE_LATEX;
 				break;
+			case "less":
+				result = SyntaxConstants.SYNTAX_STYLE_LESS;
+				break;
 			case "lisp":
 				result = SyntaxConstants.SYNTAX_STYLE_LISP;
 				break;
