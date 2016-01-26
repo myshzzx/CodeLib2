@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: mysh.codelib2.ui.CodeLib2Frame
-
