@@ -1,11 +1,11 @@
 
 package mysh.codelib2.model;
 
-import mysh.annotation.ThreadSafe;
 import mysh.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.io.Closeable;
 import java.util.List;
 import java.util.Queue;

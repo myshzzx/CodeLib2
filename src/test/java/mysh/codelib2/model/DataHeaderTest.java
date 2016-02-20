@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
@@ -54,7 +55,7 @@ public class DataHeaderTest {
 			filepath += ".comp";
 
 		long start = System.nanoTime();
-		dataHeader.saveToFile(filepath, this.eles);
+		dataHeader.saveToFile(new File(filepath), this.eles);
 		System.out.println("save cost: " + (System.nanoTime() - start) / 1_000_000 + " mm");
 
 		start = System.nanoTime();
