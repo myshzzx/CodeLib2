@@ -501,7 +501,7 @@ public class UIController implements StateObserver, ResultCatcher {
 
 		try {
 			this.uiSetStatusBar("正在保存 ...");
-			new DataHeader().saveToFile(saveFile.getAbsolutePath(), this.eles);
+			new DataHeader().saveToFile(saveFile, this.eles);
 
 			this.file = saveFile;
 			this.saveState.changeState(State.SAVED);
@@ -583,13 +583,13 @@ public class UIController implements StateObserver, ResultCatcher {
 				if (exportFile != null) {
 					ExportEngine.ExportInfo info = new ExportInfo();
 
-					info.filepath = exportFile.getPath();
+					info.file = exportFile;
 					if (this.file == null) {
 						info.title = AppTitle + " - "
-										+ FilesUtil.getFileNameWithoutExtention(info.filepath);
+										+ FilesUtil.getFileNameWithoutExtension(exportFile);
 					} else {
 						info.title = AppTitle + " - "
-										+ FilesUtil.getFileNameWithoutExtention(this.file.getPath());
+										+ FilesUtil.getFileNameWithoutExtension(this.file);
 					}
 
 					ExportEngine.export(info, items);
@@ -1135,7 +1135,8 @@ public class UIController implements StateObserver, ResultCatcher {
 					attachment = (Attachment) this.ui.attachmentTable.getValueAt(row, 0);
 					filepath = dirPath + '/' + attachment.getName();
 
-					if (new File(filepath).exists()
+					File file = new File(filepath);
+					if (file.exists()
 									&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
 									"是否覆盖文件?\n" + filepath, AppTitle,
 									JOptionPane.YES_NO_OPTION)) {
@@ -1143,7 +1144,7 @@ public class UIController implements StateObserver, ResultCatcher {
 					}
 
 					try {
-						FilesUtil.writeFile(filepath, attachment.getBinaryContent());
+						FilesUtil.writeFile(file, attachment.getBinaryContent());
 					} catch (IOException ex) {
 						log.error("export error.", ex);
 						JOptionPane.showMessageDialog(this.ui, "导出失败.\n" + attachment.getName(),
@@ -1169,12 +1170,12 @@ public class UIController implements StateObserver, ResultCatcher {
 			this.uiSetStatusBar("正在导入 ...");
 			try {
 				for (File tFile : files) {
-					String fileExt = FilesUtil.getFileExtension(tFile.getName());
+					String fileExt = FilesUtil.getFileExtension(tFile);
 					if (UIController.Extention.equals('.' + fileExt))
 						readItems.addAll(DataHeader.readFromFile(tFile.getAbsolutePath()));
 					else {
 						CodeLib2Element ele = new CodeLib2Element();
-						ele.setKeywords(fileExt + ", " + FilesUtil.getFileNameWithoutExtention(tFile.getName()));
+						ele.setKeywords(fileExt + ", " + FilesUtil.getFileNameWithoutExtension(tFile));
 						ele.setContent(java.nio.file.Files.readAllBytes(Paths.get(tFile.getAbsolutePath())));
 						readItems.add(ele);
 					}
@@ -1356,10 +1357,10 @@ public class UIController implements StateObserver, ResultCatcher {
 							&& attachment.getBinaryContent() != null) {
 				ui.contentTab.setSelectedComponent(ui.browserPanel);
 				try {
-					String fileExtention = FilesUtil.getFileExtension(attachment.getName());
+					String fileExtension = FilesUtil.getFileExtension(new File(attachment.getName()));
 					String content = new String(attachment.getBinaryContent(),
 									attachment.getContentType().getTextEncode());
-					if (!"html".equals(fileExtention) && !"htm".equals(fileExtention)) {
+					if (!"html".equals(fileExtension) && !"htm".equals(fileExtension)) {
 						String html = "<html><head><meta http-equiv='Content-Type' content='text/html; charset="
 										+ attachment.getContentType().getTextEncode()
 										+ "'/></head><body>"
@@ -1399,15 +1400,14 @@ public class UIController implements StateObserver, ResultCatcher {
 		if (selectedRow > -1) {
 			Attachment attachment = (Attachment) this.ui.attachmentTable.getValueAt(selectedRow, 0);
 			final String oriFilePath = TempDir + attachment.getName();
-			String filePath = FilesUtil.getWritableFile(oriFilePath).getPath();
+			File tempFile = FilesUtil.getWritableFile(oriFilePath);
 			try {
-				FilesUtil.writeFile(filePath, attachment.getBinaryContent());
+				FilesUtil.writeFile(tempFile, attachment.getBinaryContent());
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this.ui, "写入临时文件失败.", "打开文件", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 
-			File tempFile = new File(filePath);
 			try {
 				tempFile.deleteOnExit();
 				Desktop.getDesktop().open(tempFile);

@@ -4,6 +4,7 @@ package mysh.codelib2.model;
 import mysh.util.FilesUtil;
 import org.apache.commons.codec.binary.Base64;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +33,7 @@ public class ExportEngine {
 		/**
 		 * 导出路径.
 		 */
-		public String filepath;
+		public File file;
 	}
 
 	/**
@@ -46,7 +47,7 @@ public class ExportEngine {
 
 		Collections.sort(eles);
 
-		String extention = FilesUtil.getFileExtension(info.filepath);
+		String extention = FilesUtil.getFileExtension(info.file);
 
 		switch (extention) {
 			case "zcl2":
@@ -66,7 +67,7 @@ public class ExportEngine {
 	 */
 	private static void toZul2(ExportInfo info, List<CodeLib2Element> eles) throws Exception {
 
-		new DataHeader().saveToFile(info.filepath, eles);
+		new DataHeader().saveToFile(info.file, eles);
 	}
 
 	/**
@@ -74,7 +75,7 @@ public class ExportEngine {
 	 */
 	private static void toHtml(ExportInfo info, List<CodeLib2Element> eles) throws IOException {
 
-		try (FileOutputStream htmlOut = new FileOutputStream(info.filepath)) {
+		try (FileOutputStream htmlOut = new FileOutputStream(info.file)) {
 			htmlOut.write("<!DOCTYPE html><html><head><meta charset='".getBytes(CodeLib2Element.DefaultCharsetEncode));
 			htmlOut.write(CodeLib2Element.DefaultCharsetEncode.getBytes(CodeLib2Element.DefaultCharsetEncode));
 			htmlOut.write("' /><script>var title = '".getBytes(CodeLib2Element.DefaultCharsetEncode));

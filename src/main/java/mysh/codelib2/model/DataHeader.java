@@ -39,13 +39,13 @@ public class DataHeader implements Serializable {
 	/**
 	 * 数据保存到文件.<br/>
 	 *
-	 * @param filepath 文件名.
-	 * @param eles     数据集.
+	 * @param file 文件
+	 * @param eles 数据集.
 	 */
-	public void saveToFile(String filepath, Collection<CodeLib2Element> eles) throws Exception {
+	public void saveToFile(File file, Collection<CodeLib2Element> eles) throws Exception {
 
 		ObjectOutputStream codeDataSerialOut;
-		try (final FileOutputStream fileOut = new FileOutputStream(filepath)) {
+		try (final FileOutputStream fileOut = new FileOutputStream(file)) {
 
 			// write header to file
 			ObjectOutputStream fileObjOut = new ObjectOutputStream(fileOut);
@@ -73,8 +73,8 @@ public class DataHeader implements Serializable {
 					public Boolean call() throws Exception {
 
 						return Compresses.compress(DataHeader.compressEntry,
-								compressIn, Long.MAX_VALUE,
-								this.compressOut, 0);
+										compressIn, Long.MAX_VALUE,
+										this.compressOut, 0);
 					}
 				};
 
