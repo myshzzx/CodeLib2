@@ -8,27 +8,14 @@
 <!--    http://www.qos.ch/shop/products/professionalSupport         -->
 <!--                                                                -->
 <configuration>
-
-	<!--http://code.google.com/p/log4jdbc/-->
-	<logger name="jdbc.sqltiming" level="DEBUG"/>
-	<logger name="jdbc.sqlonly" level="ERROR"/>
-	<logger name="jdbc.resultset" level="ERROR"/>
-	<logger name="jdbc.audit" level="ERROR"/>
-
 	<logger name="org.springframework" level="INFO"/>
-
-	<logger name="org.hibernate.cfg.Ejb3Column" level="INFO"/>
-	<logger name="org.hibernate.cfg.annotations" level="INFO"/>
-	<logger name="org.hibernate.engine.internal.TwoPhaseLoad" level="INFO"/>
-	<logger name="org.hibernate.ejb.packaging.AbstractJarVisitor" level="INFO"/>
-	<logger name="org.hibernate.loader.Loader" level="INFO"/>
-	<logger name="org.hibernate.type.BasicTypeRegistry" level="INFO"/>
+	<logger name="org.apache" level="INFO"/>
 
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<!-- Tests run on modern PCs show that buffering related property -->
 		<!-- "ImmediateFlush" has negligible impact and will be ignored.  -->
 		<encoder>
-			<pattern>%d [%-5level] [%thread] %logger: %msg%n</pattern>
+			<pattern>●%date{MM-dd HH:mm:ss} %msg ~%logger{5}-%L [%thread] %level%n</pattern>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>DEBUG</level>
@@ -37,31 +24,29 @@
 
 	<appender name="DebugFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
-		<Append>true</Append>
-		<File>${java.io.tmpdir}/debug.log</File>
+		<append>true</append>
+		<file>${java.io.tmpdir}/debug.log</file>
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<!--See http://logback.qos.ch/manual/layouts.html#ClassicHTMLLayout-->
 			<!--for documentation-->
-			<LocationInfo>true</LocationInfo>
+			<locationInfo>true</locationInfo>
 			<pattern>●%date{MM-dd HH:mm:ss} %msg ~%logger{5}-%L [%thread] %level%n</pattern>
 		</layout>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>DEBUG</level>
 		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-			<maxIndex>50</maxIndex>
-			<FileNamePattern>${java.io.tmpdir}/debug.%i.log</FileNamePattern>
+			<maxIndex>20</maxIndex>
+			<fileNamePattern>${java.io.tmpdir}/debug.%i.log</fileNamePattern>
 		</rollingPolicy>
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<MaxFileSize>4MB</MaxFileSize>
+			<maxFileSize>4MB</maxFileSize>
 		</triggeringPolicy>
 	</appender>
 
-
-	<root level="debug">
+	<root level="DEBUG">
 		<appender-ref ref="console"/>
 		<appender-ref ref="DebugFile"/>
 	</root>
 
 </configuration>
-
