@@ -15,6 +15,7 @@ import mysh.codelib2.model.SearchEngine;
 import mysh.codelib2.model.SearchEngine.ResultCatcher;
 import mysh.codelib2.ui.SaveStateManager.State;
 import mysh.codelib2.ui.SaveStateManager.StateObserver;
+import mysh.collect.Pair;
 import mysh.util.FilesUtil;
 import mysh.util.HotKeys;
 import mysh.util.UIs;
@@ -81,7 +82,7 @@ public class UIController implements StateObserver, ResultCatcher {
 
 	static {
 //		迭代次数, 100次到达e
-		final int IterateVersion = 9;
+		final int IterateVersion = 10;
 		//版本号取 4 位小数
 		AppTitle = "CodeLib2 b" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 0.53).substring(2, 6);
 
@@ -137,6 +138,8 @@ public class UIController implements StateObserver, ResultCatcher {
 	 */
 	private File file;
 
+	private DataHeader header;
+
 	/**
 	 * 当前正在搜索的关键字.
 	 */
@@ -155,7 +158,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	/**
 	 * 文件扩展名.
 	 */
-	static final String Extention = ".zcl2";
+	static final String Extension = ".zcl2";
 
 	/**
 	 * 代码框文本搜索.
@@ -447,8 +450,8 @@ public class UIController implements StateObserver, ResultCatcher {
 		if (this.checkForSave()) {
 
 			// this.fileChooser.setDialogTitle("打开");
-			if (this.ui.zcl2OpenChooser.showOpenDialog(this.ui) == JFileChooser.APPROVE_OPTION) {
-				File openFile = this.ui.zcl2OpenChooser.getSelectedFile();
+			if (this.ui.zclOpenChooser.showOpenDialog(this.ui) == JFileChooser.APPROVE_OPTION) {
+				File openFile = this.ui.zclOpenChooser.getSelectedFile();
 				this.uiOpenFile(openFile);
 			}
 		}
@@ -463,20 +466,21 @@ public class UIController implements StateObserver, ResultCatcher {
 
 		try {
 			this.uiSetStatusBar("正在打开文件 ...");
-			Collection<CodeLib2Element> datas = DataHeader.readFromFile(openFile.getAbsolutePath());
+			Pair<DataHeader, Collection<CodeLib2Element>> data = DataHeader.readFromFile(openFile);
 
 			this.eles.clear();
-			this.eles.addAll(datas);
+			this.eles.addAll(data.getR());
 			Collections.sort(this.eles);
 			this.currentItem = null;
 			this.file = openFile;
+			this.header = data.getL();
 
 			this.saveState.changeState(State.SAVED);
 			this.ui.filterText.setText("");
 			this.ui.filterText.requestFocus();
 			this.uiSearch("");
 
-			this.ui.zcl2OpenChooser.setCurrentDirectory(openFile.getParentFile());
+			this.ui.zclOpenChooser.setCurrentDirectory(openFile.getParentFile());
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "打开文件失败.\n" + e.getMessage(), UIController.AppTitle,
 							JOptionPane.ERROR_MESSAGE);
@@ -493,15 +497,14 @@ public class UIController implements StateObserver, ResultCatcher {
 		File saveFile = this.file;
 
 		if (saveFile == null) {
-			saveFile = UIs.getSaveFileWithOverwriteChecking(
-							this.ui.zcl2OpenChooser, this.ui, () -> UIController.Extention);
+			saveFile = UIs.getSaveFileWithOverwriteChecking(this.ui.zclOpenChooser, this.ui, () -> UIController.Extension);
 			if (saveFile == null)
 				return;
 		}
 
 		try {
 			this.uiSetStatusBar("正在保存 ...");
-			new DataHeader().saveToFile(saveFile, this.eles);
+			this.header.saveToFile(saveFile, this.eles);
 
 			this.file = saveFile;
 			this.saveState.changeState(State.SAVED);
@@ -1161,8 +1164,8 @@ public class UIController implements StateObserver, ResultCatcher {
 	@SuppressWarnings("unchecked")
 	void uiImportFile() {
 
-		if (JFileChooser.APPROVE_OPTION == this.ui.zcl2ImportChooser.showOpenDialog(this.ui)) {
-			File[] files = this.ui.zcl2ImportChooser.getSelectedFiles();
+		if (JFileChooser.APPROVE_OPTION == this.ui.zclImportChooser.showOpenDialog(this.ui)) {
+			File[] files = this.ui.zclImportChooser.getSelectedFiles();
 
 			// 这里用set保证元素不重复, 以便下面去重操作
 			Set<CodeLib2Element> readItems = new HashSet<>();
@@ -1171,8 +1174,10 @@ public class UIController implements StateObserver, ResultCatcher {
 			try {
 				for (File tFile : files) {
 					String fileExt = FilesUtil.getFileExtension(tFile);
-					if (UIController.Extention.equals('.' + fileExt))
-						readItems.addAll(DataHeader.readFromFile(tFile.getAbsolutePath()));
+					if (UIController.Extension.equals('.' + fileExt)) {
+						Pair<DataHeader, Collection<CodeLib2Element>> data = DataHeader.readFromFile(tFile);
+						readItems.addAll(data.getR());
+					}
 					else {
 						CodeLib2Element ele = new CodeLib2Element();
 						ele.setKeywords(fileExt + ", " + FilesUtil.getFileNameWithoutExtension(tFile));
@@ -1188,7 +1193,6 @@ public class UIController implements StateObserver, ResultCatcher {
 				// 去除重复元素
 				readItems.addAll(this.eles);
 				this.eles.clear();
-
 				this.eles.addAll(readItems);
 				Collections.sort(this.eles);
 

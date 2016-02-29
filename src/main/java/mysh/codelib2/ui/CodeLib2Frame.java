@@ -30,7 +30,7 @@ public class CodeLib2Frame extends javax.swing.JFrame {
 	    System.setProperty("file.encoding", CodeLib2Element.DefaultCharsetEncode);
 
       this.getContentPane().setLayout(new BorderLayout());
-      this.codeLib2Main = new CodeLib2Main().setAppTitleSetter(new CodeLib2Main.AppTitltSetter() {
+      this.codeLib2Main = new CodeLib2Main().setAppTitleSetter(new CodeLib2Main.AppTitleSetter() {
 
           @Override
           public void setTitle(String title) {

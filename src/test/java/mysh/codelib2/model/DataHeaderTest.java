@@ -1,6 +1,7 @@
 
 package mysh.codelib2.model;
 
+import mysh.collect.Pair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -36,34 +37,26 @@ public class DataHeaderTest {
 	@Test
 	public void compressSaveReadTest() throws Exception {
 
-		DataHeader dataHeader = new DataHeader();
-		this.saveReadTest(dataHeader);
-	}
-
-	@Test
-	public void unCompressSaveReadTest() throws Exception {
-
-		DataHeader dataHeader = new DataHeader();
-		dataHeader.setCompressed(false);
+		DataHeader dataHeader = new DataHeader(3);
 		this.saveReadTest(dataHeader);
 	}
 
 	private void saveReadTest(DataHeader dataHeader) throws Exception {
 
 		String filepath = "e:/test/test.zcl2";
-		if (dataHeader.isCompressed())
-			filepath += ".comp";
+		filepath += ".comp";
 
 		long start = System.nanoTime();
-		dataHeader.saveToFile(new File(filepath), this.eles);
+		File file = new File(filepath);
+		dataHeader.saveToFile(file, this.eles);
 		System.out.println("save cost: " + (System.nanoTime() - start) / 1_000_000 + " mm");
 
 		start = System.nanoTime();
-		Collection<CodeLib2Element> readEles = DataHeader.readFromFile(filepath);
+		Pair<DataHeader, Collection<CodeLib2Element>> data = DataHeader.readFromFile(file);
 		System.out.println("read cost: " + (System.nanoTime() - start) / 1_000_000 + " mm");
 
 		start = System.nanoTime();
-		Assert.assertEquals(this.eles, readEles);
+		Assert.assertEquals(this.eles, data.getR());
 		System.out.println("check cost: " + (System.nanoTime() - start) / 1_000_000 + " mm");
 	}
 

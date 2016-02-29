@@ -1,18 +1,18 @@
 
 package mysh.codelib2.model;
 
+import mysh.collect.Pair;
 import mysh.util.Compresses;
+import mysh.util.FilesUtil;
+import mysh.util.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 文件数据头部. <br/>
@@ -24,17 +24,12 @@ public class DataHeader implements Serializable {
 	private static final long serialVersionUID = -5817161670435220173L;
 
 	private static final Logger log = LoggerFactory.getLogger(DataHeader.class);
-	private static transient final String compressEntry = "zcl2";
 
-	/**
-	 * 压缩标记.
-	 */
-	private volatile boolean compressed = true;
+	private final int version;
 
-	// /**
-	// * 加密标记.
-	// */
-	// private volatile boolean encrypted = false;
+	public DataHeader(int version) {
+		this.version = version;
+	}
 
 	/**
 	 * 数据保存到文件.<br/>
@@ -42,142 +37,102 @@ public class DataHeader implements Serializable {
 	 * @param file 文件
 	 * @param eles 数据集.
 	 */
-	public void saveToFile(File file, Collection<CodeLib2Element> eles) throws Exception {
+	public boolean saveToFile(File file, Collection<CodeLib2Element> eles) throws Exception {
+		switch (version) {
+			case 2:
+				return writeVer2(file, eles);
+			case 3:
+				return writeVer3(file, eles);
+			default:
+				throw new IllegalArgumentException("unknown version: " + version);
+		}
+	}
 
-		ObjectOutputStream codeDataSerialOut;
-		try (final FileOutputStream fileOut = new FileOutputStream(file)) {
-
-			// write header to file
-			ObjectOutputStream fileObjOut = new ObjectOutputStream(fileOut);
-			fileObjOut.writeObject(this);
-			fileObjOut.flush();
-
-			codeDataSerialOut = fileObjOut;
-			ExecutorService exec = Executors.newCachedThreadPool();
-
-			// need Compress?
-			Callable<Boolean> compressThread = null;
-			Future<Boolean> compressFutureResult = null;
-			if (this.compressed) {
-				PipedOutputStream serialDataOut = new PipedOutputStream();
-				final PipedInputStream compressIn = new PipedInputStream(serialDataOut,
-								Compresses.DEFAULT_BUF_SIZE);
-				codeDataSerialOut = new ObjectOutputStream(serialDataOut);
-
-				// compress thread
-				compressThread = new Callable<Boolean>() {
-
-					private OutputStream compressOut = fileOut;
-
-					@Override
-					public Boolean call() throws Exception {
-
-						return Compresses.compress(DataHeader.compressEntry,
-										compressIn, Long.MAX_VALUE,
-										this.compressOut, 0);
-					}
-				};
-
-				compressFutureResult = exec.submit(compressThread);
-				exec.shutdown();
+	/**
+	 * 从文件读取数据.
+	 */
+	@SuppressWarnings("unchecked")
+	public static Pair<DataHeader, Collection<CodeLib2Element>> readFromFile(File file) throws Exception {
+		try (FileInputStream in = new FileInputStream(file)) {
+			DataHeader header = readHeader(in);
+			switch (header.version) {
+				case 3: return Pair.of(header, readVer3(in));
+				default:
+					return Pair.of(header, readVer2(in));
 			}
+		}
+	}
+
+	private void writeHeader(OutputStream out) throws IOException {
+		out.write(Serializer.buildIn.serialize(this));
+		out.flush();
+	}
+
+	private static DataHeader readHeader(InputStream in) {
+		return Serializer.buildIn.deserialize(in);
+	}
+
+	private boolean writeVer3(File file, Collection<CodeLib2Element> eles) throws Exception {
+		file.getParentFile().mkdirs();
+		File writeFile = FilesUtil.getWriteFile(file);
+		try (FileOutputStream out = new FileOutputStream(writeFile)) {
+			writeHeader(out);
+			Compresses.compress("zcl", new ByteArrayInputStream(Serializer.fst.serialize((Serializable) eles)),
+							Long.MAX_VALUE, out, 500_000);
+		}
+		file.delete();
+		return writeFile.renameTo(file);
+	}
+
+	private static Collection<CodeLib2Element> readVer3(FileInputStream in) throws Exception {
+		AtomicReference<Collection<CodeLib2Element>> result = new AtomicReference<>();
+		Compresses.deCompress((entry, ein) -> result.set(Serializer.fst.deserialize(ein)), in);
+		return result.get();
+	}
+
+	private boolean writeVer2(File file, Collection<CodeLib2Element> eles) throws Exception {
+		try (final FileOutputStream fileOut = new FileOutputStream(file)) {
+			writeHeader(fileOut);
+
+			PipedOutputStream serialDataOut = new PipedOutputStream();
+			final PipedInputStream compressIn = new PipedInputStream(serialDataOut, 100_000);
+			ObjectOutputStream codeDataSerialOut = new ObjectOutputStream(serialDataOut);
+
+			// compress thread
+			Future<Boolean> compressFutureResult = ForkJoinPool.commonPool().submit(
+							() -> Compresses.compress("zcl", compressIn, Long.MAX_VALUE, fileOut, 0));
 
 			// write codeData obj, use try-with to ensure objOutput close
-			try (ObjectOutputStream tempCodeDataSerialOut = codeDataSerialOut) {
-				tempCodeDataSerialOut.writeObject(eles);
-			}
+			codeDataSerialOut.writeObject(eles);
+			codeDataSerialOut.close();
 
-			if (this.compressed && compressThread != null) {
-				boolean compressResult = compressFutureResult.get();
-				if (!compressResult)
-					throw new Exception("数据压缩失败.");
-			}
-
+			boolean compressResult = compressFutureResult.get();
+			if (!compressResult)
+				throw new Exception("数据压缩失败.");
+			return true;
 		} catch (Exception e) {
 			log.error("保存库文件失败.", e);
 			throw e;
 		}
 	}
 
-	/**
-	 * 从文件读取数据.
-	 *
-	 * @param filepath 文件路径.
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	public static Collection<CodeLib2Element> readFromFile(String filepath) throws Exception {
+	private static Collection<CodeLib2Element> readVer2(InputStream in) throws Exception {
+		final AtomicReference<Collection<CodeLib2Element>> result = new AtomicReference<>();
+		boolean deCompressResult = Compresses.deCompress(
+						(entry, ein) -> {
+							try {
+								ObjectInputStream objIn = new ObjectInputStream(ein);
+								result.set((Collection<CodeLib2Element>) objIn.readObject());
+							} catch (Exception e) {
+								throw new RuntimeException("解压失败: " + e);
+							}
+						}, in);
 
-		try (final FileInputStream fileIn = new FileInputStream(filepath)) {
-
-			ObjectInputStream headerInput = new ObjectInputStream(fileIn);
-			DataHeader header = (DataHeader) headerInput.readObject();
-
-			if (header == null)
-				throw new Exception("读取文件头失败.");
-
-			if (header.compressed) {
-				final List<Collection<CodeLib2Element>> result = new ArrayList<>();
-				boolean deCompressResult = Compresses.deCompress((entry, in) -> {
-
-					try {
-						ObjectInputStream objIn = new ObjectInputStream(in);
-						if (DataHeader.compressEntry.equals(entry.getName())) {
-							result.add((Collection<CodeLib2Element>) objIn.readObject());
-						}
-					} catch (Exception e) {
-						throw new RuntimeException("解压失败: " + e);
-					}
-				}, fileIn);
-
-				if (deCompressResult) {
-					return result.get(0);
-				} else {
-					throw new Exception("解压失败.");
-				}
-			} else {
-				return (Collection<CodeLib2Element>) headerInput.readObject();
-			}
-		} catch (Exception e) {
-			log.error("打开库文件失败.", e);
-			throw e;
+		if (deCompressResult) {
+			return result.get();
+		} else {
+			throw new Exception("解压失败.");
 		}
 	}
-
-	/**
-	 * 取压缩标记.
-	 */
-	public boolean isCompressed() {
-
-		return compressed;
-	}
-
-	/**
-	 * 设置压缩标记.
-	 */
-	public void setCompressed(boolean compressed) {
-
-		this.compressed = compressed;
-	}
-
-	// /**
-	// * 取加密标记.
-	// *
-	// * @return
-	// */
-	// public boolean isEncrypted() {
-	//
-	// return encrypted;
-	// }
-	//
-	// /**
-	// * 设置加密标记.
-	// *
-	// * @param encrypted
-	// */
-	// public void setEncrypted(boolean encrypted) {
-	//
-	// this.encrypted = encrypted;
-	// }
 
 }

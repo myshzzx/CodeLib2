@@ -2,12 +2,12 @@
 
 <Form version="1.8" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
-    <Component class="javax.swing.JFileChooser" name="zcl2OpenChooser">
+    <Component class="javax.swing.JFileChooser" name="zclOpenChooser">
       <Properties>
         <Property name="dialogTitle" type="java.lang.String" value="zcl2 &#x6587;&#x4ef6;"/>
       </Properties>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="zcl2OpenChooser.setFileFilter(this.zcl2Filter);"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="zclOpenChooser.setFileFilter(this.zclFilter);"/>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
       </AuxValues>
     </Component>
@@ -18,7 +18,7 @@
         <Property name="dialogTitle" type="java.lang.String" value="&#x5bfc;&#x51fa;&#x6210;&#x4ec0;&#x4e48;&#x5462;?"/>
       </Properties>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="// &#x5bfc;&#x51fa;&#x9009;&#x4e2d;&#x7684;&#x8282;&#x70b9;.&#xa;        itemExportChooser.addChoosableFileFilter(new FileFilter() {&#xa;&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;&#xa;                if (f.isDirectory() || f.getName().toLowerCase().endsWith(UIControllor.Extention)) {&#xa;                    return true;&#xa;                }&#xa;                return false;&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;&#xa;                return &quot;.zcl2&quot;;&#xa;            }&#xa;        });&#xa;&#xa;// &#x5bfc;&#x51fa;&#x4e3a;&#x7f51;&#x9875;&#xa;        itemExportChooser.addChoosableFileFilter(new FileFilter() {&#xa;&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;&#xa;                if (f.isDirectory() || f.getName().toLowerCase().endsWith(&quot;.html&quot;)) {&#xa;                    return true;&#xa;                }&#xa;                return false;&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;&#xa;                return &quot;.html&quot;;&#xa;            }&#xa;        });"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="        // &#x5bfc;&#x51fa;&#x9009;&#x4e2d;&#x7684;&#x8282;&#x70b9;.&#xa;        itemExportChooser.addChoosableFileFilter(new FileFilter() {&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;                return f.isDirectory() || f.getName().toLowerCase().endsWith(UIController.Extension);&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;                return &quot;.zcl2&quot;;&#xa;            }&#xa;        });&#xa;&#xa;        // &#x5bfc;&#x51fa;&#x4e3a;&#x7f51;&#x9875;&#xa;        itemExportChooser.addChoosableFileFilter(new FileFilter() {&#xa;            @Override&#xa;            public boolean accept(File f) {&#xa;                return f.isDirectory() || f.getName().toLowerCase().endsWith(&quot;.html&quot;);&#xa;            }&#xa;&#xa;            @Override&#xa;            public String getDescription() {&#xa;                return &quot;.html&quot;;&#xa;            }&#xa;        });"/>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
       </AuxValues>
     </Component>
@@ -43,7 +43,7 @@
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
       </AuxValues>
     </Component>
-    <Component class="javax.swing.JFileChooser" name="zcl2ImportChooser">
+    <Component class="javax.swing.JFileChooser" name="zclImportChooser">
       <Properties>
         <Property name="approveButtonText" type="java.lang.String" value="&#x5bfc;&#x5165;"/>
         <Property name="dialogTitle" type="java.lang.String" value="&#x9009;&#x62e9;&#x5bfc;&#x5165;&#x6587;&#x4ef6;(&#x53ef;&#x591a;&#x9009;)"/>

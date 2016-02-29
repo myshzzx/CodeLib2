@@ -47,27 +47,26 @@ public class ExportEngine {
 
 		Collections.sort(eles);
 
-		String extention = FilesUtil.getFileExtension(info.file);
+		String extension = FilesUtil.getFileExtension(info.file);
 
-		switch (extention) {
+		switch (extension) {
 			case "zcl2":
-				toZul2(info, eles);
+				toZclVer3(info, eles);
 				break;
 			case "html":
 				toHtml(info, eles);
 				break;
 			default:
-				throw new RuntimeException("不支持的导出类型: " + extention);
+				throw new RuntimeException("不支持的导出类型: " + extension);
 		}
-
 	}
 
-	/**
-	 * 导出为 zul2 文件.
-	 */
-	private static void toZul2(ExportInfo info, List<CodeLib2Element> eles) throws Exception {
+	private static void toZcl2(ExportInfo info, List<CodeLib2Element> eles) throws Exception {
+		new DataHeader(2).saveToFile(info.file, eles);
+	}
 
-		new DataHeader().saveToFile(info.file, eles);
+	private static void toZclVer3(ExportInfo info, List<CodeLib2Element> eles) throws Exception {
+		new DataHeader(3).saveToFile(info.file, eles);
 	}
 
 	/**
