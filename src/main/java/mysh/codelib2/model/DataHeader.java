@@ -25,7 +25,7 @@ public class DataHeader implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(DataHeader.class);
 
-	private final int version;
+	private int version;
 
 	public DataHeader(int version) {
 		this.version = version;
@@ -38,14 +38,8 @@ public class DataHeader implements Serializable {
 	 * @param eles 数据集.
 	 */
 	public boolean saveToFile(File file, Collection<CodeLib2Element> eles) throws Exception {
-		switch (version) {
-			case 2:
-				return writeVer2(file, eles);
-			case 3:
-				return writeVer3(file, eles);
-			default:
-				throw new IllegalArgumentException("unknown version: " + version);
-		}
+		version = 3;
+		return writeVer3(file, eles);
 	}
 
 	/**
@@ -56,9 +50,13 @@ public class DataHeader implements Serializable {
 		try (FileInputStream in = new FileInputStream(file)) {
 			DataHeader header = readHeader(in);
 			switch (header.version) {
-				case 3: return Pair.of(header, readVer3(in));
-				default:
+				case 0:
+				case 2:
 					return Pair.of(header, readVer2(in));
+				case 3:
+					return Pair.of(header, readVer3(in));
+				default:
+					throw new RuntimeException("unknown header version: " + header.version);
 			}
 		}
 	}

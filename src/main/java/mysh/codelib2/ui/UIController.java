@@ -17,7 +17,7 @@ import mysh.codelib2.ui.SaveStateManager.State;
 import mysh.codelib2.ui.SaveStateManager.StateObserver;
 import mysh.collect.Pair;
 import mysh.util.FilesUtil;
-import mysh.util.HotKeys;
+import mysh.util.HotKeysLocal;
 import mysh.util.UIs;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.SearchContext;
@@ -387,13 +387,13 @@ public class UIController implements StateObserver, ResultCatcher {
 	 */
 	private void registerHotKey() {
 		// 注册 esc 热键.
-		HotKeys.registerHotKey(KeyEvent.VK_ESCAPE, 0, escAction);
+		HotKeysLocal.registerHotKey(KeyEvent.VK_ESCAPE, 0, escAction);
 
 		// 注册 Ctrl+F 热键.
-		HotKeys.registerHotKey(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK, findAction);
+		HotKeysLocal.registerHotKey(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK, findAction);
 
 		// 注册 Ctrl+S 热键.
-		HotKeys.registerHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, saveAction);
+		HotKeysLocal.registerHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, saveAction);
 	}
 
 	/**
@@ -401,13 +401,13 @@ public class UIController implements StateObserver, ResultCatcher {
 	 */
 	private void unRegisterHotKey() {
 		// 注册 esc 热键.
-		HotKeys.unRegisterHotKey(KeyEvent.VK_ESCAPE, 0, escAction);
+		HotKeysLocal.unRegisterHotKey(KeyEvent.VK_ESCAPE, 0, escAction);
 
 		// 注册 Ctrl+F 热键.
-		HotKeys.unRegisterHotKey(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK, findAction);
+		HotKeysLocal.unRegisterHotKey(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK, findAction);
 
 		// 注册 Ctrl+S 热键.
-		HotKeys.unRegisterHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, saveAction);
+		HotKeysLocal.unRegisterHotKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, saveAction);
 	}
 
 	/**
@@ -482,6 +482,7 @@ public class UIController implements StateObserver, ResultCatcher {
 
 			this.ui.zclOpenChooser.setCurrentDirectory(openFile.getParentFile());
 		} catch (Exception e) {
+			log.error("open file error.", e);
 			JOptionPane.showMessageDialog(this.ui, "打开文件失败.\n" + e.getMessage(), UIController.AppTitle,
 							JOptionPane.ERROR_MESSAGE);
 		} finally {
@@ -1177,8 +1178,7 @@ public class UIController implements StateObserver, ResultCatcher {
 					if (UIController.Extension.equals('.' + fileExt)) {
 						Pair<DataHeader, Collection<CodeLib2Element>> data = DataHeader.readFromFile(tFile);
 						readItems.addAll(data.getR());
-					}
-					else {
+					} else {
 						CodeLib2Element ele = new CodeLib2Element();
 						ele.setKeywords(fileExt + ", " + FilesUtil.getFileNameWithoutExtension(tFile));
 						ele.setContent(java.nio.file.Files.readAllBytes(Paths.get(tFile.getAbsolutePath())));
