@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- For assistance related to logback-translator or configuration  -->
-<!-- files in general, please contact the logback user mailing list -->
-<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
-<!--                                                                -->
-<!-- For professional support please see                            -->
-<!--    http://www.qos.ch/shop/products/professionalSupport         -->
-<!--                                                                -->
+<!--http://logback.qos.ch/manual/configuration.html-->
 <configuration>
+
+	<property scope="context" name="appName" value="CodeLib2"/>
+
 	<logger name="org.springframework" level="INFO"/>
 	<logger name="org.apache" level="INFO"/>
 
+
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-		<!-- Tests run on modern PCs show that buffering related property -->
-		<!-- "ImmediateFlush" has negligible impact and will be ignored.  -->
 		<encoder>
 			<pattern>●%date{MM-dd HH:mm:ss} %msg ~%logger{5}:%L [%thread] %level%n</pattern>
 		</encoder>
@@ -25,7 +21,7 @@
 	<appender name="DebugFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
 		<append>true</append>
-		<file>${java.io.tmpdir}/debug.log</file>
+		<file>${java.io.tmpdir}/${appName}.log</file>
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<!--See http://logback.qos.ch/manual/layouts.html#ClassicHTMLLayout-->
 			<!--for documentation-->
@@ -37,7 +33,7 @@
 		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<maxIndex>20</maxIndex>
-			<fileNamePattern>${java.io.tmpdir}/debug.%i.log</fileNamePattern>
+			<fileNamePattern>${java.io.tmpdir}/${appName}.%i.log</fileNamePattern>
 		</rollingPolicy>
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
 			<maxFileSize>4MB</maxFileSize>
