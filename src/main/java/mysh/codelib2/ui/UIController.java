@@ -1244,7 +1244,7 @@ public class UIController implements StateObserver, ResultCatcher {
 								SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
 			}
 
-			findResult |= this.browserSearch(text);
+//			findResult |= this.browserSearch(text);
 			if (findResult) {
 				this.ui.findText.setForeground(Color.BLACK);
 			} else {
