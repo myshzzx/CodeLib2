@@ -38,8 +38,8 @@ public class DataHeader implements Serializable {
 	 * @param eles 数据集.
 	 */
 	public boolean saveToFile(File file, Collection<CodeLib2Element> eles) throws Exception {
-		version = 3;
-		return writeVer3(file, eles);
+		version = 4;
+		return writeVer4(file, eles);
 	}
 
 	/**
@@ -55,6 +55,8 @@ public class DataHeader implements Serializable {
 					return Pair.of(header, readVer2(in));
 				case 3:
 					return Pair.of(header, readVer3(in));
+				case 4:
+					return Pair.of(header, readVer4(in));
 				default:
 					throw new RuntimeException("unknown header version: " + header.version);
 			}
@@ -68,6 +70,24 @@ public class DataHeader implements Serializable {
 
 	private static DataHeader readHeader(InputStream in) {
 		return Serializer.buildIn.deserialize(in);
+	}
+
+	private boolean writeVer4(File file, Collection<CodeLib2Element> eles) throws Exception {
+		file.getParentFile().mkdirs();
+		File writeFile = FilesUtil.getWriteFile(file);
+		try (FileOutputStream out = new FileOutputStream(writeFile)) {
+			writeHeader(out);
+			Compresses.compress("zcl", new ByteArrayInputStream(Serializer.buildIn.serialize((Serializable) eles)),
+							Long.MAX_VALUE, out, 500_000);
+		}
+		file.delete();
+		return writeFile.renameTo(file);
+	}
+
+	private static Collection<CodeLib2Element> readVer4(FileInputStream in) throws Exception {
+		AtomicReference<Collection<CodeLib2Element>> result = new AtomicReference<>();
+		Compresses.deCompress((entry, ein) -> result.set(Serializer.buildIn.deserialize(ein)), in);
+		return result.get();
 	}
 
 	private boolean writeVer3(File file, Collection<CodeLib2Element> eles) throws Exception {
