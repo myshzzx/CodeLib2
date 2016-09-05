@@ -1,7 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>mysh</groupId>
+
+	<parent>
+		<groupId>mysh</groupId>
+		<artifactId>mlib</artifactId>
+		<version>1.0.1-SNAPSHOT</version>
+	</parent>
+
 	<artifactId>code-lib2</artifactId>
 	<version>e</version>
 	<packaging>jar</packaging>
@@ -16,28 +22,11 @@
 功能提示都会在状态栏或 tooltips 里出现
 ]]></description>
 	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.18</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.1.6</version>
-		</dependency>
 
 		<dependency>
 			<groupId>com.fifesoft</groupId>
 			<artifactId>rsyntaxtextarea</artifactId>
-			<version>2.5.8</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>mysh</groupId>
@@ -47,12 +36,12 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.9</version>
+			<version>1.10</version>
 		</dependency>
 		<dependency>
 			<groupId>de.ruedigermoeller</groupId>
 			<artifactId>fst</artifactId>
-			<version>2.43</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
@@ -76,6 +65,7 @@
 
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.6</version>
 				<configuration>
 					<finalName>CodeLib2</finalName>
 					<archive>
