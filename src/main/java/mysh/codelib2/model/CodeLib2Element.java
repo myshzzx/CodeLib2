@@ -60,7 +60,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			private static final List<String> textExt = Arrays.asList("as", "asm", "asp", "bat", "bbcode",
 							"c", "clj", "clojure", "cpp", "cs", "css", "d", "f", "for", "fortran", "groovy", "gsp",
 							"h", "htm", "html", "ini", "java", "js", "jsp", "lisp", "log", "lua", "mq4", "mq5", "mqh", "mx",
-							"mxml", "pas", "php", "pl", "properties", "py", "r", "rb", "ruby", "sas", "scala", "scheme",
+							"mxml", "pas", "php", "pl", "properties", "py", "r", "rb", "reg", "ruby", "sas", "scala", "scheme",
 							"scm", "sh", "sql", "ss", "tcl", "txt", "vb", "vbs", "xml", "xsd", "xsl");
 
 			/**
@@ -170,7 +170,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		/**
 		 * 判断内容类型.
 		 */
-		private void judgeContentType() {
+		public void judgeContentType() {
 
 			this.contentType = ContentType.Binary;
 

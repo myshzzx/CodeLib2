@@ -82,7 +82,7 @@ public class UIController implements StateObserver, ResultCatcher {
 
 	static {
 //		迭代次数, 100次到达e
-		final int IterateVersion = 10;
+		final int IterateVersion = 11;
 		//版本号取 4 位小数
 		AppTitle = "CodeLib2 b" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 0.53).substring(2, 6);
 
@@ -1357,16 +1357,22 @@ public class UIController implements StateObserver, ResultCatcher {
 		int selectedRow = ui.attachmentTable.getSelectedRow();
 		if (selectedRow > -1) {
 			Attachment attachment = (Attachment) ui.attachmentTable.getValueAt(selectedRow, 0);
-			if (attachment.getContentType() != Attachment.ContentType.Binary
-							&& attachment.getBinaryContent() != null) {
+
+			// recheck attachment type
+			Attachment.ContentType oldContentType = attachment.getContentType();
+			attachment.judgeContentType();
+			Attachment.ContentType newContentType = attachment.getContentType();
+			if (oldContentType != newContentType)
+				this.saveState.changeState(State.MODIFIED);
+
+			if (newContentType != Attachment.ContentType.Binary && attachment.getBinaryContent() != null) {
 				ui.contentTab.setSelectedComponent(ui.browserPanel);
 				try {
 					String fileExtension = FilesUtil.getFileExtension(new File(attachment.getName()));
-					String content = new String(attachment.getBinaryContent(),
-									attachment.getContentType().getTextEncode());
+					String content = new String(attachment.getBinaryContent(), newContentType.getTextEncode());
 					if (!"html".equals(fileExtension) && !"htm".equals(fileExtension)) {
 						String html = "<html><head><meta http-equiv='Content-Type' content='text/html; charset="
-										+ attachment.getContentType().getTextEncode()
+										+ newContentType.getTextEncode()
 										+ "'/></head><body>"
 										+ content.replace("&", "&amp;")
 										.replace("\"", "&quot;").replace("'", "&#39;")

@@ -135,7 +135,6 @@ public final class SearchEngine implements Closeable {
 			int keyIndex;
 			boolean isSingleKeyMatches; // 单个 key 匹配结果.
 			while (!this.isInterrupted() && searchTargetIndex.get() < targetLib.size()) {
-
 				try {
 					ele = targetLib.get(searchTargetIndex.getAndIncrement());
 
@@ -152,23 +151,23 @@ public final class SearchEngine implements Closeable {
 									this.lowerKeysByteArray[keyIndex]) > -1;
 
 							// 匹配附件
-							if ((ele.getAttachments() != null) && !isSingleKeyMatches) {
-								String attachementEncode;
+							if (!isSingleKeyMatches && (ele.getAttachments() != null)) {
+								String attachmentEncode;
 								for (Attachment attachment : ele.getAttachments()) {
 									// 附件名
 									isSingleKeyMatches = attachment.getName().toLowerCase().contains(
 													this.lowerCaseKeys[keyIndex]);
 
 									// 附件内容
-									attachementEncode = attachment.getContentType().getTextEncode();
-									if (attachementEncode != null && !isSingleKeyMatches) {
+									attachmentEncode = attachment.getContentType().getTextEncode();
+									if (!isSingleKeyMatches && attachmentEncode != null) {
 										isSingleKeyMatches = Bytes.findStringIndexIgnoreCase(
-												attachment.getBinaryContent(), attachementEncode, 0, this.lowerCaseKeys[keyIndex])
+												attachment.getBinaryContent(), attachmentEncode, 0, this.lowerCaseKeys[keyIndex])
 														> -1;
-
-										if (isSingleKeyMatches)
-											break;
 									}
+
+									if (isSingleKeyMatches)
+										break;
 								}
 							}
 						}
