@@ -30,11 +30,16 @@ public class CodeLib2Frame extends javax.swing.JFrame {
 	    System.setProperty("file.encoding", CodeLib2Element.DefaultCharsetEncode);
 
       this.getContentPane().setLayout(new BorderLayout());
-      this.codeLib2Main = new CodeLib2Main().setAppTitleSetter(new CodeLib2Main.AppTitleSetter() {
+      this.codeLib2Main = new CodeLib2Main().setAppUIController(new CodeLib2Main.AppUIController() {
 
           @Override
           public void setTitle(String title) {
               CodeLib2Frame.this.setTitle(title);
+          }
+
+          @Override
+          public void setOnTop(boolean onTop) {
+              CodeLib2Frame.this.setAlwaysOnTop(onTop);
           }
       });
       this.getContentPane().add(this.codeLib2Main, BorderLayout.CENTER);

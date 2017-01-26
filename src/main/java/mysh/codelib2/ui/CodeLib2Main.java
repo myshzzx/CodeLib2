@@ -19,7 +19,7 @@ import java.io.File;
 public final class CodeLib2Main extends javax.swing.JPanel {
 
     private UIController controller;
-    private AppTitleSetter appTitleSetter;
+    private AppUIController appUIController;
     private FileFilter zclFilter = new FileFilter() {
         @Override
         public boolean accept(File f) {
@@ -62,9 +62,11 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         this.controller.uiOpenFile(file);
     }
 
-    public interface AppTitleSetter {
+    public interface AppUIController {
 
         void setTitle(String title);
+        
+        void setOnTop(boolean onTop);
     }
 
     /**
@@ -76,14 +78,14 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         this.controller = new UIController(this);
     }
 
-    public CodeLib2Main setAppTitleSetter(AppTitleSetter appTitleSetter) {
-        this.appTitleSetter = appTitleSetter;
+    public CodeLib2Main setAppUIController(AppUIController appUIController) {
+        this.appUIController = appUIController;
         return this;
     }
 
     public void setAppTitle(String title) {
-        if (this.appTitleSetter != null) {
-            this.appTitleSetter.setTitle(title);
+        if (this.appUIController != null) {
+            this.appUIController.setTitle(title);
         }
     }
 
@@ -112,6 +114,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         importButton = new javax.swing.JButton();
         export = new javax.swing.JButton();
         copyToClipboard = new javax.swing.JButton();
+        onTopBtn = new javax.swing.JToggleButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
         filterText = new javax.swing.JTextField();
@@ -349,6 +352,26 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jToolBar1.add(copyToClipboard);
 
+        onTopBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/onTop.png"))); // NOI18N
+        onTopBtn.setToolTipText("总在最上");
+        onTopBtn.setFocusable(false);
+        onTopBtn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        onTopBtn.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        onTopBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                onTopBtnMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                onTopBtnMouseExited(evt);
+            }
+        });
+        onTopBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onTopBtnActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(onTopBtn);
+
         jSplitPane1.setDividerLocation(330);
         jSplitPane1.setDividerSize(4);
         jSplitPane1.setFont(new java.awt.Font("Microsoft YaHei", 0, 14)); // NOI18N
@@ -395,7 +418,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(filterText, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE))
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
@@ -465,7 +488,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(keyWordText, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(contentTab, javax.swing.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
+                .addComponent(contentTab, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE))
         );
 
         jSplitPane2.setTopComponent(jPanel2);
@@ -918,6 +941,18 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         this.controller.findNext();
     }//GEN-LAST:event_filterTextActionPerformed
 
+    private void onTopBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onTopBtnActionPerformed
+        this.appUIController.setOnTop(this.onTopBtn.isSelected());
+    }//GEN-LAST:event_onTopBtnActionPerformed
+
+    private void onTopBtnMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_onTopBtnMouseEntered
+        this.controller.uiSetStatusBar(this.onTopBtn.getToolTipText());
+    }//GEN-LAST:event_onTopBtnMouseEntered
+
+    private void onTopBtnMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_onTopBtnMouseExited
+        this.controller.uiSetStatusBarReady();
+    }//GEN-LAST:event_onTopBtnMouseExited
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add;
     private javax.swing.JButton addAttachment;
@@ -950,6 +985,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private javax.swing.JToolBar jToolbar2;
     javax.swing.JTextField keyWordText;
     private javax.swing.JButton newInst;
+    private javax.swing.JToggleButton onTopBtn;
     private javax.swing.JButton open;
     javax.swing.JScrollPane rTextScrollPane;
     private javax.swing.JButton remove;

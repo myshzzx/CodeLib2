@@ -82,7 +82,7 @@ public class UIController implements StateObserver, ResultCatcher {
 
 	static {
 //		迭代次数, 100次到达e
-		final int IterateVersion = 11;
+		final int IterateVersion = 12;
 		//版本号取 4 位小数
 		AppTitle = "CodeLib2 b" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 0.53).substring(2, 6);
 

@@ -262,6 +262,22 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="copyToClipboardActionPerformed"/>
           </Events>
         </Component>
+        <Component class="javax.swing.JToggleButton" name="onTopBtn">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/icons/onTop.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="&#x603b;&#x5728;&#x6700;&#x4e0a;"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="onTopBtnMouseEntered"/>
+            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="onTopBtnMouseExited"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="onTopBtnActionPerformed"/>
+          </Events>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JSplitPane" name="jSplitPane1">
@@ -299,7 +315,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="filterText" min="-2" pref="29" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="452" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="451" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -389,7 +405,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="keyWordText" min="-2" pref="27" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="contentTab" pref="416" max="32767" attributes="0"/>
+                          <Component id="contentTab" pref="342" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
