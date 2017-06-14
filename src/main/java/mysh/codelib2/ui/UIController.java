@@ -81,7 +81,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	public static final String AppTitle;
 
 	static {
-//		迭代次数, 100次到达e
+		//		迭代次数, 100次到达e
 		final int IterateVersion = 12;
 		//版本号取 4 位小数
 		AppTitle = "CodeLib2 b" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 0.53).substring(2, 6);
@@ -931,7 +931,8 @@ public class UIController implements StateObserver, ResultCatcher {
 
 			int count = 1;
 			for (Object sortedResult : resultsArray) {
-				if (count++ > dispalyLimit) break;
+				if (count++ > dispalyLimit)
+					break;
 				((DefaultListModel<CodeLib2Element>) ui.resultList.getModel()).addElement(((SearchResult) sortedResult).ele);
 			}
 
@@ -965,7 +966,8 @@ public class UIController implements StateObserver, ResultCatcher {
 			this.searchEngine.close();
 			try {
 				ClassLoader cl = CodeLib2Frame.class.getClassLoader();
-				if (cl instanceof Closeable) ((Closeable) cl).close();
+				if (cl instanceof Closeable)
+					((Closeable) cl).close();
 			} catch (Exception e) {
 			}
 			return true;
@@ -1186,9 +1188,9 @@ public class UIController implements StateObserver, ResultCatcher {
 					}
 				}
 
-//				展示导入的元素
-//				for (CodeLib2Element ele : readItems)
-//					((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(ele);
+				//				展示导入的元素
+				//				for (CodeLib2Element ele : readItems)
+				//					((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(ele);
 
 				// 去除重复元素
 				readItems.addAll(this.eles);
@@ -1244,7 +1246,7 @@ public class UIController implements StateObserver, ResultCatcher {
 								SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
 			}
 
-//			findResult |= this.browserSearch(text);
+			//			findResult |= this.browserSearch(text);
 			if (findResult) {
 				this.ui.findText.setForeground(Color.BLACK);
 			} else {
@@ -1409,8 +1411,8 @@ public class UIController implements StateObserver, ResultCatcher {
 		int selectedRow = this.ui.attachmentTable.getSelectedRow();
 		if (selectedRow > -1) {
 			Attachment attachment = (Attachment) this.ui.attachmentTable.getValueAt(selectedRow, 0);
-			final String oriFilePath = TempDir + attachment.getName();
-			File tempFile = FilesUtil.getWritableFile(oriFilePath);
+			File oriFile = new File(TempDir, attachment.getName());
+			File tempFile = FilesUtil.getWritableFile(oriFile);
 			try {
 				FilesUtil.writeFile(tempFile, attachment.getBinaryContent());
 			} catch (IOException e) {
@@ -1423,8 +1425,8 @@ public class UIController implements StateObserver, ResultCatcher {
 				Desktop.getDesktop().open(tempFile);
 			} catch (IOException e) {
 				if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui,
-								"打开文件失败, 要尝试用文本方式打开吗?\n" + oriFilePath, "打开文件", JOptionPane.YES_NO_OPTION)) {
-					File textFile = FilesUtil.getWritableFile(oriFilePath + ".txt");
+								"打开文件失败, 要尝试用文本方式打开吗?\n" + oriFile.getAbsolutePath(), "打开文件", JOptionPane.YES_NO_OPTION)) {
+					File textFile = FilesUtil.getWritableFile(new File(oriFile.getAbsolutePath() + ".txt"));
 					if (tempFile.renameTo(textFile)) {
 						textFile.deleteOnExit();
 						try {
