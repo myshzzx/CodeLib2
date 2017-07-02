@@ -7,6 +7,7 @@ package mysh.codelib2.ui;
 import mysh.codelib2.model.CodeLib2Element;
 import mysh.util.UIs;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -24,13 +25,13 @@ public class CodeLib2Frame extends javax.swing.JFrame {
      */
     public CodeLib2Frame() {
         initComponents();
-	    this.setTitle(UIController.AppTitle);
-	    this.setIconImage(Toolkit.getDefaultToolkit().getImage(
-					    this.getClass().getClassLoader().getResource("icons/CodeLib2.png")));
-	    System.setProperty("file.encoding", CodeLib2Element.DefaultCharsetEncode);
+        this.setTitle(UIController.AppTitle);
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage(
+              this.getClass().getClassLoader().getResource("icons/CodeLib2.png")));
+        System.setProperty("file.encoding", CodeLib2Element.DefaultCharsetEncode);
 
-      this.getContentPane().setLayout(new BorderLayout());
-      this.codeLib2Main = new CodeLib2Main().setAppUIController(new CodeLib2Main.AppUIController() {
+        this.getContentPane().setLayout(new BorderLayout());
+        this.codeLib2Main = new CodeLib2Main().setAppUIController(new CodeLib2Main.AppUIController() {
 
           @Override
           public void setTitle(String title) {
@@ -41,8 +42,16 @@ public class CodeLib2Frame extends javax.swing.JFrame {
           public void setOnTop(boolean onTop) {
               CodeLib2Frame.this.setAlwaysOnTop(onTop);
           }
-      });
-      this.getContentPane().add(this.codeLib2Main, BorderLayout.CENTER);
+        });
+
+        SwingUtilities.invokeLater(() -> {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            this.getContentPane().add(this.codeLib2Main, BorderLayout.CENTER);
+        });
 
       this.setLocationRelativeTo(null);
     }
