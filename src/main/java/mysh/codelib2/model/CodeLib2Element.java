@@ -3,8 +3,11 @@ package mysh.codelib2.model;
 
 import mysh.util.Bytes;
 import mysh.util.Encodings;
+import mysh.util.Times;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,10 +61,10 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			 * 支持的文本类型扩展名.
 			 */
 			private static final List<String> textExt = Arrays.asList("as", "asm", "asp", "bat", "bbcode",
-							"c", "clj", "clojure", "cpp", "cs", "css", "d", "f", "for", "fortran", "groovy", "gsp",
-							"h", "htm", "html", "ini", "java", "js", "jsp", "lisp", "log", "lua", "mq4", "mq5", "mqh", "mx",
-							"mxml", "pas", "php", "pl", "properties", "py", "r", "rb", "reg", "ruby", "sas", "scala", "scheme",
-							"scm", "sh", "sql", "ss", "tcl", "txt", "vb", "vbs", "xml", "xsd", "xsl");
+					"c", "clj", "clojure", "cpp", "cs", "css", "d", "f", "for", "fortran", "groovy", "gsp",
+					"h", "htm", "html", "ini", "java", "js", "jsp", "lisp", "log", "lua", "mq4", "mq5", "mqh", "mx",
+					"mxml", "pas", "php", "pl", "properties", "py", "r", "rb", "reg", "ruby", "sas", "scala", "scheme",
+					"scm", "sh", "sql", "ss", "tcl", "txt", "vb", "vbs", "xml", "xsd", "xsl");
 
 			/**
 			 * 取文本编码类型. 若非文本, 返回 null.
@@ -175,7 +178,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			this.contentType = ContentType.Binary;
 
 			if (this.binaryContent != null && this.binaryContent.length > 0
-							&& this.name != null && this.name.length() > 0) {
+					&& this.name != null && this.name.length() > 0) {
 				int pointPos = this.name.lastIndexOf('.');
 				if (pointPos > -1 && pointPos < this.name.length() - 1) {
 					String ext = this.name.substring(pointPos + 1, this.name.length()).toLowerCase();
@@ -226,22 +229,26 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	 */
 	private List<Attachment> attachments;
 
+	private Instant createTime = Instant.now(), updateTime = createTime;
+
 	@Override
 	public boolean equals(Object obj) {
 
-		if (!(obj instanceof CodeLib2Element)) return false;
+		if (!(obj instanceof CodeLib2Element))
+			return false;
 
 		CodeLib2Element e = (CodeLib2Element) obj;
 
 		if (this.keywords != null && e.keywords != null) {
 			if (this.keywords.hashCode() != e.keywords.hashCode()
-							&& !this.keywords.equals(e.keywords))
+					&& !this.keywords.equals(e.keywords))
 				return false;
 		} else if (this.keywords != null || e.keywords != null) {
 			return false;
 		}
 
-		if (!Arrays.equals(this.content, e.content)) return false;
+		if (!Arrays.equals(this.content, e.content))
+			return false;
 
 		if (this.attachments != e.attachments) {
 			return this.attachments != null && this.attachments.equals(e.attachments);
@@ -279,6 +286,18 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			return this.keywords + " [附]";
 		}
 	}
+
+	public String showInfo() {
+		return "创建时间: "
+				+
+				Times.format(Times.Formats.DayTime, createTime, ZoneId.systemDefault())
+				+
+				"\n修改时间: "
+				+
+				Times.format(Times.Formats.DayTime, updateTime, ZoneId.systemDefault());
+	}
+
+	// get set
 
 	/**
 	 * 关键字.
@@ -337,6 +356,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	public void setAttachments(List<Attachment> attachments) {
 
 		this.attachments = attachments;
+		this.updateTime = Instant.now();
 	}
 
 	/**
@@ -356,6 +376,26 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	public void setContent(byte[] content) {
 
 		this.content = content;
+		this.updateTime = Instant.now();
 	}
+
+	public Instant getCreateTime() {
+		return createTime;
+	}
+
+	public CodeLib2Element setCreateTime(Instant createTime) {
+		this.createTime = createTime;
+		return this;
+	}
+
+	public Instant getUpdateTime() {
+		return updateTime;
+	}
+
+	public CodeLib2Element setUpdateTime(Instant updateTime) {
+		this.updateTime = updateTime;
+		return this;
+	}
+
 
 }

@@ -205,7 +205,7 @@ public final class SearchEngine implements Closeable {
 	private static int countMatchDegree(CodeLib2Element ele, byte[][] upperKeysByteArray, byte[][] lowerKeysByteArray) {
 		final int KeyWeight = 100;
 		final int ContentWeightP = 5;
-		final int AttachementNameWeight = 50;
+		final int AttachmentNameWeight = 50;
 
 		int tMatchIndex;
 		byte[] tSearchContent;
@@ -238,7 +238,7 @@ public final class SearchEngine implements Closeable {
 							attachmentMatchCount++;
 						}
 					}
-					degree += AttachementNameWeight * attachmentMatchCount / ele.getAttachments().size();
+					degree += AttachmentNameWeight * attachmentMatchCount / ele.getAttachments().size();
 				}
 			}
 		} catch (Exception e) {
@@ -348,8 +348,7 @@ public final class SearchEngine implements Closeable {
 
 		String[] upperCaseKeys = keyword.trim().toUpperCase().split("[\\s,]+");
 		String[] lowerCaseKeys = keyword.trim().toLowerCase().split("[\\s,]+");
-		if (lowerCaseKeys == null || keyword.length() == 0 || lowerCaseKeys.length == 0
-						|| lowerCaseKeys[0].length() == 0) {
+		if (keyword.length() == 0 || lowerCaseKeys.length == 0 || lowerCaseKeys[0].length() == 0) {
 			// throw new IllegalArgumentException("无效关键字: " + keyword);
 			this.resultCatcher.onSearchComplete(keyword);
 			return;

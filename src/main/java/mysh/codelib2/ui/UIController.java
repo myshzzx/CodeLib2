@@ -43,6 +43,7 @@ import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.*;
 import java.util.List;
 import java.util.Queue;
@@ -257,8 +258,8 @@ public class UIController implements StateObserver, ResultCatcher {
 				try {
 					Transferable transferable = evt.getTransferable();
 					if (currentItem != null
-									&&
-									Arrays.asList(transferable.getTransferDataFlavors()).contains(DataFlavor.javaFileListFlavor)) {
+							&&
+							Arrays.asList(transferable.getTransferDataFlavors()).contains(DataFlavor.javaFileListFlavor)) {
 						evt.acceptDrop(DnDConstants.ACTION_COPY);
 						List<File> transferData = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 						addAttachment(currentItem, transferData);
@@ -431,7 +432,7 @@ public class UIController implements StateObserver, ResultCatcher {
 
 		if (this.saveState.getState() == State.MODIFIED) {
 			int op = JOptionPane.showConfirmDialog(this.ui, "是否保存修改?", UIController.AppTitle,
-							JOptionPane.YES_NO_CANCEL_OPTION);
+					JOptionPane.YES_NO_CANCEL_OPTION);
 			if (op == JOptionPane.YES_OPTION) {
 				this.uiSave();
 			} else if (op == JOptionPane.CANCEL_OPTION) {
@@ -484,7 +485,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		} catch (Exception e) {
 			log.error("open file error.", e);
 			JOptionPane.showMessageDialog(this.ui, "打开文件失败.\n" + e.getMessage(), UIController.AppTitle,
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.ERROR_MESSAGE);
 		} finally {
 			this.uiSetStatusBarReady();
 		}
@@ -511,7 +512,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			this.saveState.changeState(State.SAVED);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "保存文件失败.\\n" + e.getMessage(), UIController.AppTitle,
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.ERROR_MESSAGE);
 		} finally {
 			this.uiSetStatusBarReady();
 		}
@@ -543,7 +544,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		if (selectedItems.size() > 0) {
 
 			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui, "删除确认?", AppTitle,
-							JOptionPane.YES_NO_OPTION)) {
+					JOptionPane.YES_NO_OPTION)) {
 
 				this.eles.removeAll(selectedItems);
 
@@ -575,13 +576,13 @@ public class UIController implements StateObserver, ResultCatcher {
 
 		if (items != null && items.size() > 0) {
 			File exportFile = UIs.getSaveFileWithOverwriteChecking(
-							this.ui.itemExportChooser, this.ui,
-							() -> {
-								String ext = ui.itemExportChooser.getFileFilter().getDescription();
-								if (!ext.startsWith("."))
-									ext = "";
-								return ext;
-							});
+					this.ui.itemExportChooser, this.ui,
+					() -> {
+						String ext = ui.itemExportChooser.getFileFilter().getDescription();
+						if (!ext.startsWith("."))
+							ext = "";
+						return ext;
+					});
 
 			try {
 				if (exportFile != null) {
@@ -590,10 +591,10 @@ public class UIController implements StateObserver, ResultCatcher {
 					info.file = exportFile;
 					if (this.file == null) {
 						info.title = AppTitle + " - "
-										+ FilesUtil.getFileNameWithoutExtension(exportFile);
+								+ FilesUtil.getFileNameWithoutExtension(exportFile);
 					} else {
 						info.title = AppTitle + " - "
-										+ FilesUtil.getFileNameWithoutExtension(this.file);
+								+ FilesUtil.getFileNameWithoutExtension(this.file);
 					}
 
 					ExportEngine.export(info, items);
@@ -623,7 +624,7 @@ public class UIController implements StateObserver, ResultCatcher {
 				this.uiSetStatusBar("正在搜索 [ " + text + " ] ...");
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this.ui, "创建搜索任务失败.\n关键字: [" + text + "]\n错误:\n" + e, AppTitle,
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -646,6 +647,8 @@ public class UIController implements StateObserver, ResultCatcher {
 				this.ui.codeText.setCaretPosition(0);
 				this.ui.codeText.setEditable(true);
 
+				this.ui.infoText.setText(item.showInfo());
+
 				this.browserSetContent(DefaultBrowserContent);
 
 				this.findText();
@@ -658,7 +661,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			if (item.getAttachments() != null) {
 				for (Attachment attachment : item.getAttachments()) {
 					((DefaultTableModel) this.ui.attachmentTable.getModel()).addRow(new Object[]{
-									attachment, attachment.getBinaryContent().length});
+							attachment, attachment.getBinaryContent().length});
 				}
 			}
 			this.ui.attachmentTable.updateUI();
@@ -862,7 +865,7 @@ public class UIController implements StateObserver, ResultCatcher {
 				this.saveState.changeState(State.MODIFIED);
 
 				byte[] newContent = this.ui.codeText.getText().getBytes(
-								CodeLib2Element.DefaultCharsetEncode);
+						CodeLib2Element.DefaultCharsetEncode);
 				this.currentItem.setContent(newContent);
 			}
 		} catch (UnsupportedEncodingException e) {
@@ -911,27 +914,35 @@ public class UIController implements StateObserver, ResultCatcher {
 	public void onSearchComplete(final String keyword) {
 
 		final Object[] resultsArray = this.searchResults.toArray();
-		Arrays.sort(resultsArray, (o1, o2) -> ((SearchResult) o2).matchDegree - ((SearchResult) o1).matchDegree);
+		Arrays.sort(resultsArray, (o1, o2) -> {
+			SearchResult sr1 = (SearchResult) o1;
+			SearchResult sr2 = (SearchResult) o2;
+			int mdd = sr2.matchDegree - sr1.matchDegree;
+			if (mdd == 0) {
+				return sr2.ele.getUpdateTime().compareTo(sr1.ele.getUpdateTime());
+			} else
+				return mdd;
+		});
 
 		// update status bar
 		SwingUtilities.invokeLater(() -> {
-			int dispalyLimit = 500;
+			int displayLimit = 500;
 
-			if (resultsArray.length > dispalyLimit
-							&&
-							"*".equals(currentKeyword.trim().split("[\\s,]+")[0])
-							&&
-							JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(ui,
-											"结果条目 " + resultsArray.length + " 条, 建议只展示部分结果以缩短渲染时间\n" +
-															"选 \"是\" 只展示前 " + dispalyLimit + " 条, 选 \"否\" 全部展示",
-											AppTitle,
-											JOptionPane.YES_NO_OPTION)) {
-				dispalyLimit = Integer.MAX_VALUE;
+			if (resultsArray.length > displayLimit
+					&&
+					"*".equals(currentKeyword.trim().split("[\\s,]+")[0])
+					&&
+					JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(ui,
+							"结果条目 " + resultsArray.length + " 条, 建议只展示部分结果以缩短渲染时间\n" +
+									"选 \"是\" 只展示前 " + displayLimit + " 条, 选 \"否\" 全部展示",
+							AppTitle,
+							JOptionPane.YES_NO_OPTION)) {
+				displayLimit = Integer.MAX_VALUE;
 			}
 
 			int count = 1;
 			for (Object sortedResult : resultsArray) {
-				if (count++ > dispalyLimit)
+				if (count++ > displayLimit)
 					break;
 				((DefaultListModel<CodeLib2Element>) ui.resultList.getModel()).addElement(((SearchResult) sortedResult).ele);
 			}
@@ -947,7 +958,7 @@ public class UIController implements StateObserver, ResultCatcher {
 
 			if (currentKeyword.trim().length() > 0 && currentKeyword.split("[\\s,]+").length > 0) {
 				uiSetStatusBar("搜索 [" + currentKeyword + "] 完成, 展示条目/全部结果="
-								+ ui.resultList.getModel().getSize() + "/" + resultsArray.length);
+						+ ui.resultList.getModel().getSize() + "/" + resultsArray.length);
 				if (ui.resultList.getModel().getSize() > 0) {
 					ui.resultList.setSelectedIndex(0);
 				}
@@ -1029,7 +1040,7 @@ public class UIController implements StateObserver, ResultCatcher {
 
 		CodeLib2Element attachToItem = this.currentItem;
 		if (attachToItem != null
-						&& JFileChooser.APPROVE_OPTION == this.ui.attachmentImportChooser.showOpenDialog(this.ui)) {
+				&& JFileChooser.APPROVE_OPTION == this.ui.attachmentImportChooser.showOpenDialog(this.ui)) {
 			File[] files = this.ui.attachmentImportChooser.getSelectedFiles();
 			this.addAttachment(attachToItem, Arrays.asList(files));
 		}
@@ -1050,18 +1061,18 @@ public class UIController implements StateObserver, ResultCatcher {
 		for (File file : files) {
 			try {
 				if (file.length() > 1_000_000
-								&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
-								file.getName() + "\n文件超过1MB, 仍然导入?", AppTitle,
-								JOptionPane.YES_NO_OPTION)) {
+						&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
+						file.getName() + "\n文件超过1MB, 仍然导入?", AppTitle,
+						JOptionPane.YES_NO_OPTION)) {
 					continue;
 				}
 
 				attachments.add(new Attachment().setName(file.getName()).setBinaryContent(
-								java.nio.file.Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
+						java.nio.file.Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
 			} catch (Exception e) {
 				log.error("导入附件失败. " + file.getAbsolutePath(), e);
 				JOptionPane.showMessageDialog(this.ui, "导入附件失败.\n" + file.getName(), AppTitle,
-								JOptionPane.ERROR_MESSAGE);
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 
@@ -1070,6 +1081,7 @@ public class UIController implements StateObserver, ResultCatcher {
 				attachToItem.setAttachments(new ArrayList<>());
 
 			attachToItem.getAttachments().addAll(attachments);
+			attachToItem.setUpdateTime(Instant.now());
 			Collections.sort(attachToItem.getAttachments());
 
 			this.saveState.changeState(State.MODIFIED);
@@ -1111,10 +1123,11 @@ public class UIController implements StateObserver, ResultCatcher {
 		int[] selectedRows = this.ui.attachmentTable.getSelectedRows();
 		if (selectedRows.length > 0) {
 			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui, "确认移除附件?", AppTitle,
-							JOptionPane.YES_NO_OPTION)) {
+					JOptionPane.YES_NO_OPTION)) {
 				for (int i = selectedRows.length - 1; i > -1; i--) {
 					this.currentItem.getAttachments().remove(
-									this.ui.attachmentTable.getValueAt(selectedRows[i], 0));
+							this.ui.attachmentTable.getValueAt(selectedRows[i], 0));
+					this.currentItem.setUpdateTime(Instant.now());
 					((DefaultTableModel) this.ui.attachmentTable.getModel()).removeRow(selectedRows[i]);
 				}
 				this.saveState.changeState(State.MODIFIED);
@@ -1132,7 +1145,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		int[] selectedRows = this.ui.attachmentTable.getSelectedRows();
 		Attachment attachment;
 		if (selectedRows.length > 0
-						&& JFileChooser.APPROVE_OPTION == this.ui.attachmentExportChooser.showSaveDialog(this.ui)) {
+				&& JFileChooser.APPROVE_OPTION == this.ui.attachmentExportChooser.showSaveDialog(this.ui)) {
 			File dir = this.ui.attachmentExportChooser.getSelectedFile();
 			String filepath;
 			for (int row : selectedRows) {
@@ -1143,9 +1156,9 @@ public class UIController implements StateObserver, ResultCatcher {
 
 					File file = new File(filepath);
 					if (file.exists()
-									&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
-									"是否覆盖文件?\n" + filepath, AppTitle,
-									JOptionPane.YES_NO_OPTION)) {
+							&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
+							"是否覆盖文件?\n" + filepath, AppTitle,
+							JOptionPane.YES_NO_OPTION)) {
 						continue;
 					}
 
@@ -1154,7 +1167,7 @@ public class UIController implements StateObserver, ResultCatcher {
 					} catch (IOException ex) {
 						log.error("export error.", ex);
 						JOptionPane.showMessageDialog(this.ui, "导出失败.\n" + attachment.getName(),
-										AppTitle, JOptionPane.ERROR_MESSAGE);
+								AppTitle, JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
@@ -1201,11 +1214,11 @@ public class UIController implements StateObserver, ResultCatcher {
 				this.saveState.changeState(State.MODIFIED);
 				this.uiSetStatusBar("成功导入");
 				JOptionPane.showMessageDialog(this.ui, "导入成功\n现有 " + this.eles.size() + " 项", AppTitle,
-								JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.INFORMATION_MESSAGE);
 			} catch (Throwable t) {
 				this.uiSetStatusBarReady();
 				JOptionPane.showMessageDialog(this.ui, "导入失败\n失败详情请查看日志", AppTitle,
-								JOptionPane.ERROR_MESSAGE);
+						JOptionPane.ERROR_MESSAGE);
 				log.error("导入失败: ", t);
 			}
 
@@ -1235,7 +1248,7 @@ public class UIController implements StateObserver, ResultCatcher {
 
 			int oldCaretPosition = this.ui.codeText.getCaretPosition();
 			findResult = org.fife.ui.rtextarea.
-							SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
+					SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
 			if (!findResult) {
 				if (this.findContext.getSearchForward()) {
 					this.ui.codeText.setCaretPosition(0);
@@ -1243,7 +1256,7 @@ public class UIController implements StateObserver, ResultCatcher {
 					this.ui.codeText.setCaretPosition(this.ui.codeText.getText().length());
 				}
 				findResult = org.fife.ui.rtextarea.
-								SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
+						SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
 			}
 
 			//			findResult |= this.browserSearch(text);
@@ -1338,7 +1351,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	private String getPageSearchJs() throws IOException {
 		if (pageSearchJs == null) {
 			try (BufferedReader in = new BufferedReader(new InputStreamReader(
-							UIController.class.getResourceAsStream("/js/pageSearchCompress.js")))) {
+					UIController.class.getResourceAsStream("/js/pageSearchCompress.js")))) {
 				StringBuilder sbjs = new StringBuilder();
 				int len;
 				char[] buf = new char[100_000];
@@ -1374,17 +1387,17 @@ public class UIController implements StateObserver, ResultCatcher {
 					String content = new String(attachment.getBinaryContent(), newContentType.getTextEncode());
 					if (!"html".equals(fileExtension) && !"htm".equals(fileExtension)) {
 						String html = "<html><head><meta http-equiv='Content-Type' content='text/html; charset="
-										+ newContentType.getTextEncode()
-										+ "'/></head><body>"
-										+ content.replace("&", "&amp;")
-										.replace("\"", "&quot;").replace("'", "&#39;")
-										.replace("<", "&lt;").replace(">", "&gt;")
-										.replace("\r\n", "<br/>")
-										.replace("\r", "<br/>")
-										.replace("\n", "<br/>")
-										.replace(" ", "&nbsp;").replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-										+ "<script>" + getPageSearchJs() + "</script>"
-										+ "</body></html>";
+								+ newContentType.getTextEncode()
+								+ "'/></head><body>"
+								+ content.replace("&", "&amp;")
+								.replace("\"", "&quot;").replace("'", "&#39;")
+								.replace("<", "&lt;").replace(">", "&gt;")
+								.replace("\r\n", "<br/>")
+								.replace("\r", "<br/>")
+								.replace("\n", "<br/>")
+								.replace(" ", "&nbsp;").replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+								+ "<script>" + getPageSearchJs() + "</script>"
+								+ "</body></html>";
 						this.browserSetContent(html);
 					} else {
 						int endIdx = content.lastIndexOf("</html>");
@@ -1392,7 +1405,7 @@ public class UIController implements StateObserver, ResultCatcher {
 							this.browserSetContent(content);
 						else {
 							String sb = content.substring(0, endIdx)
-											+ "<script>" + getPageSearchJs() + "</script></html>";
+									+ "<script>" + getPageSearchJs() + "</script></html>";
 							this.browserSetContent(sb);
 						}
 					}
@@ -1425,7 +1438,7 @@ public class UIController implements StateObserver, ResultCatcher {
 				Desktop.getDesktop().open(tempFile);
 			} catch (IOException e) {
 				if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui,
-								"打开文件失败, 要尝试用文本方式打开吗?\n" + oriFile.getAbsolutePath(), "打开文件", JOptionPane.YES_NO_OPTION)) {
+						"打开文件失败, 要尝试用文本方式打开吗?\n" + oriFile.getAbsolutePath(), "打开文件", JOptionPane.YES_NO_OPTION)) {
 					File textFile = FilesUtil.getWritableFile(new File(oriFile.getAbsolutePath() + ".txt"));
 					if (tempFile.renameTo(textFile)) {
 						textFile.deleteOnExit();
@@ -1433,8 +1446,8 @@ public class UIController implements StateObserver, ResultCatcher {
 							Desktop.getDesktop().open(textFile);
 						} catch (IOException e1) {
 							JOptionPane.showMessageDialog(this.ui,
-											textFile.getAbsolutePath() + e1.getMessage(),
-											"打开文本文件失败.", JOptionPane.ERROR_MESSAGE);
+									textFile.getAbsolutePath() + e1.getMessage(),
+									"打开文本文件失败.", JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}

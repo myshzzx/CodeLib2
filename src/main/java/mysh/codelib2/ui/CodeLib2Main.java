@@ -127,6 +127,8 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         rTextScrollPane = new javax.swing.JScrollPane();
         codeText = new org.fife.ui.rsyntaxtextarea.RSyntaxTextArea();
         browserPanel = new javax.swing.JPanel();
+        infoPanel = new javax.swing.JScrollPane();
+        infoText = new javax.swing.JTextArea();
         attachmentPanel = new javax.swing.JSplitPane();
         attachmentToolPanel = new javax.swing.JPanel();
         jToolbar2 = new javax.swing.JToolBar();
@@ -476,19 +478,26 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         browserPanel.setLayout(new java.awt.BorderLayout());
         contentTab.addTab(" 浏览器 ", browserPanel);
 
+        infoText.setEditable(false);
+        infoText.setColumns(20);
+        infoText.setRows(5);
+        infoPanel.setViewportView(infoText);
+
+        contentTab.addTab("信息", infoPanel);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(keyWordText)
-            .addComponent(contentTab, javax.swing.GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
+            .addComponent(contentTab)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(keyWordText, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(contentTab, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE))
+                .addComponent(contentTab))
         );
 
         jSplitPane2.setTopComponent(jPanel2);
@@ -972,6 +981,8 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     javax.swing.JButton findPreviousBtn;
     mysh.ui.JTextFieldWithTips findText;
     private javax.swing.JButton importButton;
+    private javax.swing.JScrollPane infoPanel;
+    javax.swing.JTextArea infoText;
     javax.swing.JFileChooser itemExportChooser;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
