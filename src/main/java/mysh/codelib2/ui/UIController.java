@@ -643,8 +643,8 @@ public class UIController implements StateObserver, ResultCatcher {
 			this.ui.keyWordText.setEditable(true);
 			try {
 				this.ui.codeText.setSyntaxEditingStyle(this.getSyntaxStyle(item.getFirstKeyword().toLowerCase()));
-				this.ui.codeText.setText(new String(item.getContent(), CodeLib2Element.DefaultCharsetEncode));
 				this.ui.codeText.setCaretPosition(0);
+				this.ui.codeText.setText(new String(item.getContent(), CodeLib2Element.DefaultCharsetEncode));
 				this.ui.codeText.setEditable(true);
 
 				this.ui.infoText.setText(item.showInfo());
@@ -670,6 +670,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		} else {
 			this.ui.keyWordText.setText("");
 			this.ui.keyWordText.setEditable(false);
+			this.ui.codeText.setCaretPosition(0);
 			this.ui.codeText.setText("");
 			this.ui.codeText.setEditable(false);
 

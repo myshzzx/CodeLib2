@@ -1,6 +1,7 @@
 
 package mysh.codelib2.model;
 
+import mysh.collect.Colls;
 import mysh.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -231,7 +232,7 @@ public final class SearchEngine implements Closeable {
 
 				//attachment name
 				int attachmentMatchCount = 0;
-				if (ele.getAttachments() != null) {
+				if (Colls.isNotEmpty(ele.getAttachments())) {
 					for (Attachment attachment : ele.getAttachments()) {
 						if (Bytes.findStringIndexIgnoreCase(attachment.getName().getBytes(CodeLib2Element.DefaultCharsetEncode),
 								0, upperKeysByteArray[i], lowerKeysByteArray[i]) > -1) {
