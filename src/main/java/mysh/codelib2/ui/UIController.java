@@ -40,13 +40,26 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -643,8 +656,8 @@ public class UIController implements StateObserver, ResultCatcher {
 			this.ui.keyWordText.setEditable(true);
 			try {
 				this.ui.codeText.setSyntaxEditingStyle(this.getSyntaxStyle(item.getFirstKeyword().toLowerCase()));
-				this.ui.codeText.setText(new String(item.getContent(), CodeLib2Element.DefaultCharsetEncode));
 				this.ui.codeText.setCaretPosition(0);
+				this.ui.codeText.setText(new String(item.getContent(), CodeLib2Element.DefaultCharsetEncode));
 				this.ui.codeText.setEditable(true);
 
 				this.ui.infoText.setText(item.showInfo());
@@ -670,6 +683,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		} else {
 			this.ui.keyWordText.setText("");
 			this.ui.keyWordText.setEditable(false);
+			this.ui.codeText.setCaretPosition(0);
 			this.ui.codeText.setText("");
 			this.ui.codeText.setEditable(false);
 
