@@ -50,20 +50,29 @@
 	<build>
 
 		<plugins>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.7.0</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>${project.build.sourceEncoding}</encoding>
+					<source>10</source>
+					<target>10</target>
+					<encoding>${sourceEncoding}</encoding>
 				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.ow2.asm</groupId>
+						<artifactId>asm</artifactId>
+						<version>6.1.1</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.6</version>
+				<version>3.1.0</version>
 				<configuration>
 					<finalName>CodeLib2</finalName>
 					<archive>
