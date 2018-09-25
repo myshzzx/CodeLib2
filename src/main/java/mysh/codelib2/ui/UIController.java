@@ -1103,9 +1103,17 @@ public class UIController implements StateObserver, ResultCatcher {
 	 * 清空附件列表.
 	 */
 	private void attachmentClearTable() {
-		((DefaultTableModel) this.ui.attachmentTable.getModel()).setRowCount(0);
-		((DefaultTableModel) this.ui.attachmentTable.getModel()).getDataVector().clear();
-		this.ui.attachmentTable.updateUI();
+		this.ui.attachmentTable.setModel(new DefaultTableModel(
+				new Object[][]{
+				},
+				new String[]{
+						"附件名", "附件大小(字节)"
+				}
+		) {
+			public boolean isCellEditable(int rowIndex, int columnIndex) {
+				return false;
+			}
+		});
 	}
 	
 	/**
