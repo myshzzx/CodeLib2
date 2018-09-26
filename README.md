@@ -26,9 +26,6 @@
 <p><br><img src="http://dl.iteye.com/upload/attachment/0083/8838/64144baf-f126-3c2a-9c64-3a0ef9ac9537.png" alt=""><br> </p>
 <p> </p>
 <p> </p>
-<p>受BOSS影响, 做这工具时更多地考虑了UE. 大家要是有什么想法可以给我留言.</p>
-<p>程序需要 jre8 才能跑, 因为内置浏览器用了 JavaFX 的组件.</p>
-<p> </p>
 <p> </p>
 <p>Thanks for</p>
 <ul>
