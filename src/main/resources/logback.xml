@@ -25,7 +25,6 @@
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<!--See http://logback.qos.ch/manual/layouts.html#ClassicHTMLLayout-->
 			<!--for documentation-->
-			<locationInfo>true</locationInfo>
 			<pattern>●%date{MM-dd HH:mm:ss} %msg ~%logger{5}:%L [%thread] %level%n</pattern>
 		</layout>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
