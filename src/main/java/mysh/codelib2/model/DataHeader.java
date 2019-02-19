@@ -62,12 +62,12 @@ public class DataHeader implements Serializable {
 	}
 
 	private void writeHeader(OutputStream out) throws IOException {
-		out.write(Serializer.buildIn.serialize(this));
+		out.write(Serializer.BUILD_IN.serialize(this));
 		out.flush();
 	}
 
 	private static DataHeader readHeader(InputStream in) {
-		return Serializer.buildIn.deserialize(in);
+		return Serializer.BUILD_IN.deserialize(in);
 	}
 
 	private boolean writeVer4(File file, Collection<CodeLib2Element> eles) throws Exception {
@@ -75,7 +75,7 @@ public class DataHeader implements Serializable {
 		File writeFile = FilesUtil.getWriteFile(file);
 		try (FileOutputStream out = new FileOutputStream(writeFile)) {
 			writeHeader(out);
-			Compresses.compress("zcl", new ByteArrayInputStream(Serializer.buildIn.serialize((Serializable) eles)),
+			Compresses.compress("zcl", new ByteArrayInputStream(Serializer.BUILD_IN.serialize((Serializable) eles)),
 							Long.MAX_VALUE, out, 500_000);
 		}
 		file.delete();
@@ -84,13 +84,13 @@ public class DataHeader implements Serializable {
 
 	private static Collection<CodeLib2Element> readVer4(FileInputStream in) throws Exception {
 		AtomicReference<Collection<CodeLib2Element>> result = new AtomicReference<>();
-		Compresses.deCompress((entry, ein) -> result.set(Serializer.buildIn.deserialize(ein)), in);
+		Compresses.deCompress((entry, ein) -> result.set(Serializer.BUILD_IN.deserialize(ein)), in);
 		return result.get();
 	}
 
 	private static Collection<CodeLib2Element> readVer3(FileInputStream in) throws Exception {
 		AtomicReference<Collection<CodeLib2Element>> result = new AtomicReference<>();
-		Compresses.deCompress((entry, ein) -> result.set(Serializer.fst.deserialize(ein)), in);
+		Compresses.deCompress((entry, ein) -> result.set(Serializer.FST.deserialize(ein)), in);
 		return result.get();
 	}
 
