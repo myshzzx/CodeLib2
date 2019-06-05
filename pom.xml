@@ -24,10 +24,6 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>com.fifesoft</groupId>
-			<artifactId>rsyntaxtextarea</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>mysh</groupId>
 			<artifactId>mlib-core</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
@@ -40,6 +36,19 @@
 		<dependency>
 			<groupId>de.ruedigermoeller</groupId>
 			<artifactId>fst</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fifesoft</groupId>
+			<artifactId>rsyntaxtextarea</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.vladsch.flexmark</groupId>
+			<artifactId>flexmark-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.plantuml</groupId>
+			<artifactId>plantuml</artifactId>
 		</dependency>
 
 		<dependency>

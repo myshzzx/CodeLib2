@@ -1,6 +1,12 @@
 
 package mysh.codelib2.ui;
 
+import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
+import com.vladsch.flexmark.ext.tables.TablesExtension;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.ast.Document;
+import com.vladsch.flexmark.util.options.MutableDataSet;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -15,16 +21,23 @@ import mysh.codelib2.model.SearchEngine;
 import mysh.codelib2.model.SearchEngine.ResultCatcher;
 import mysh.codelib2.ui.SaveStateManager.State;
 import mysh.codelib2.ui.SaveStateManager.StateObserver;
+import mysh.collect.Colls;
 import mysh.collect.Pair;
 import mysh.util.FilesUtil;
 import mysh.util.HotKeysLocal;
 import mysh.util.UIs;
+import net.sourceforge.plantuml.FileFormat;
+import net.sourceforge.plantuml.FileFormatOption;
+import net.sourceforge.plantuml.SourceStringReader;
+import org.apache.pdfbox.util.Charsets;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.SearchContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
@@ -45,14 +58,23 @@ import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -88,25 +110,19 @@ public class UIController implements StateObserver, ResultCatcher {
 	public static final String AppTitle;
 	
 	static {
-		//		迭代次数, 100次到达e
-		final int IterateVersion = 13;
-		//版本号取 4 位小数
-		AppTitle = "CodeLib2 b" + Double.toString(0.04088487957 * Math.log(IterateVersion) + 0.53).substring(2, 6);
+		AppTitle = "CodeLib2 b20190605";
 		
-		// 加载浏览器默认页面.
-		try (InputStream browserHomePageIn = UIController.class.getResourceAsStream("/html/minimized/browserHome.html")) {
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			byte[] buf = new byte[70_000];
-			int len;
-			while ((len = browserHomePageIn.read(buf)) != -1) {
-				out.write(buf, 0, len);
-			}
-			DefaultBrowserContent = new String(out.toByteArray(), "utf-8");
-		} catch (Exception e) {
-			log.error("取默认页面失败.", e);
-			DefaultBrowserContent = AppTitle;
-		}
+		MutableDataSet mdOpt = new MutableDataSet();
+		//  set optional extensions
+		mdOpt.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(), StrikethroughExtension.create()));
+		// convert soft-breaks to hard breaks
+		mdOpt.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
+		mdParser = Parser.builder(mdOpt).build();
+		mdRenderer = HtmlRenderer.builder(mdOpt).build();
 	}
+	
+	private static final Parser mdParser;
+	private static final HtmlRenderer mdRenderer;
 	
 	/**
 	 * 临时目录.
@@ -123,7 +139,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	/**
 	 * 浏览器默认页面.
 	 */
-	private static String DefaultBrowserContent;
+	private static String DefaultBrowserContent = "";
 	
 	/**
 	 * 数据集.
@@ -288,6 +304,22 @@ public class UIController implements StateObserver, ResultCatcher {
 			browserEngine = browser.getEngine();
 			browserEngine.loadContent(DefaultBrowserContent);
 			browserEngine.setOnAlert(evt -> JOptionPane.showMessageDialog(ui, evt.getData()));
+		});
+		
+		this.ui.contentTab.addChangeListener(new ChangeListener() {
+			Component lastTab = ui.rTextScrollPane;
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				Component currentTab = ui.contentTab.getSelectedComponent();
+				if (currentTab == ui.browserPanel && lastTab == ui.rTextScrollPane) {
+					if (isCurrentMarkdown())
+						renderMarkdown();
+					else if (isCurrentPlantUml())
+					    renderPlantUml();
+				}
+				lastTab = currentTab;
+			}
 		});
 	}
 	
@@ -648,7 +680,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			this.ui.keyWordText.setText(item.getKeywords());
 			this.ui.keyWordText.setEditable(true);
 			try {
-				this.ui.codeText.setSyntaxEditingStyle(this.getSyntaxStyle(item.getFirstKeyword().toLowerCase()));
+				this.ui.codeText.setSyntaxEditingStyle(this.getRSyntaxStyle(item.getFirstKeyword().toLowerCase()));
 				this.ui.codeText.setCaretPosition(0);
 				this.ui.codeText.setText(new String(item.getContent(), CodeLib2Element.DefaultCharsetEncode));
 				this.ui.codeText.setEditable(true);
@@ -673,6 +705,9 @@ public class UIController implements StateObserver, ResultCatcher {
 			this.ui.attachmentTable.updateUI();
 			
 			this.currentItem = item;
+			
+			if (isCurrentMarkdown() || isCurrentPlantUml())
+				this.ui.contentTab.setSelectedComponent(this.ui.browserPanel);
 		} else {
 			this.ui.keyWordText.setText("");
 			this.ui.keyWordText.setEditable(false);
@@ -686,165 +721,126 @@ public class UIController implements StateObserver, ResultCatcher {
 		}
 	}
 	
+	private static final Map<String,String> rSyntaxMap = Colls.ofHashMap(
+			"actionscript", SyntaxConstants.SYNTAX_STYLE_ACTIONSCRIPT,
+			"as", SyntaxConstants.SYNTAX_STYLE_ACTIONSCRIPT,
+			
+			"asm", SyntaxConstants.SYNTAX_STYLE_ASSEMBLER_X86,
+			
+			"bat", SyntaxConstants.SYNTAX_STYLE_WINDOWS_BATCH,
+			
+			"bbcode", SyntaxConstants.SYNTAX_STYLE_BBCODE,
+			
+			"c", SyntaxConstants.SYNTAX_STYLE_C,
+			
+			"clj", SyntaxConstants.SYNTAX_STYLE_CLOJURE,
+			"clojure", SyntaxConstants.SYNTAX_STYLE_CLOJURE,
+			
+			"cpp", SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS,
+			"c++", SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS,
+			
+			"cs", SyntaxConstants.SYNTAX_STYLE_CSHARP,
+			"c#", SyntaxConstants.SYNTAX_STYLE_CSHARP,
+			
+			"css", SyntaxConstants.SYNTAX_STYLE_CSS,
+			
+			"csv", SyntaxConstants.SYNTAX_STYLE_CSV,
+			
+			"d", SyntaxConstants.SYNTAX_STYLE_D,
+			
+			"dart", SyntaxConstants.SYNTAX_STYLE_DART,
+			
+			"delphi", SyntaxConstants.SYNTAX_STYLE_DELPHI,
+			"pas", SyntaxConstants.SYNTAX_STYLE_DELPHI,
+			"pascal", SyntaxConstants.SYNTAX_STYLE_DELPHI,
+			
+			"dtd", SyntaxConstants.SYNTAX_STYLE_DTD,
+			
+			"fortran", SyntaxConstants.SYNTAX_STYLE_FORTRAN,
+			
+			"groovy", SyntaxConstants.SYNTAX_STYLE_GROOVY,
+			"gsp", SyntaxConstants.SYNTAX_STYLE_GROOVY,
+			
+			"htm", SyntaxConstants.SYNTAX_STYLE_HTML,
+			"html", SyntaxConstants.SYNTAX_STYLE_HTML,
+			
+			"java", SyntaxConstants.SYNTAX_STYLE_JAVA,
+			
+			"javascript", SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT,
+			"js", SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT,
+			
+			"json", SyntaxConstants.SYNTAX_STYLE_JSON,
+			
+			"jsp", SyntaxConstants.SYNTAX_STYLE_JSP,
+			
+			"latex", SyntaxConstants.SYNTAX_STYLE_LATEX,
+			
+			"less", SyntaxConstants.SYNTAX_STYLE_LESS,
+			
+			"lisp", SyntaxConstants.SYNTAX_STYLE_LISP,
+			
+			"lua", SyntaxConstants.SYNTAX_STYLE_LUA,
+			
+			"markdown", SyntaxConstants.SYNTAX_STYLE_PYTHON,
+			"md", SyntaxConstants.SYNTAX_STYLE_PYTHON,
+			
+			"makefile", SyntaxConstants.SYNTAX_STYLE_MAKEFILE,
+			
+			"mq4", SyntaxConstants.SYNTAX_STYLE_C,
+			"mq5", SyntaxConstants.SYNTAX_STYLE_C,
+			"mqh", SyntaxConstants.SYNTAX_STYLE_C,
+			
+			"mx", SyntaxConstants.SYNTAX_STYLE_MXML,
+			"mxml", SyntaxConstants.SYNTAX_STYLE_MXML,
+			
+			"nsi", SyntaxConstants.SYNTAX_STYLE_NSIS,
+			"nsis", SyntaxConstants.SYNTAX_STYLE_NSIS,
+			
+			"perl", SyntaxConstants.SYNTAX_STYLE_PERL,
+			
+			"php", SyntaxConstants.SYNTAX_STYLE_PHP,
+			
+			"prolog", SyntaxConstants.SYNTAX_STYLE_CLOJURE,
+			
+			"properties", SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE,
+			
+			"py", SyntaxConstants.SYNTAX_STYLE_PYTHON,
+			"python", SyntaxConstants.SYNTAX_STYLE_PYTHON,
+			
+			"puml", SyntaxConstants.SYNTAX_STYLE_CSS,
+			
+			"ruby", SyntaxConstants.SYNTAX_STYLE_RUBY,
+			
+			"sas", SyntaxConstants.SYNTAX_STYLE_SAS,
+			
+			"scala", SyntaxConstants.SYNTAX_STYLE_SCALA,
+			
+			"scheme", SyntaxConstants.SYNTAX_STYLE_LISP,
+			"scm", SyntaxConstants.SYNTAX_STYLE_LISP,
+			"ss", SyntaxConstants.SYNTAX_STYLE_LISP,
+			
+			"sh", SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL,
+			"shell", SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL,
+			
+			"sql", SyntaxConstants.SYNTAX_STYLE_SQL,
+			
+			"tcl", SyntaxConstants.SYNTAX_STYLE_TCL,
+			
+			"vb", SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC,
+			"vbs", SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC,
+			
+			"xml", SyntaxConstants.SYNTAX_STYLE_XML,
+			"xsd", SyntaxConstants.SYNTAX_STYLE_XML,
+			"xsl", SyntaxConstants.SYNTAX_STYLE_XML
+	);
+	
 	/**
 	 * 根据语法关键字取 RSyntaxTextArea 的语法样式.
 	 *
 	 * @param syntaxKeyword 语法关键字.
 	 */
-	private String getSyntaxStyle(String syntaxKeyword) {
-		
-		String result = SyntaxConstants.SYNTAX_STYLE_NONE;
-		
-		switch (syntaxKeyword) {
-			case "actionscript":
-			case "as":
-				result = SyntaxConstants.SYNTAX_STYLE_ACTIONSCRIPT;
-				break;
-			case "asm":
-				result = SyntaxConstants.SYNTAX_STYLE_ASSEMBLER_X86;
-				break;
-			case "bat":
-				result = SyntaxConstants.SYNTAX_STYLE_WINDOWS_BATCH;
-				break;
-			case "bbcode":
-				result = SyntaxConstants.SYNTAX_STYLE_BBCODE;
-				break;
-			case "c":
-				result = SyntaxConstants.SYNTAX_STYLE_C;
-				break;
-			case "clj":
-			case "clojure":
-				result = SyntaxConstants.SYNTAX_STYLE_CLOJURE;
-				break;
-			case "cpp":
-			case "c++":
-				result = SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS;
-				break;
-			case "cs":
-			case "c#":
-				result = SyntaxConstants.SYNTAX_STYLE_CSHARP;
-				break;
-			case "css":
-				result = SyntaxConstants.SYNTAX_STYLE_CSS;
-				break;
-			case "d":
-				result = SyntaxConstants.SYNTAX_STYLE_D;
-				break;
-			case "dart":
-				result = SyntaxConstants.SYNTAX_STYLE_DART;
-				break;
-			case "delphi":
-			case "pas":
-			case "pascal":
-				result = SyntaxConstants.SYNTAX_STYLE_DELPHI;
-				break;
-			case "dtd":
-				result = SyntaxConstants.SYNTAX_STYLE_DTD;
-				break;
-			case "fortran":
-				result = SyntaxConstants.SYNTAX_STYLE_FORTRAN;
-				break;
-			case "groovy":
-			case "gsp":
-				result = SyntaxConstants.SYNTAX_STYLE_GROOVY;
-				break;
-			case "htm":
-			case "html":
-				result = SyntaxConstants.SYNTAX_STYLE_HTML;
-				break;
-			case "java":
-				result = SyntaxConstants.SYNTAX_STYLE_JAVA;
-				break;
-			case "javascript":
-			case "js":
-				result = SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT;
-				break;
-			case "json":
-				result = SyntaxConstants.SYNTAX_STYLE_JSON;
-				break;
-			case "jsp":
-				result = SyntaxConstants.SYNTAX_STYLE_JSP;
-				break;
-			case "latex":
-				result = SyntaxConstants.SYNTAX_STYLE_LATEX;
-				break;
-			case "less":
-				result = SyntaxConstants.SYNTAX_STYLE_LESS;
-				break;
-			case "lisp":
-				result = SyntaxConstants.SYNTAX_STYLE_LISP;
-				break;
-			case "lua":
-				result = SyntaxConstants.SYNTAX_STYLE_LUA;
-				break;
-			case "makefile":
-				result = SyntaxConstants.SYNTAX_STYLE_MAKEFILE;
-				break;
-			case "mq4":
-			case "mq5":
-			case "mqh":
-				result = SyntaxConstants.SYNTAX_STYLE_C;
-				break;
-			case "mx":
-			case "mxml":
-				result = SyntaxConstants.SYNTAX_STYLE_MXML;
-				break;
-			case "nsi":
-			case "nsis":
-				result = SyntaxConstants.SYNTAX_STYLE_NSIS;
-				break;
-			case "perl":
-				result = SyntaxConstants.SYNTAX_STYLE_PERL;
-				break;
-			case "php":
-				result = SyntaxConstants.SYNTAX_STYLE_PHP;
-				break;
-			case "prolog":
-				result = SyntaxConstants.SYNTAX_STYLE_CLOJURE;
-				break;
-			case "properties":
-				result = SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE;
-				break;
-			case "py":
-			case "python":
-				result = SyntaxConstants.SYNTAX_STYLE_PYTHON;
-				break;
-			case "ruby":
-				result = SyntaxConstants.SYNTAX_STYLE_RUBY;
-				break;
-			case "sas":
-				result = SyntaxConstants.SYNTAX_STYLE_SAS;
-				break;
-			case "scala":
-				result = SyntaxConstants.SYNTAX_STYLE_SCALA;
-				break;
-			case "scheme":
-			case "scm":
-			case "ss":
-				result = SyntaxConstants.SYNTAX_STYLE_LISP;
-				break;
-			case "sh":
-			case "shell":
-				result = SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL;
-				break;
-			case "sql":
-				result = SyntaxConstants.SYNTAX_STYLE_SQL;
-				break;
-			case "tcl":
-				result = SyntaxConstants.SYNTAX_STYLE_TCL;
-				break;
-			case "vb":
-			case "vbs":
-				result = SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC;
-				break;
-			case "xml":
-			case "xsd":
-			case "xsl":
-				result = SyntaxConstants.SYNTAX_STYLE_XML;
-				break;
-		}
-		
-		return result;
+	private String getRSyntaxStyle(String syntaxKeyword) {
+		return rSyntaxMap.getOrDefault(syntaxKeyword, SyntaxConstants.SYNTAX_STYLE_NONE);
 	}
 	
 	/**
@@ -856,7 +852,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			this.saveState.changeState(State.MODIFIED);
 			
 			this.currentItem.setKeywords(this.ui.keyWordText.getText());
-			this.ui.codeText.setSyntaxEditingStyle(this.getSyntaxStyle(this.currentItem.getFirstKeyword().toLowerCase()));
+			this.ui.codeText.setSyntaxEditingStyle(this.getRSyntaxStyle(this.currentItem.getFirstKeyword().toLowerCase()));
 			
 			this.ui.resultList.repaint();
 		}
@@ -1474,5 +1470,68 @@ public class UIController implements StateObserver, ResultCatcher {
 				}
 			}
 		}
+	}
+	
+	private boolean isCurrentPlantUml() {
+		if (this.currentItem == null)
+			return false;
+		String type = this.currentItem.getFirstKeyword().toLowerCase();
+		return Objects.equals(type, "puml");
+	}
+	
+	/**
+	 * 渲染 plantUml
+	 */
+	private void renderPlantUml() {
+		String text = this.ui.codeText.getText();
+		String html = plantUml2html(text);
+		this.browserSetContent(html);
+	}
+	
+	private String plantUml2html(String text) {
+		SourceStringReader reader = new SourceStringReader(text);
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+			reader.outputImage(out, new FileFormatOption(FileFormat.SVG));
+			return new String(out.toByteArray(), Charsets.UTF_8);
+		} catch (Exception e) {
+			return "";
+		}
+	}
+	
+	/**
+	 * 当前选中节点是否 markdown
+	 */
+	private boolean isCurrentMarkdown() {
+		if (this.currentItem == null)
+			return false;
+		String type = this.currentItem.getFirstKeyword().toLowerCase();
+		return Objects.equals(type, "md") || Objects.equals(type, "markdown");
+	}
+	
+	/**
+	 * 渲染 markdown
+	 */
+	private void renderMarkdown() {
+		String text = this.ui.codeText.getText();
+		String html = markdown2html(text);
+		html = "<html lang=\"en\"><head><style>\n" +
+				"\tbody {\n" +
+				"\t\tfont-family: PingFang SC Medium, Microsoft YaHei;\n" +
+				"\t\tmargin-left: 40px;\n" +
+				"\t\tmargin-right: 50px;\n" +
+				"\t}\n" +
+				"\ttable, table tr th, table tr td {\n" +
+				"\t\tborder: 1px solid grey;\n" +
+				"\t\tborder-collapse: collapse;\n" +
+				"\t}\n" +
+				"</style>\n" +
+				"</head><body>"
+				+ html + "</body></html>";
+		this.browserSetContent(html);
+	}
+	
+	private String markdown2html(String text) {
+		Document doc = mdParser.parse(text);
+		return mdRenderer.render(doc);
 	}
 }

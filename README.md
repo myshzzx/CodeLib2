@@ -15,10 +15,11 @@
 <li>支持代码折叠, 以及三十多种语言的语法高亮, 语法高亮方案将参考第一个关键字, 具体支持哪些语言呢, 有兴趣的朋友自己去试试吧</li>
 <li>代码编辑框可以支持 eclipse 的一些快捷键, 貌似可以把它当代码编辑器来用</li>
 <li>支持给每个片段条目加附件, 附件可以单击, 在内置的浏览器(WebKit核心)中打开, 或者双击打开附件文件</li>
-<li>内置的浏览器默认展示一个搜索页面(http://uk.ask.com/), 可以直接在这里搜索</li>
 <li>支持把某些片段条目导出为带语法高亮的 html 文件, 这样也方便交流.</li>
 <li>保存的 zcl2 库文件有压缩处理, 因为文本的压缩潜力很大</li>
 <li>功能提示都会在状态栏或 tooltips 里出现, 更多功能可以慢慢挖掘, 发现彩蛋是件令人兴奋的事.</li>
+<li>支持 Markdown (md/markdown)</li>
+<li>支持 PlantUML (puml)</li>
 </ul>
 <p> </p>
 <p> </p>
@@ -27,11 +28,13 @@
 <p> </p>
 <p> </p>
 <p> </p>
-<p>Thanks for</p>
+<p>Thanks to</p>
 <ul>
 <li>Minimal Icons (icon resources)</li>
 <li>Fifesoft (RSyntaxTextArea)</li>
 <li>CodeMirror (HTML Highlight)</li>
+<li>flexmark-java</li>
+<li>PlantUML</li>
 </ul>
 <p> </p>
 </div>
