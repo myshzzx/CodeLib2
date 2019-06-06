@@ -189,7 +189,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 					&& this.name != null && this.name.length() > 0) {
 				int pointPos = this.name.lastIndexOf('.');
 				if (pointPos > -1 && pointPos < this.name.length() - 1) {
-					String ext = this.name.substring(pointPos + 1, this.name.length()).toLowerCase();
+					String ext = this.name.substring(pointPos + 1).toLowerCase();
 					
 					if (ContentType.textExt.contains(ext)) {
 						if (Encodings.isUTF8Bytes(this.binaryContent)) {

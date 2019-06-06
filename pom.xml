@@ -45,6 +45,12 @@
 		<dependency>
 			<groupId>com.vladsch.flexmark</groupId>
 			<artifactId>flexmark-all</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>flexmark-pdf-converter</artifactId>
+					<groupId>com.vladsch.flexmark</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.plantuml</groupId>

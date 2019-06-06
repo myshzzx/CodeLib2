@@ -10,6 +10,8 @@ import com.vladsch.flexmark.util.options.MutableDataSet;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.input.MouseButton;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import mysh.codelib2.model.CodeLib2Element;
@@ -25,11 +27,11 @@ import mysh.collect.Colls;
 import mysh.collect.Pair;
 import mysh.util.FilesUtil;
 import mysh.util.HotKeysLocal;
+import mysh.util.Strings;
 import mysh.util.UIs;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
-import org.apache.pdfbox.util.Charsets;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.SearchContext;
 import org.slf4j.Logger;
@@ -61,6 +63,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -123,11 +127,6 @@ public class UIController implements StateObserver, ResultCatcher {
 	
 	private static final Parser mdParser;
 	private static final HtmlRenderer mdRenderer;
-	
-	/**
-	 * 临时目录.
-	 */
-	private static final String TempDir = System.getProperty("java.io.tmpdir") + AppTitle + File.separatorChar;
 	
 	private final CodeLib2Main ui;
 	
@@ -280,8 +279,8 @@ public class UIController implements StateObserver, ResultCatcher {
 				try {
 					Transferable transferable = evt.getTransferable();
 					if (currentItem != null
-							&&
-							Arrays.asList(transferable.getTransferDataFlavors()).contains(DataFlavor.javaFileListFlavor)) {
+							    &&
+							    Arrays.asList(transferable.getTransferDataFlavors()).contains(DataFlavor.javaFileListFlavor)) {
 						evt.acceptDrop(DnDConstants.ACTION_COPY);
 						List<File> transferData = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 						addAttachment(currentItem, transferData);
@@ -302,8 +301,24 @@ public class UIController implements StateObserver, ResultCatcher {
 			Scene scene = new Scene(browser);
 			fxPanel.setScene(scene);
 			browserEngine = browser.getEngine();
-			browserEngine.loadContent(DefaultBrowserContent);
+			browserSetContent(DefaultBrowserContent);
 			browserEngine.setOnAlert(evt -> JOptionPane.showMessageDialog(ui, evt.getData()));
+			
+			// menu
+			browser.setContextMenuEnabled(false);
+			ContextMenu browserMenu = new ContextMenu();
+			browser.setOnMousePressed(e -> {
+				if (e.getButton() == MouseButton.SECONDARY) {
+					browserMenu.show(browser, e.getScreenX(), e.getScreenY());
+				} else {
+					browserMenu.hide();
+				}
+			});
+			javafx.scene.control.MenuItem reload = new javafx.scene.control.MenuItem("Reload");
+			reload.setOnAction(e -> browserEngine.reload());
+			javafx.scene.control.MenuItem externalOpen = new javafx.scene.control.MenuItem("External Open");
+			externalOpen.setOnAction(e -> browserOpenInExternal());
+			browserMenu.getItems().addAll(reload, externalOpen);
 		});
 		
 		this.ui.contentTab.addChangeListener(new ChangeListener() {
@@ -316,7 +331,9 @@ public class UIController implements StateObserver, ResultCatcher {
 					if (isCurrentMarkdown())
 						renderMarkdown();
 					else if (isCurrentPlantUml())
-					    renderPlantUml();
+						renderPlantUml();
+					else
+						browserSetContent("");
 				}
 				lastTab = currentTab;
 			}
@@ -629,10 +646,10 @@ public class UIController implements StateObserver, ResultCatcher {
 					info.file = exportFile;
 					if (this.file == null) {
 						info.title = AppTitle + " - "
-								+ FilesUtil.getFileNameWithoutExtension(exportFile);
+								             + FilesUtil.getFileNameWithoutExtension(exportFile);
 					} else {
 						info.title = AppTitle + " - "
-								+ FilesUtil.getFileNameWithoutExtension(this.file);
+								             + FilesUtil.getFileNameWithoutExtension(this.file);
 					}
 					
 					ExportEngine.export(info, items);
@@ -721,7 +738,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		}
 	}
 	
-	private static final Map<String,String> rSyntaxMap = Colls.ofHashMap(
+	private static final Map<String, String> rSyntaxMap = Colls.ofHashMap(
 			"actionscript", SyntaxConstants.SYNTAX_STYLE_ACTIONSCRIPT,
 			"as", SyntaxConstants.SYNTAX_STYLE_ACTIONSCRIPT,
 			
@@ -932,14 +949,14 @@ public class UIController implements StateObserver, ResultCatcher {
 			int displayLimit = 500;
 			
 			if (resultsArray.length > displayLimit
-					&&
-					"*".equals(currentKeyword.trim().split("[\\s,]+")[0])
-					&&
-					JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(ui,
-							"结果条目 " + resultsArray.length + " 条, 建议只展示部分结果以缩短渲染时间\n" +
-									"选 \"是\" 只展示前 " + displayLimit + " 条, 选 \"否\" 全部展示",
-							AppTitle,
-							JOptionPane.YES_NO_OPTION)) {
+					    &&
+					    "*".equals(currentKeyword.trim().split("[\\s,]+")[0])
+					    &&
+					    JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(ui,
+							    "结果条目 " + resultsArray.length + " 条, 建议只展示部分结果以缩短渲染时间\n" +
+									    "选 \"是\" 只展示前 " + displayLimit + " 条, 选 \"否\" 全部展示",
+							    AppTitle,
+							    JOptionPane.YES_NO_OPTION)) {
 				displayLimit = Integer.MAX_VALUE;
 			}
 			
@@ -961,7 +978,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			
 			if (currentKeyword.trim().length() > 0 && currentKeyword.split("[\\s,]+").length > 0) {
 				uiSetStatusBar("搜索 [" + currentKeyword + "] 完成, 展示条目/全部结果="
-						+ ui.resultList.getModel().getSize() + "/" + resultsArray.length);
+						               + ui.resultList.getModel().getSize() + "/" + resultsArray.length);
 				if (ui.resultList.getModel().getSize() > 0) {
 					ui.resultList.setSelectedIndex(0);
 				}
@@ -1043,7 +1060,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		
 		CodeLib2Element attachToItem = this.currentItem;
 		if (attachToItem != null
-				&& JFileChooser.APPROVE_OPTION == this.ui.attachmentImportChooser.showOpenDialog(this.ui)) {
+				    && JFileChooser.APPROVE_OPTION == this.ui.attachmentImportChooser.showOpenDialog(this.ui)) {
 			File[] files = this.ui.attachmentImportChooser.getSelectedFiles();
 			this.addAttachment(attachToItem, Arrays.asList(files));
 		}
@@ -1064,7 +1081,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		for (File file : files) {
 			try {
 				if (file.length() > 1_000_000
-						&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
+						    && JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
 						file.getName() + "\n文件超过1MB, 仍然导入?", AppTitle,
 						JOptionPane.YES_NO_OPTION)) {
 					continue;
@@ -1156,7 +1173,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		int[] selectedRows = this.ui.attachmentTable.getSelectedRows();
 		Attachment attachment;
 		if (selectedRows.length > 0
-				&& JFileChooser.APPROVE_OPTION == this.ui.attachmentExportChooser.showSaveDialog(this.ui)) {
+				    && JFileChooser.APPROVE_OPTION == this.ui.attachmentExportChooser.showSaveDialog(this.ui)) {
 			File dir = this.ui.attachmentExportChooser.getSelectedFile();
 			String filepath;
 			for (int row : selectedRows) {
@@ -1167,7 +1184,7 @@ public class UIController implements StateObserver, ResultCatcher {
 					
 					File file = new File(filepath);
 					if (file.exists()
-							&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
+							    && JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
 							"是否覆盖文件?\n" + filepath, AppTitle,
 							JOptionPane.YES_NO_OPTION)) {
 						continue;
@@ -1259,7 +1276,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			
 			int oldCaretPosition = this.ui.codeText.getCaretPosition();
 			findResult = org.fife.ui.rtextarea.
-					SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
+					                                  SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
 			if (!findResult) {
 				if (this.findContext.getSearchForward()) {
 					this.ui.codeText.setCaretPosition(0);
@@ -1267,7 +1284,7 @@ public class UIController implements StateObserver, ResultCatcher {
 					this.ui.codeText.setCaretPosition(this.ui.codeText.getText().length());
 				}
 				findResult = org.fife.ui.rtextarea.
-						SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
+						                                  SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
 			}
 			
 			//			findResult |= this.browserSearch(text);
@@ -1312,10 +1329,13 @@ public class UIController implements StateObserver, ResultCatcher {
 		return false;
 	}
 	
+	private String browserContent;
+	
 	/**
 	 * 设置浏览器展示的内容(异步).
 	 */
 	private void browserSetContent(final String content) {
+		this.browserContent = content;
 		Platform.runLater(() -> browserEngine.loadContent(content));
 	}
 	
@@ -1352,6 +1372,19 @@ public class UIController implements StateObserver, ResultCatcher {
 			return null;
 		}
 		return result.get();
+	}
+	
+	private void browserOpenInExternal() {
+		try {
+			if (Strings.isNotBlank(this.browserContent)) {
+				File tempFile = File.createTempFile("codelib2-", ".html");
+				tempFile.deleteOnExit();
+				Files.write(tempFile.toPath(), this.browserContent.getBytes());
+				Desktop.getDesktop().open(tempFile);
+			}
+		} catch (Exception e) {
+			log.error("browserOpenInExternal-exp", e);
+		}
 	}
 	
 	/**
@@ -1403,17 +1436,17 @@ public class UIController implements StateObserver, ResultCatcher {
 						String content = new String(attachment.getBinaryContent(), newContentType.getTextEncode());
 						if (!"html".equals(fileExtension) && !"htm".equals(fileExtension)) {
 							String html = "<html><head><meta http-equiv='Content-Type' content='text/html; charset="
-									+ newContentType.getTextEncode()
-									+ "'/></head><body>"
-									+ content.replace("&", "&amp;")
-									.replace("\"", "&quot;").replace("'", "&#39;")
-									.replace("<", "&lt;").replace(">", "&gt;")
-									.replace("\r\n", "<br/>")
-									.replace("\r", "<br/>")
-									.replace("\n", "<br/>")
-									.replace(" ", "&nbsp;").replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-									+ "<script>" + getPageSearchJs() + "</script>"
-									+ "</body></html>";
+									              + newContentType.getTextEncode()
+									              + "'/></head><body>"
+									              + content.replace("&", "&amp;")
+											                .replace("\"", "&quot;").replace("'", "&#39;")
+											                .replace("<", "&lt;").replace(">", "&gt;")
+											                .replace("\r\n", "<br/>")
+											                .replace("\r", "<br/>")
+											                .replace("\n", "<br/>")
+											                .replace(" ", "&nbsp;").replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+									              + "<script>" + getPageSearchJs() + "</script>"
+									              + "</body></html>";
 							this.browserSetContent(html);
 						} else {
 							int endIdx = content.lastIndexOf("</html>");
@@ -1421,7 +1454,7 @@ public class UIController implements StateObserver, ResultCatcher {
 								this.browserSetContent(content);
 							else {
 								String sb = content.substring(0, endIdx)
-										+ "<script>" + getPageSearchJs() + "</script></html>";
+										            + "<script>" + getPageSearchJs() + "</script></html>";
 								this.browserSetContent(sb);
 							}
 						}
@@ -1441,29 +1474,28 @@ public class UIController implements StateObserver, ResultCatcher {
 		int selectedRow = this.ui.attachmentTable.getSelectedRow();
 		if (selectedRow > -1) {
 			Attachment attachment = (Attachment) this.ui.attachmentTable.getValueAt(selectedRow, 0);
-			File oriFile = new File(TempDir, attachment.getName());
-			File tempFile = FilesUtil.getWritableFile(oriFile);
+			File tempFile;
 			try {
-				FilesUtil.writeFile(tempFile, attachment.getBinaryContent());
+				tempFile = File.createTempFile("codelib2-", "." + FilesUtil.getFileExtension(new File(attachment.getName())));
+				Files.write(tempFile.toPath(), attachment.getBinaryContent());
+				tempFile.deleteOnExit();
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this.ui, "写入临时文件失败.", "打开文件", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
 			try {
-				tempFile.deleteOnExit();
 				Desktop.getDesktop().open(tempFile);
 			} catch (IOException e) {
 				if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui,
-						"打开文件失败, 要尝试用文本方式打开吗?\n" + oriFile.getAbsolutePath(), "打开文件", JOptionPane.YES_NO_OPTION)) {
-					File textFile = FilesUtil.getWritableFile(new File(oriFile.getAbsolutePath() + ".txt"));
-					if (tempFile.renameTo(textFile)) {
-						textFile.deleteOnExit();
+						"打开文件失败, 要尝试用文本方式打开吗?\n" + tempFile.getAbsolutePath(), "打开文件", JOptionPane.YES_NO_OPTION)) {
+					if (tempFile.renameTo(new File(tempFile.getParentFile(), tempFile.getName() + ".txt"))) {
+						tempFile.deleteOnExit();
 						try {
-							Desktop.getDesktop().open(textFile);
+							Desktop.getDesktop().open(tempFile);
 						} catch (IOException e1) {
 							JOptionPane.showMessageDialog(this.ui,
-									textFile.getAbsolutePath() + e1.getMessage(),
+									tempFile.getAbsolutePath() + e1.getMessage(),
 									"打开文本文件失败.", JOptionPane.ERROR_MESSAGE);
 						}
 					}
@@ -1492,7 +1524,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		SourceStringReader reader = new SourceStringReader(text);
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			reader.outputImage(out, new FileFormatOption(FileFormat.SVG));
-			return new String(out.toByteArray(), Charsets.UTF_8);
+			return new String(out.toByteArray(), StandardCharsets.UTF_8);
 		} catch (Exception e) {
 			return "";
 		}
@@ -1515,18 +1547,18 @@ public class UIController implements StateObserver, ResultCatcher {
 		String text = this.ui.codeText.getText();
 		String html = markdown2html(text);
 		html = "<html lang=\"en\"><head><style>\n" +
-				"\tbody {\n" +
-				"\t\tfont-family: PingFang SC Medium, Microsoft YaHei;\n" +
-				"\t\tmargin-left: 40px;\n" +
-				"\t\tmargin-right: 50px;\n" +
-				"\t}\n" +
-				"\ttable, table tr th, table tr td {\n" +
-				"\t\tborder: 1px solid grey;\n" +
-				"\t\tborder-collapse: collapse;\n" +
-				"\t}\n" +
-				"</style>\n" +
-				"</head><body>"
-				+ html + "</body></html>";
+				       "\tbody {\n" +
+				       "\t\tfont-family: PingFang SC Medium, Microsoft YaHei;\n" +
+				       "\t\tmargin-left: 40px;\n" +
+				       "\t\tmargin-right: 50px;\n" +
+				       "\t}\n" +
+				       "\ttable, table tr th, table tr td {\n" +
+				       "\t\tborder: 1px solid grey;\n" +
+				       "\t\tborder-collapse: collapse;\n" +
+				       "\t}\n" +
+				       "</style>\n" +
+				       "</head><body>"
+				       + html + "</body></html>";
 		this.browserSetContent(html);
 	}
 	
