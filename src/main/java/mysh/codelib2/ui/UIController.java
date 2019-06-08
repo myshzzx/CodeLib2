@@ -6,7 +6,7 @@ import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Document;
-import com.vladsch.flexmark.util.options.MutableDataSet;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -111,11 +111,9 @@ public class UIController implements StateObserver, ResultCatcher {
 	/**
 	 * 应用名.
 	 */
-	public static final String AppTitle;
+	public static final String AppTitle = "CodeLib2 b20190605";
 	
 	static {
-		AppTitle = "CodeLib2 b20190605";
-		
 		MutableDataSet mdOpt = new MutableDataSet();
 		//  set optional extensions
 		mdOpt.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(), StrikethroughExtension.create()));
