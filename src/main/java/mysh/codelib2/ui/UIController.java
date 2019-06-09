@@ -316,7 +316,9 @@ public class UIController implements StateObserver, ResultCatcher {
 			reload.setOnAction(e -> browserEngine.reload());
 			javafx.scene.control.MenuItem externalOpen = new javafx.scene.control.MenuItem("External Open");
 			externalOpen.setOnAction(e -> browserOpenInExternal());
-			browserMenu.getItems().addAll(reload, externalOpen);
+			javafx.scene.control.MenuItem externalOpenUrl = new javafx.scene.control.MenuItem("External Open Location");
+			externalOpenUrl.setOnAction(e -> UIs.openOuterBrowser(browserEngine.getLocation()));
+			browserMenu.getItems().addAll(reload, externalOpen, externalOpenUrl);
 		});
 		
 		this.ui.contentTab.addChangeListener(new ChangeListener() {
