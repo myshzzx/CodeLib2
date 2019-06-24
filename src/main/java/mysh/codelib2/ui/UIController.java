@@ -747,6 +747,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			"bat", SyntaxConstants.SYNTAX_STYLE_WINDOWS_BATCH,
 			
 			"bbcode", SyntaxConstants.SYNTAX_STYLE_BBCODE,
+			"bb", SyntaxConstants.SYNTAX_STYLE_BBCODE,
 			
 			"c", SyntaxConstants.SYNTAX_STYLE_C,
 			
@@ -791,6 +792,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			"jsp", SyntaxConstants.SYNTAX_STYLE_JSP,
 			
 			"latex", SyntaxConstants.SYNTAX_STYLE_LATEX,
+			"tex", SyntaxConstants.SYNTAX_STYLE_LATEX,
 			
 			"less", SyntaxConstants.SYNTAX_STYLE_LESS,
 			
@@ -802,13 +804,14 @@ public class UIController implements StateObserver, ResultCatcher {
 			"md", SyntaxConstants.SYNTAX_STYLE_PYTHON,
 			
 			"makefile", SyntaxConstants.SYNTAX_STYLE_MAKEFILE,
+			"make", SyntaxConstants.SYNTAX_STYLE_MAKEFILE,
 			
 			"mq4", SyntaxConstants.SYNTAX_STYLE_C,
 			"mq5", SyntaxConstants.SYNTAX_STYLE_C,
 			"mqh", SyntaxConstants.SYNTAX_STYLE_C,
 			
-			"mx", SyntaxConstants.SYNTAX_STYLE_MXML,
 			"mxml", SyntaxConstants.SYNTAX_STYLE_MXML,
+			"mx", SyntaxConstants.SYNTAX_STYLE_MXML,
 			
 			"nsi", SyntaxConstants.SYNTAX_STYLE_NSIS,
 			"nsis", SyntaxConstants.SYNTAX_STYLE_NSIS,
@@ -820,9 +823,10 @@ public class UIController implements StateObserver, ResultCatcher {
 			"prolog", SyntaxConstants.SYNTAX_STYLE_CLOJURE,
 			
 			"properties", SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE,
+			"prop", SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE,
 			
-			"py", SyntaxConstants.SYNTAX_STYLE_PYTHON,
 			"python", SyntaxConstants.SYNTAX_STYLE_PYTHON,
+			"py", SyntaxConstants.SYNTAX_STYLE_PYTHON,
 			
 			"puml", SyntaxConstants.SYNTAX_STYLE_CSS,
 			
