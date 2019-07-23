@@ -71,6 +71,8 @@
 	</properties>
 
 	<build>
+		<finalName>CodeLib2</finalName>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
