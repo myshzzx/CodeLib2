@@ -4,12 +4,12 @@
  */
 package mysh.codelib2.ui;
 
+import javafx.application.Platform;
 import mysh.codelib2.model.CodeLib2Element;
 import mysh.util.UIs;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
 import java.io.File;
 
 /**
@@ -65,7 +65,7 @@ public class CodeLib2Frame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("CodeLib2");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -90,6 +90,7 @@ public class CodeLib2Frame extends javax.swing.JFrame {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         if (this.codeLib2Main.doClose()) {
             this.dispose();
+            Platform.exit();
         }
     }//GEN-LAST:event_formWindowClosing
 
@@ -135,8 +136,4 @@ public class CodeLib2Frame extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private static CodeLib2Frame frame;
-    public static void shutdown(){
-        WindowEvent we = new WindowEvent(frame, WindowEvent.WINDOW_CLOSING);
-        frame.dispatchEvent(we);
-    }
 }
