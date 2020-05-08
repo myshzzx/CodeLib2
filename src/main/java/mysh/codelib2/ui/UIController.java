@@ -776,6 +776,8 @@ public class UIController implements StateObserver, ResultCatcher {
 			
 			"fortran", SyntaxConstants.SYNTAX_STYLE_FORTRAN,
 			
+			"go", SyntaxConstants.SYNTAX_STYLE_GO,
+			
 			"groovy", SyntaxConstants.SYNTAX_STYLE_GROOVY,
 			"gsp", SyntaxConstants.SYNTAX_STYLE_GROOVY,
 			
@@ -846,6 +848,8 @@ public class UIController implements StateObserver, ResultCatcher {
 			"sql", SyntaxConstants.SYNTAX_STYLE_SQL,
 			
 			"tcl", SyntaxConstants.SYNTAX_STYLE_TCL,
+			
+			"ts", SyntaxConstants.SYNTAX_STYLE_TYPESCRIPT,
 			
 			"vb", SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC,
 			"vbs", SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC,
