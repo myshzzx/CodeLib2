@@ -24,7 +24,7 @@
 		<file>${java.io.tmpdir}/${appName}.log</file>
 		<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
 			<layout class="ch.qos.logback.classic.PatternLayout">
-				<pattern>●%date{MM-dd HH:mm:ss} %msg ~%logger{5}:%L [%thread] %level%n</pattern>
+				<pattern>●%date{MM-dd HH:mm:ss.SSS} %msg ~%logger{5}:%L [%thread] %level%n</pattern>
 			</layout>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
