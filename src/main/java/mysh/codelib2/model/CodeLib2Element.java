@@ -11,7 +11,9 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * 代码库元素.<br/>
@@ -222,6 +224,8 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		
 	}
 	
+	private String id = UUID.randomUUID().toString();
+	
 	/**
 	 * 关键字. (代码范围内保证不为 null, 但反射和反序列化仍可能导致 null)
 	 */
@@ -239,6 +243,8 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 	
 	private Instant createTime = Instant.now(), updateTime = createTime;
 	
+	private boolean deleted;
+	
 	@Override
 	public boolean equals(Object obj) {
 		
@@ -246,23 +252,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			return false;
 		
 		CodeLib2Element e = (CodeLib2Element) obj;
-		
-		if (this.keywords != null && e.keywords != null) {
-			if (this.keywords.hashCode() != e.keywords.hashCode()
-					&& !this.keywords.equals(e.keywords))
-				return false;
-		} else if (this.keywords != null || e.keywords != null) {
-			return false;
-		}
-		
-		if (!Arrays.equals(this.content, e.content))
-			return false;
-		
-		if (this.attachments != e.attachments) {
-			return this.attachments != null && this.attachments.equals(e.attachments);
-		} else {
-			return true;
-		}
+		return Objects.equals(id, e.id);
 	}
 	
 	@Override
@@ -305,7 +295,28 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 				Times.format(Times.Formats.DayTime, updateTime, ZoneId.systemDefault());
 	}
 	
+	public void delete() {
+		updateTime = Instant.now();
+		deleted = true;
+		keywords = DefaultKeywords;
+		content = null;
+		attachments = null;
+	}
+	
 	// get set
+	
+	public String getId() {
+		return id;
+	}
+	
+	public CodeLib2Element setId(final String id) {
+		this.id = id;
+		return this;
+	}
+	
+	public boolean isDeleted() {
+		return deleted;
+	}
 	
 	/**
 	 * 关键字.
@@ -339,6 +350,7 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			}
 		}
 		
+		updateTime = Instant.now();
 		return this;
 	}
 	
@@ -405,5 +417,14 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 		return this;
 	}
 	
-	
+	public int getSize() {
+		int s = keywords.length();
+		if (content != null)
+			s += content.length;
+		if (Colls.isNotEmpty(attachments))
+			for (Attachment attachment : attachments) {
+				s += attachment.binaryContent.length;
+			}
+		return s;
+	}
 }

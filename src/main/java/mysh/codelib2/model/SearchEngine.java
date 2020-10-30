@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
@@ -56,7 +57,7 @@ public final class SearchEngine implements Closeable {
 		/**
 		 * 搜索完成.
 		 */
-		void onSearchComplete(String keyword);
+		void onSearchComplete(String keyword, Comparator c);
 	}
 	
 	/**
@@ -137,6 +138,8 @@ public final class SearchEngine implements Closeable {
 			while (!this.isInterrupted() && searchTargetIndex.get() < targetLib.size()) {
 				try {
 					ele = targetLib.get(searchTargetIndex.getAndIncrement());
+					if (ele.isDeleted())
+						continue;
 					
 					// 单个 key 匹配
 					for (keyIndex = 0, isSingleKeyMatches = true; isSingleKeyMatches && keyIndex < keyLength; keyIndex++) {
@@ -350,7 +353,7 @@ public final class SearchEngine implements Closeable {
 		String[] lowerCaseKeys = keyword.trim().toLowerCase().split("[\\s,]+");
 		if (keyword.length() == 0 || lowerCaseKeys.length == 0 || lowerCaseKeys[0].length() == 0) {
 			// throw new IllegalArgumentException("无效关键字: " + keyword);
-			this.resultCatcher.onSearchComplete(keyword);
+			this.resultCatcher.onSearchComplete(keyword, null);
 			return;
 		} else if (lowerCaseKeys.length == 1 && "*".equals(lowerCaseKeys[0])) {
 			upperCaseKeys[0] = "";
@@ -374,7 +377,7 @@ public final class SearchEngine implements Closeable {
 		this.runningTasks.remove(task);
 		
 		if (this.runningTasks.size() == 0) {
-			this.resultCatcher.onSearchComplete(task.keyword);
+			this.resultCatcher.onSearchComplete(task.keyword, null);
 		}
 	}
 	

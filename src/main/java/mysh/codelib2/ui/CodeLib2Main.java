@@ -54,7 +54,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
      *
      * @return
      */
-    boolean doClose() {
+    public boolean doClose() {
         return this.controller.uiDoClose();
     }
 

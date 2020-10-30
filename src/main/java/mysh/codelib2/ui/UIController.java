@@ -55,35 +55,21 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Queue;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 /**
  * UI 控制器. 控制UI行为及状态.
@@ -111,7 +97,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	/**
 	 * 应用名.
 	 */
-	public static final String AppTitle = "CodeLib2 b20190605";
+	public static final String AppTitle = "CodeLib2 b20201030";
 	
 	static {
 		MutableDataSet mdOpt = new MutableDataSet();
@@ -158,7 +144,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	 */
 	private File file;
 	
-	private DataHeader header;
+	private DataHeader header = new DataHeader(4);
 	
 	/**
 	 * 当前正在搜索的关键字.
@@ -277,8 +263,8 @@ public class UIController implements StateObserver, ResultCatcher {
 				try {
 					Transferable transferable = evt.getTransferable();
 					if (currentItem != null
-							    &&
-							    Arrays.asList(transferable.getTransferDataFlavors()).contains(DataFlavor.javaFileListFlavor)) {
+							&&
+							Arrays.asList(transferable.getTransferDataFlavors()).contains(DataFlavor.javaFileListFlavor)) {
 						evt.acceptDrop(DnDConstants.ACTION_COPY);
 						List<File> transferData = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 						addAttachment(currentItem, transferData);
@@ -522,6 +508,12 @@ public class UIController implements StateObserver, ResultCatcher {
 		
 		try {
 			this.uiSetStatusBar("正在打开文件 ...");
+			if (!openFile.exists()) {
+				this.eles.clear();
+				this.file = openFile;
+				this.uiSave();
+			}
+			
 			Pair<DataHeader, Collection<CodeLib2Element>> data = DataHeader.readFromFile(openFile);
 			
 			this.eles.clear();
@@ -561,15 +553,26 @@ public class UIController implements StateObserver, ResultCatcher {
 		
 		try {
 			this.uiSetStatusBar("正在保存 ...");
+			this.checkEles();
 			this.header.saveToFile(saveFile, this.eles);
 			
 			this.file = saveFile;
 			this.saveState.changeState(State.SAVED);
 		} catch (Exception e) {
+			log.error("saveFile-fail: " + saveFile, e);
 			JOptionPane.showMessageDialog(this.ui, "保存文件失败.\\n" + e.getMessage(), UIController.AppTitle,
 					JOptionPane.ERROR_MESSAGE);
 		} finally {
 			this.uiSetStatusBarReady();
+		}
+	}
+	
+	private void checkEles() {
+		if (Colls.isNotEmpty(this.eles)) {
+			for (CodeLib2Element ele : eles) {
+				if (ele.getId() == null)
+					ele.setId(UUID.randomUUID().toString());
+			}
 		}
 	}
 	
@@ -601,10 +604,10 @@ public class UIController implements StateObserver, ResultCatcher {
 			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this.ui, "删除确认?", AppTitle,
 					JOptionPane.YES_NO_OPTION)) {
 				
-				this.eles.removeAll(selectedItems);
-				
-				for (CodeLib2Element item : selectedItems)
+				for (CodeLib2Element item : selectedItems) {
+					item.delete();
 					((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).removeElement(item);
+				}
 				
 				this.saveState.changeState(State.MODIFIED);
 			}
@@ -646,10 +649,10 @@ public class UIController implements StateObserver, ResultCatcher {
 					info.file = exportFile;
 					if (this.file == null) {
 						info.title = AppTitle + " - "
-								             + FilesUtil.getFileNameWithoutExtension(exportFile);
+								+ FilesUtil.getFileNameWithoutExtension(exportFile);
 					} else {
 						info.title = AppTitle + " - "
-								             + FilesUtil.getFileNameWithoutExtension(this.file);
+								+ FilesUtil.getFileNameWithoutExtension(this.file);
 					}
 					
 					ExportEngine.export(info, items);
@@ -667,10 +670,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	private void uiSearch(String text) {
 		this.currentKeyword = text;
 		
-		this.ui.resultList.clearSelection();
-		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).clear();
-		this.attachmentClearTable();
-		this.searchResults.clear();
+		this.clearShowItems(false);
 		
 		try {
 			this.searchEngine.addSearchTask(text, System.currentTimeMillis() + 300);
@@ -681,6 +681,14 @@ public class UIController implements StateObserver, ResultCatcher {
 			JOptionPane.showMessageDialog(this.ui, "创建搜索任务失败.\n关键字: [" + text + "]\n错误:\n" + e, AppTitle,
 					JOptionPane.ERROR_MESSAGE);
 		}
+	}
+	
+	private void clearShowItems(boolean keepSearchResult) {
+		this.ui.resultList.clearSelection();
+		((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).clear();
+		this.attachmentClearTable();
+		if (!keepSearchResult)
+			this.searchResults.clear();
 	}
 	
 	/**
@@ -939,32 +947,39 @@ public class UIController implements StateObserver, ResultCatcher {
 	}
 	
 	@Override
-	public void onSearchComplete(final String keyword) {
+	public void onSearchComplete(final String keyword, Comparator c) {
 		
 		final Object[] resultsArray = this.searchResults.toArray();
-		Arrays.sort(resultsArray, (o1, o2) -> {
-			SearchResult sr1 = (SearchResult) o1;
-			SearchResult sr2 = (SearchResult) o2;
-			int mdd = sr2.matchDegree - sr1.matchDegree;
-			if (mdd == 0) {
-				return sr2.ele.getUpdateTime().compareTo(sr1.ele.getUpdateTime());
-			} else
-				return mdd;
-		});
+		if (c != null)
+			Arrays.sort(resultsArray, c);
+		else
+			Arrays.sort(resultsArray, (o1, o2) -> {
+				SearchResult sr1 = (SearchResult) o1;
+				SearchResult sr2 = (SearchResult) o2;
+				if (keyword.trim().equals("*"))
+					return sr1.ele.getKeywords().compareTo(sr2.ele.getKeywords());
+				else {
+					int mdd = sr2.matchDegree - sr1.matchDegree;
+					if (mdd == 0) {
+						return sr2.ele.getUpdateTime().compareTo(sr1.ele.getUpdateTime());
+					} else
+						return mdd;
+				}
+			});
 		
 		// update status bar
 		SwingUtilities.invokeLater(() -> {
 			int displayLimit = 500;
 			
 			if (resultsArray.length > displayLimit
-					    &&
-					    "*".equals(currentKeyword.trim().split("[\\s,]+")[0])
-					    &&
-					    JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(ui,
-							    "结果条目 " + resultsArray.length + " 条, 建议只展示部分结果以缩短渲染时间\n" +
-									    "选 \"是\" 只展示前 " + displayLimit + " 条, 选 \"否\" 全部展示",
-							    AppTitle,
-							    JOptionPane.YES_NO_OPTION)) {
+					&&
+					"*".equals(currentKeyword.trim().split("[\\s,]+")[0])
+					&&
+					JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(ui,
+							"结果条目 " + resultsArray.length + " 条, 建议只展示部分结果以缩短渲染时间\n" +
+									"选 \"是\" 只展示前 " + displayLimit + " 条, 选 \"否\" 全部展示",
+							AppTitle,
+							JOptionPane.YES_NO_OPTION)) {
 				displayLimit = Integer.MAX_VALUE;
 			}
 			
@@ -986,7 +1001,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			
 			if (currentKeyword.trim().length() > 0 && currentKeyword.split("[\\s,]+").length > 0) {
 				uiSetStatusBar("搜索 [" + currentKeyword + "] 完成, 展示条目/全部结果="
-						               + ui.resultList.getModel().getSize() + "/" + resultsArray.length);
+						+ ui.resultList.getModel().getSize() + "/" + resultsArray.length);
 				if (ui.resultList.getModel().getSize() > 0) {
 					ui.resultList.setSelectedIndex(0);
 				}
@@ -1031,6 +1046,15 @@ public class UIController implements StateObserver, ResultCatcher {
 	}
 	
 	/**
+	 * 按条目尺寸倒序排列
+	 */
+	void orderByItemSizeDesc() {
+		this.clearShowItems(true);
+		this.onSearchComplete(this.currentKeyword,
+				(Comparator<SearchResult>) (r1, r2) -> r2.ele.getSize() - r1.ele.getSize());
+	}
+	
+	/**
 	 * 设置状态栏内容.
 	 */
 	void uiSetStatusBar(String statusText) {
@@ -1043,7 +1067,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	 */
 	void uiSetStatusBarReady() {
 		
-		this.ui.statusBar.setText("就绪 (共 " + this.eles.size() + " 个条目)");
+		this.ui.statusBar.setText("就绪 (共 " + this.eles.stream().filter(e -> !e.isDeleted()).count() + " 个条目)");
 	}
 	
 	/**
@@ -1068,7 +1092,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		
 		CodeLib2Element attachToItem = this.currentItem;
 		if (attachToItem != null
-				    && JFileChooser.APPROVE_OPTION == this.ui.attachmentImportChooser.showOpenDialog(this.ui)) {
+				&& JFileChooser.APPROVE_OPTION == this.ui.attachmentImportChooser.showOpenDialog(this.ui)) {
 			File[] files = this.ui.attachmentImportChooser.getSelectedFiles();
 			this.addAttachment(attachToItem, Arrays.asList(files));
 		}
@@ -1089,7 +1113,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		for (File file : files) {
 			try {
 				if (file.length() > 1_000_000
-						    && JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
+						&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
 						file.getName() + "\n文件超过1MB, 仍然导入?", AppTitle,
 						JOptionPane.YES_NO_OPTION)) {
 					continue;
@@ -1181,7 +1205,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		int[] selectedRows = this.ui.attachmentTable.getSelectedRows();
 		Attachment attachment;
 		if (selectedRows.length > 0
-				    && JFileChooser.APPROVE_OPTION == this.ui.attachmentExportChooser.showSaveDialog(this.ui)) {
+				&& JFileChooser.APPROVE_OPTION == this.ui.attachmentExportChooser.showSaveDialog(this.ui)) {
 			File dir = this.ui.attachmentExportChooser.getSelectedFile();
 			String filepath;
 			for (int row : selectedRows) {
@@ -1192,7 +1216,7 @@ public class UIController implements StateObserver, ResultCatcher {
 					
 					File file = new File(filepath);
 					if (file.exists()
-							    && JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
+							&& JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this.ui,
 							"是否覆盖文件?\n" + filepath, AppTitle,
 							JOptionPane.YES_NO_OPTION)) {
 						continue;
@@ -1220,7 +1244,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			File[] files = this.ui.zclImportChooser.getSelectedFiles();
 			
 			// 这里用set保证元素不重复, 以便下面去重操作
-			Set<CodeLib2Element> readItems = new HashSet<>();
+			List<CodeLib2Element> readItems = new ArrayList<>();
 			
 			this.uiSetStatusBar("正在导入 ...");
 			try {
@@ -1232,24 +1256,33 @@ public class UIController implements StateObserver, ResultCatcher {
 					} else {
 						CodeLib2Element ele = new CodeLib2Element();
 						ele.setKeywords(fileExt + ", " + FilesUtil.getFileNameWithoutExtension(tFile));
-						ele.setContent(java.nio.file.Files.readAllBytes(Paths.get(tFile.getAbsolutePath())));
+						ele.setContent(Files.readAllBytes(Paths.get(tFile.getAbsolutePath())));
 						readItems.add(ele);
 					}
 				}
 				
-				//				展示导入的元素
-				//				for (CodeLib2Element ele : readItems)
-				//					((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).addElement(ele);
-				
 				// 去除重复元素
 				readItems.addAll(this.eles);
 				this.eles.clear();
-				this.eles.addAll(readItems);
+				this.eles.addAll(readItems.stream().collect(
+						Collectors.toMap(
+								CodeLib2Element::getId, e -> e,
+								(e1, e2) -> {
+									if (e1.getUpdateTime() == null)
+										return e2;
+									else if (e2.getUpdateTime() == null)
+										return e1;
+									else
+										return e1.getUpdateTime().compareTo(e2.getUpdateTime()) < 0 ? e2 : e1;
+								}
+						)).values());
 				Collections.sort(this.eles);
 				
-				this.saveState.changeState(State.MODIFIED);
+				this.clearShowItems(false);
+				this.saveState.changeState(SaveStateManager.State.MODIFIED);
 				this.uiSetStatusBar("成功导入");
-				JOptionPane.showMessageDialog(this.ui, "导入成功\n现有 " + this.eles.size() + " 项", AppTitle,
+				JOptionPane.showMessageDialog(this.ui, "导入成功\n现有 "
+								+ this.eles.stream().filter(e -> !e.isDeleted()).count() + " 项", AppTitle,
 						JOptionPane.INFORMATION_MESSAGE);
 			} catch (Throwable t) {
 				this.uiSetStatusBarReady();
@@ -1284,7 +1317,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			
 			int oldCaretPosition = this.ui.codeText.getCaretPosition();
 			findResult = org.fife.ui.rtextarea.
-					                                  SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
+					SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
 			if (!findResult) {
 				if (this.findContext.getSearchForward()) {
 					this.ui.codeText.setCaretPosition(0);
@@ -1292,7 +1325,7 @@ public class UIController implements StateObserver, ResultCatcher {
 					this.ui.codeText.setCaretPosition(this.ui.codeText.getText().length());
 				}
 				findResult = org.fife.ui.rtextarea.
-						                                  SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
+						SearchEngine.find(this.ui.codeText, this.findContext).getCount() > 0;
 			}
 			
 			//			findResult |= this.browserSearch(text);
@@ -1444,17 +1477,17 @@ public class UIController implements StateObserver, ResultCatcher {
 						String content = new String(attachment.getBinaryContent(), newContentType.getTextEncode());
 						if (!"html".equals(fileExtension) && !"htm".equals(fileExtension)) {
 							String html = "<html><head><meta http-equiv='Content-Type' content='text/html; charset="
-									              + newContentType.getTextEncode()
-									              + "'/></head><body>"
-									              + content.replace("&", "&amp;")
-											                .replace("\"", "&quot;").replace("'", "&#39;")
-											                .replace("<", "&lt;").replace(">", "&gt;")
-											                .replace("\r\n", "<br/>")
-											                .replace("\r", "<br/>")
-											                .replace("\n", "<br/>")
-											                .replace(" ", "&nbsp;").replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-									              + "<script>" + getPageSearchJs() + "</script>"
-									              + "</body></html>";
+									+ newContentType.getTextEncode()
+									+ "'/></head><body>"
+									+ content.replace("&", "&amp;")
+									         .replace("\"", "&quot;").replace("'", "&#39;")
+									         .replace("<", "&lt;").replace(">", "&gt;")
+									         .replace("\r\n", "<br/>")
+									         .replace("\r", "<br/>")
+									         .replace("\n", "<br/>")
+									         .replace(" ", "&nbsp;").replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+									+ "<script>" + getPageSearchJs() + "</script>"
+									+ "</body></html>";
 							this.browserSetContent(html);
 						} else {
 							int endIdx = content.lastIndexOf("</html>");
@@ -1462,7 +1495,7 @@ public class UIController implements StateObserver, ResultCatcher {
 								this.browserSetContent(content);
 							else {
 								String sb = content.substring(0, endIdx)
-										            + "<script>" + getPageSearchJs() + "</script></html>";
+										+ "<script>" + getPageSearchJs() + "</script></html>";
 								this.browserSetContent(sb);
 							}
 						}
@@ -1555,18 +1588,18 @@ public class UIController implements StateObserver, ResultCatcher {
 		String text = this.ui.codeText.getText();
 		String html = markdown2html(text);
 		html = "<html lang=\"en\"><head><style>\n" +
-				       "\tbody {\n" +
-				       "\t\tfont-family: PingFang SC Medium, Microsoft YaHei;\n" +
-				       "\t\tmargin-left: 40px;\n" +
-				       "\t\tmargin-right: 50px;\n" +
-				       "\t}\n" +
-				       "\ttable, table tr th, table tr td {\n" +
-				       "\t\tborder: 1px solid grey;\n" +
-				       "\t\tborder-collapse: collapse;\n" +
-				       "\t}\n" +
-				       "</style>\n" +
-				       "</head><body>"
-				       + html + "</body></html>";
+				"\tbody {\n" +
+				"\t\tfont-family: PingFang SC Medium, Microsoft YaHei;\n" +
+				"\t\tmargin-left: 40px;\n" +
+				"\t\tmargin-right: 50px;\n" +
+				"\t}\n" +
+				"\ttable, table tr th, table tr td {\n" +
+				"\t\tborder: 1px solid grey;\n" +
+				"\t\tborder-collapse: collapse;\n" +
+				"\t}\n" +
+				"</style>\n" +
+				"</head><body>"
+				+ html + "</body></html>";
 		this.browserSetContent(html);
 	}
 	
