@@ -53,10 +53,12 @@ public class CodeLib2Element implements Serializable, Comparable<CodeLib2Element
 			/**
 			 * 二进制.
 			 */
-			Binary, /**
+			Binary,
+			/**
 			 * UTF8 文本.
 			 */
-			UTF8Text, /**
+			UTF8Text,
+			/**
 			 * 非 UTF8 文本.
 			 */
 			NonUTF8Text,

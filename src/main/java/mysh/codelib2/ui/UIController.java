@@ -18,11 +18,7 @@ import mysh.codelib2.model.CodeLib2Element;
 import mysh.codelib2.model.CodeLib2Element.Attachment;
 import mysh.codelib2.model.DataHeader;
 import mysh.codelib2.model.ExportEngine;
-import mysh.codelib2.model.ExportEngine.ExportInfo;
 import mysh.codelib2.model.SearchEngine;
-import mysh.codelib2.model.SearchEngine.ResultCatcher;
-import mysh.codelib2.ui.SaveStateManager.State;
-import mysh.codelib2.ui.SaveStateManager.StateObserver;
 import mysh.collect.Colls;
 import mysh.collect.Pair;
 import mysh.util.FilesUtil;
@@ -55,15 +51,29 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
-import java.util.*;
+import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -76,7 +86,7 @@ import java.util.stream.Collectors;
  *
  * @author Allen
  */
-public class UIController implements StateObserver, ResultCatcher {
+public class UIController implements SaveStateManager.StateObserver, SearchEngine.ResultCatcher {
 	private static final Logger log = LoggerFactory.getLogger(UIController.class);
 	
 	/**
@@ -137,14 +147,13 @@ public class UIController implements StateObserver, ResultCatcher {
 	/**
 	 * 保存状态管理器.
 	 */
-	private SaveStateManager saveState = new SaveStateManager(State.NEW);
+	private SaveStateManager saveState = new SaveStateManager(SaveStateManager.State.NEW);
 	
 	/**
 	 * 保存文件.
 	 */
 	private File file;
 	
-	private DataHeader header = new DataHeader(4);
 	
 	/**
 	 * 当前正在搜索的关键字.
@@ -458,7 +467,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	void uiNewInst() {
 		
 		if (checkForSave()) {
-			this.saveState.changeState(State.NEW);
+			this.saveState.changeState(SaveStateManager.State.NEW);
 			this.ui.filterText.setText("");
 			this.uiSearch("");
 		}
@@ -471,7 +480,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	 */
 	private boolean checkForSave() {
 		
-		if (this.saveState.getState() == State.MODIFIED) {
+		if (this.saveState.getState() == SaveStateManager.State.MODIFIED) {
 			int op = JOptionPane.showConfirmDialog(this.ui, "是否保存修改?", UIController.AppTitle,
 					JOptionPane.YES_NO_CANCEL_OPTION);
 			if (op == JOptionPane.YES_OPTION) {
@@ -521,9 +530,8 @@ public class UIController implements StateObserver, ResultCatcher {
 			Collections.sort(this.eles);
 			this.currentItem = null;
 			this.file = openFile;
-			this.header = data.getL();
 			
-			this.saveState.changeState(State.SAVED);
+			this.saveState.changeState(SaveStateManager.State.SAVED);
 			this.ui.filterText.setText("");
 			this.ui.filterText.requestFocus();
 			this.uiSearch("");
@@ -553,26 +561,16 @@ public class UIController implements StateObserver, ResultCatcher {
 		
 		try {
 			this.uiSetStatusBar("正在保存 ...");
-			this.checkEles();
-			this.header.saveToFile(saveFile, this.eles);
+			DataHeader.saveToFile(saveFile, this.eles);
 			
 			this.file = saveFile;
-			this.saveState.changeState(State.SAVED);
+			this.saveState.changeState(SaveStateManager.State.SAVED);
 		} catch (Exception e) {
 			log.error("saveFile-fail: " + saveFile, e);
 			JOptionPane.showMessageDialog(this.ui, "保存文件失败.\\n" + e.getMessage(), UIController.AppTitle,
 					JOptionPane.ERROR_MESSAGE);
 		} finally {
 			this.uiSetStatusBarReady();
-		}
-	}
-	
-	private void checkEles() {
-		if (Colls.isNotEmpty(this.eles)) {
-			for (CodeLib2Element ele : eles) {
-				if (ele.getId() == null)
-					ele.setId(UUID.randomUUID().toString());
-			}
 		}
 	}
 	
@@ -589,7 +587,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		this.ui.resultList.setSelectedValue(newEle, true);
 		this.ui.keyWordText.requestFocus();
 		
-		this.saveState.changeState(State.MODIFIED);
+		this.saveState.changeState(SaveStateManager.State.MODIFIED);
 	}
 	
 	/**
@@ -609,7 +607,7 @@ public class UIController implements StateObserver, ResultCatcher {
 					((DefaultListModel<CodeLib2Element>) this.ui.resultList.getModel()).removeElement(item);
 				}
 				
-				this.saveState.changeState(State.MODIFIED);
+				this.saveState.changeState(SaveStateManager.State.MODIFIED);
 			}
 		}
 	}
@@ -644,7 +642,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			
 			try {
 				if (exportFile != null) {
-					ExportEngine.ExportInfo info = new ExportInfo();
+					ExportEngine.ExportInfo info = new ExportEngine.ExportInfo();
 					
 					info.file = exportFile;
 					if (this.file == null) {
@@ -669,6 +667,8 @@ public class UIController implements StateObserver, ResultCatcher {
 	@SuppressWarnings("unchecked")
 	private void uiSearch(String text) {
 		this.currentKeyword = text;
+		this.orderType = 0;
+		this.ui.orderType.setToolTipText("正排");
 		
 		this.clearShowItems(false);
 		
@@ -746,126 +746,130 @@ public class UIController implements StateObserver, ResultCatcher {
 		}
 	}
 	
-	private static final Map<String, String> rSyntaxMap = Colls.ofHashMap(
-			"actionscript", SyntaxConstants.SYNTAX_STYLE_ACTIONSCRIPT,
-			"as", SyntaxConstants.SYNTAX_STYLE_ACTIONSCRIPT,
-			
-			"asm", SyntaxConstants.SYNTAX_STYLE_ASSEMBLER_X86,
-			
-			"bat", SyntaxConstants.SYNTAX_STYLE_WINDOWS_BATCH,
-			
-			"bbcode", SyntaxConstants.SYNTAX_STYLE_BBCODE,
-			"bb", SyntaxConstants.SYNTAX_STYLE_BBCODE,
-			
-			"c", SyntaxConstants.SYNTAX_STYLE_C,
-			
-			"clj", SyntaxConstants.SYNTAX_STYLE_CLOJURE,
-			"clojure", SyntaxConstants.SYNTAX_STYLE_CLOJURE,
-			
-			"cpp", SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS,
-			"c++", SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS,
-			
-			"cs", SyntaxConstants.SYNTAX_STYLE_CSHARP,
-			"c#", SyntaxConstants.SYNTAX_STYLE_CSHARP,
-			
-			"css", SyntaxConstants.SYNTAX_STYLE_CSS,
-			
-			"csv", SyntaxConstants.SYNTAX_STYLE_CSV,
-			
-			"d", SyntaxConstants.SYNTAX_STYLE_D,
-			
-			"dart", SyntaxConstants.SYNTAX_STYLE_DART,
-			
-			"delphi", SyntaxConstants.SYNTAX_STYLE_DELPHI,
-			"pas", SyntaxConstants.SYNTAX_STYLE_DELPHI,
-			"pascal", SyntaxConstants.SYNTAX_STYLE_DELPHI,
-			
-			"dtd", SyntaxConstants.SYNTAX_STYLE_DTD,
-			
-			"fortran", SyntaxConstants.SYNTAX_STYLE_FORTRAN,
-			
-			"go", SyntaxConstants.SYNTAX_STYLE_GO,
-			
-			"groovy", SyntaxConstants.SYNTAX_STYLE_GROOVY,
-			"gsp", SyntaxConstants.SYNTAX_STYLE_GROOVY,
-			
-			"htm", SyntaxConstants.SYNTAX_STYLE_HTML,
-			"html", SyntaxConstants.SYNTAX_STYLE_HTML,
-			
-			"java", SyntaxConstants.SYNTAX_STYLE_JAVA,
-			
-			"javascript", SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT,
-			"js", SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT,
-			
-			"json", SyntaxConstants.SYNTAX_STYLE_JSON,
-			
-			"jsp", SyntaxConstants.SYNTAX_STYLE_JSP,
-			
-			"latex", SyntaxConstants.SYNTAX_STYLE_LATEX,
-			"tex", SyntaxConstants.SYNTAX_STYLE_LATEX,
-			
-			"less", SyntaxConstants.SYNTAX_STYLE_LESS,
-			
-			"lisp", SyntaxConstants.SYNTAX_STYLE_LISP,
-			
-			"lua", SyntaxConstants.SYNTAX_STYLE_LUA,
-			
-			"markdown", SyntaxConstants.SYNTAX_STYLE_PYTHON,
-			"md", SyntaxConstants.SYNTAX_STYLE_PYTHON,
-			
-			"makefile", SyntaxConstants.SYNTAX_STYLE_MAKEFILE,
-			"make", SyntaxConstants.SYNTAX_STYLE_MAKEFILE,
-			
-			"mq4", SyntaxConstants.SYNTAX_STYLE_C,
-			"mq5", SyntaxConstants.SYNTAX_STYLE_C,
-			"mqh", SyntaxConstants.SYNTAX_STYLE_C,
-			
-			"mxml", SyntaxConstants.SYNTAX_STYLE_MXML,
-			"mx", SyntaxConstants.SYNTAX_STYLE_MXML,
-			
-			"nsi", SyntaxConstants.SYNTAX_STYLE_NSIS,
-			"nsis", SyntaxConstants.SYNTAX_STYLE_NSIS,
-			
-			"perl", SyntaxConstants.SYNTAX_STYLE_PERL,
-			
-			"php", SyntaxConstants.SYNTAX_STYLE_PHP,
-			
-			"prolog", SyntaxConstants.SYNTAX_STYLE_CLOJURE,
-			
-			"properties", SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE,
-			"prop", SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE,
-			
-			"python", SyntaxConstants.SYNTAX_STYLE_PYTHON,
-			"py", SyntaxConstants.SYNTAX_STYLE_PYTHON,
-			
-			"puml", SyntaxConstants.SYNTAX_STYLE_CSS,
-			
-			"ruby", SyntaxConstants.SYNTAX_STYLE_RUBY,
-			
-			"sas", SyntaxConstants.SYNTAX_STYLE_SAS,
-			
-			"scala", SyntaxConstants.SYNTAX_STYLE_SCALA,
-			
-			"scheme", SyntaxConstants.SYNTAX_STYLE_LISP,
-			"scm", SyntaxConstants.SYNTAX_STYLE_LISP,
-			"ss", SyntaxConstants.SYNTAX_STYLE_LISP,
-			
-			"sh", SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL,
-			"shell", SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL,
-			
-			"sql", SyntaxConstants.SYNTAX_STYLE_SQL,
-			
-			"tcl", SyntaxConstants.SYNTAX_STYLE_TCL,
-			
-			"ts", SyntaxConstants.SYNTAX_STYLE_TYPESCRIPT,
-			
-			"vb", SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC,
-			"vbs", SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC,
-			
-			"xml", SyntaxConstants.SYNTAX_STYLE_XML,
-			"xsd", SyntaxConstants.SYNTAX_STYLE_XML,
-			"xsl", SyntaxConstants.SYNTAX_STYLE_XML
-	);
+	private static final Map<String, String> rSyntaxMap;
+	
+	static {
+		rSyntaxMap = Colls.ofHashMap(
+				"actionscript", SyntaxConstants.SYNTAX_STYLE_ACTIONSCRIPT,
+				"as", SyntaxConstants.SYNTAX_STYLE_ACTIONSCRIPT,
+				
+				"asm", SyntaxConstants.SYNTAX_STYLE_ASSEMBLER_X86,
+				
+				"bat", SyntaxConstants.SYNTAX_STYLE_WINDOWS_BATCH,
+				
+				"bbcode", SyntaxConstants.SYNTAX_STYLE_BBCODE,
+				"bb", SyntaxConstants.SYNTAX_STYLE_BBCODE,
+				
+				"c", SyntaxConstants.SYNTAX_STYLE_C,
+				
+				"clj", SyntaxConstants.SYNTAX_STYLE_CLOJURE,
+				"clojure", SyntaxConstants.SYNTAX_STYLE_CLOJURE,
+				
+				"cpp", SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS,
+				"c++", SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS,
+				
+				"cs", SyntaxConstants.SYNTAX_STYLE_CSHARP,
+				"c#", SyntaxConstants.SYNTAX_STYLE_CSHARP,
+				
+				"css", SyntaxConstants.SYNTAX_STYLE_CSS,
+				
+				"csv", SyntaxConstants.SYNTAX_STYLE_CSV,
+				
+				"d", SyntaxConstants.SYNTAX_STYLE_D,
+				
+				"dart", SyntaxConstants.SYNTAX_STYLE_DART,
+				
+				"delphi", SyntaxConstants.SYNTAX_STYLE_DELPHI,
+				"pas", SyntaxConstants.SYNTAX_STYLE_DELPHI,
+				"pascal", SyntaxConstants.SYNTAX_STYLE_DELPHI,
+				
+				"dtd", SyntaxConstants.SYNTAX_STYLE_DTD,
+				
+				"fortran", SyntaxConstants.SYNTAX_STYLE_FORTRAN,
+				
+				"go", SyntaxConstants.SYNTAX_STYLE_GO,
+				
+				"groovy", SyntaxConstants.SYNTAX_STYLE_GROOVY,
+				"gsp", SyntaxConstants.SYNTAX_STYLE_GROOVY,
+				
+				"htm", SyntaxConstants.SYNTAX_STYLE_HTML,
+				"html", SyntaxConstants.SYNTAX_STYLE_HTML,
+				
+				"java", SyntaxConstants.SYNTAX_STYLE_JAVA,
+				
+				"javascript", SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT,
+				"js", SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT,
+				
+				"json", SyntaxConstants.SYNTAX_STYLE_JSON,
+				
+				"jsp", SyntaxConstants.SYNTAX_STYLE_JSP,
+				
+				"latex", SyntaxConstants.SYNTAX_STYLE_LATEX,
+				"tex", SyntaxConstants.SYNTAX_STYLE_LATEX,
+				
+				"less", SyntaxConstants.SYNTAX_STYLE_LESS,
+				
+				"lisp", SyntaxConstants.SYNTAX_STYLE_LISP,
+				
+				"lua", SyntaxConstants.SYNTAX_STYLE_LUA,
+				
+				"markdown", SyntaxConstants.SYNTAX_STYLE_PYTHON,
+				"md", SyntaxConstants.SYNTAX_STYLE_PYTHON,
+				
+				"makefile", SyntaxConstants.SYNTAX_STYLE_MAKEFILE,
+				"make", SyntaxConstants.SYNTAX_STYLE_MAKEFILE,
+				
+				"mq4", SyntaxConstants.SYNTAX_STYLE_C,
+				"mq5", SyntaxConstants.SYNTAX_STYLE_C,
+				"mqh", SyntaxConstants.SYNTAX_STYLE_C,
+				
+				"mxml", SyntaxConstants.SYNTAX_STYLE_MXML,
+				"mx", SyntaxConstants.SYNTAX_STYLE_MXML,
+				
+				"nsi", SyntaxConstants.SYNTAX_STYLE_NSIS,
+				"nsis", SyntaxConstants.SYNTAX_STYLE_NSIS,
+				
+				"perl", SyntaxConstants.SYNTAX_STYLE_PERL,
+				
+				"php", SyntaxConstants.SYNTAX_STYLE_PHP,
+				
+				"prolog", SyntaxConstants.SYNTAX_STYLE_CLOJURE,
+				
+				"properties", SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE,
+				"prop", SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE,
+				
+				"python", SyntaxConstants.SYNTAX_STYLE_PYTHON,
+				"py", SyntaxConstants.SYNTAX_STYLE_PYTHON,
+				
+				"puml", SyntaxConstants.SYNTAX_STYLE_CSS,
+				
+				"ruby", SyntaxConstants.SYNTAX_STYLE_RUBY,
+				
+				"sas", SyntaxConstants.SYNTAX_STYLE_SAS,
+				
+				"scala", SyntaxConstants.SYNTAX_STYLE_SCALA,
+				
+				"scheme", SyntaxConstants.SYNTAX_STYLE_LISP,
+				"scm", SyntaxConstants.SYNTAX_STYLE_LISP,
+				"ss", SyntaxConstants.SYNTAX_STYLE_LISP,
+				
+				"sh", SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL,
+				"shell", SyntaxConstants.SYNTAX_STYLE_UNIX_SHELL,
+				
+				"sql", SyntaxConstants.SYNTAX_STYLE_SQL,
+				
+				"tcl", SyntaxConstants.SYNTAX_STYLE_TCL,
+				
+				"ts", SyntaxConstants.SYNTAX_STYLE_TYPESCRIPT,
+				
+				"vb", SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC,
+				"vbs", SyntaxConstants.SYNTAX_STYLE_VISUAL_BASIC,
+				
+				"xml", SyntaxConstants.SYNTAX_STYLE_XML,
+				"xsd", SyntaxConstants.SYNTAX_STYLE_XML,
+				"xsl", SyntaxConstants.SYNTAX_STYLE_XML
+		);
+	}
 	
 	/**
 	 * 根据语法关键字取 RSyntaxTextArea 的语法样式.
@@ -882,7 +886,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	private void saveCurrentItemKeywords() {
 		
 		if (this.currentItem != null) {
-			this.saveState.changeState(State.MODIFIED);
+			this.saveState.changeState(SaveStateManager.State.MODIFIED);
 			
 			this.currentItem.setKeywords(this.ui.keyWordText.getText());
 			this.ui.codeText.setSyntaxEditingStyle(this.getRSyntaxStyle(this.currentItem.getFirstKeyword().toLowerCase()));
@@ -898,7 +902,7 @@ public class UIController implements StateObserver, ResultCatcher {
 		
 		try {
 			if (this.currentItem != null) {
-				this.saveState.changeState(State.MODIFIED);
+				this.saveState.changeState(SaveStateManager.State.MODIFIED);
 				
 				byte[] newContent = this.ui.codeText.getText().getBytes(
 						CodeLib2Element.DefaultCharsetEncode);
@@ -910,7 +914,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	}
 	
 	@Override
-	public boolean onSaveStateChanged(State oldState, State newState) {
+	public boolean onSaveStateChanged(SaveStateManager.State oldState, SaveStateManager.State newState) {
 		
 		switch (newState) {
 			case NEW:
@@ -920,7 +924,7 @@ public class UIController implements StateObserver, ResultCatcher {
 				this.ui.setAppTitle(UIController.AppTitle);
 				break;
 			case MODIFIED:
-				String title = "*" + UIController.AppTitle;
+				String title = "* " + UIController.AppTitle;
 				if (this.file != null) {
 					title += " - " + file.getAbsolutePath();
 				}
@@ -1000,8 +1004,11 @@ public class UIController implements StateObserver, ResultCatcher {
 			ui.resultList.repaint();
 			
 			if (currentKeyword.trim().length() > 0 && currentKeyword.split("[\\s,]+").length > 0) {
-				uiSetStatusBar("搜索 [" + currentKeyword + "] 完成, 展示条目/全部结果="
-						+ ui.resultList.getModel().getSize() + "/" + resultsArray.length);
+				if (orderType > 0)
+					uiSetStatusBar(this.ui.orderType.getToolTipText());
+				else
+					uiSetStatusBar("搜索 [" + currentKeyword + "] 完成, 展示条目/全部结果="
+							+ ui.resultList.getModel().getSize() + "/" + resultsArray.length);
 				if (ui.resultList.getModel().getSize() > 0) {
 					ui.resultList.setSelectedIndex(0);
 				}
@@ -1045,13 +1052,29 @@ public class UIController implements StateObserver, ResultCatcher {
 		sysclip.setContents(text, null);
 	}
 	
+	private int orderType;
+	
 	/**
-	 * 按条目尺寸倒序排列
+	 * 按条目尺寸倒排/按修改时间倒排/正排
 	 */
-	void orderByItemSizeDesc() {
+	void reorderItems() {
 		this.clearShowItems(true);
-		this.onSearchComplete(this.currentKeyword,
-				(Comparator<SearchResult>) (r1, r2) -> r2.ele.getSize() - r1.ele.getSize());
+		Comparator<SearchResult> c = null;
+		switch ((++orderType) % 3) {
+			case 0:
+				this.ui.orderType.setToolTipText("正排");
+				break;
+			case 1:
+				c = (r1, r2) -> r2.ele.getSize() - r1.ele.getSize();
+				this.ui.orderType.setToolTipText("按条目尺寸倒排");
+				break;
+			case 2:
+				c = (r1, r2) -> r2.ele.getUpdateTime().compareTo(r1.ele.getUpdateTime());
+				this.ui.orderType.setToolTipText("按修改时间倒排");
+				break;
+		}
+		this.onSearchComplete(this.currentKeyword, c);
+		this.uiSetStatusBar(this.ui.orderType.getToolTipText());
 	}
 	
 	/**
@@ -1075,7 +1098,7 @@ public class UIController implements StateObserver, ResultCatcher {
 	 */
 	void onUrlClicked(URL url) {
 		
-		java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+		Desktop desktop = Desktop.getDesktop();
 		if (desktop.isSupported(Action.BROWSE)) {
 			try {
 				desktop.browse(url.toURI());
@@ -1120,7 +1143,7 @@ public class UIController implements StateObserver, ResultCatcher {
 				}
 				
 				attachments.add(new Attachment().setName(file.getName()).setBinaryContent(
-						java.nio.file.Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
+						Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
 			} catch (Exception e) {
 				log.error("导入附件失败. " + file.getAbsolutePath(), e);
 				JOptionPane.showMessageDialog(this.ui, "导入附件失败.\n" + file.getName(), AppTitle,
@@ -1136,7 +1159,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			attachToItem.setUpdateTime(Instant.now());
 			Collections.sort(attachToItem.getAttachments());
 			
-			this.saveState.changeState(State.MODIFIED);
+			this.saveState.changeState(SaveStateManager.State.MODIFIED);
 			this.ui.resultList.repaint();
 		}
 		
@@ -1190,7 +1213,7 @@ public class UIController implements StateObserver, ResultCatcher {
 					this.currentItem.setUpdateTime(Instant.now());
 					((DefaultTableModel) this.ui.attachmentTable.getModel()).removeRow(selectedRows[i]);
 				}
-				this.saveState.changeState(State.MODIFIED);
+				this.saveState.changeState(SaveStateManager.State.MODIFIED);
 				this.ui.resultList.repaint();
 				this.ui.attachmentTable.updateUI();
 			}
@@ -1264,18 +1287,7 @@ public class UIController implements StateObserver, ResultCatcher {
 				// 去除重复元素
 				readItems.addAll(this.eles);
 				this.eles.clear();
-				this.eles.addAll(readItems.stream().collect(
-						Collectors.toMap(
-								CodeLib2Element::getId, e -> e,
-								(e1, e2) -> {
-									if (e1.getUpdateTime() == null)
-										return e2;
-									else if (e2.getUpdateTime() == null)
-										return e1;
-									else
-										return e1.getUpdateTime().compareTo(e2.getUpdateTime()) < 0 ? e2 : e1;
-								}
-						)).values());
+				this.eles.addAll(itemsUniq(readItems));
 				Collections.sort(this.eles);
 				
 				this.clearShowItems(false);
@@ -1293,6 +1305,24 @@ public class UIController implements StateObserver, ResultCatcher {
 			
 			System.gc();
 		}
+	}
+	
+	/**
+	 * 去除重复
+	 */
+	private Collection<CodeLib2Element> itemsUniq(Collection<CodeLib2Element> readItems) {
+		return readItems.stream().collect(
+				Collectors.toMap(
+						CodeLib2Element::getId, e -> e,
+						(e1, e2) -> {
+							if (e1.getUpdateTime() == null)
+								return e2;
+							else if (e2.getUpdateTime() == null)
+								return e1;
+							else
+								return e1.getUpdateTime().compareTo(e2.getUpdateTime()) < 0 ? e2 : e1;
+						}
+				)).values();
 	}
 	
 	/**
@@ -1463,7 +1493,7 @@ public class UIController implements StateObserver, ResultCatcher {
 			attachment.judgeContentType();
 			Attachment.ContentType newContentType = attachment.getContentType();
 			if (oldContentType != newContentType)
-				this.saveState.changeState(State.MODIFIED);
+				this.saveState.changeState(SaveStateManager.State.MODIFIED);
 			
 			if (newContentType != Attachment.ContentType.Binary && attachment.getBinaryContent() != null) {
 				ui.contentTab.setSelectedComponent(ui.browserPanel);

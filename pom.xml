@@ -21,8 +21,8 @@
 保存的 zcl2 库文件有压缩处理
 功能提示都会在状态栏或 tooltips 里出现
 ]]></description>
+	
 	<dependencies>
-
 		<dependency>
 			<groupId>com.github.myshzzx</groupId>
 			<artifactId>mlib-core</artifactId>
@@ -69,11 +69,14 @@
 			<artifactId>xz</artifactId>
 		</dependency>
 	</dependencies>
-
+	
 	<properties>
+		<maven.compiler.source>9</maven.compiler.source>
+		<maven.compiler.target>9</maven.compiler.target>
+		<maven.compiler.release>9</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
+	
 	<build>
 		<finalName>CodeLib2</finalName>
 

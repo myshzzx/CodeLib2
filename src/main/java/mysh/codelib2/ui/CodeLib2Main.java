@@ -113,7 +113,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         jSeparator2 = new javax.swing.JToolBar.Separator();
         importButton = new javax.swing.JButton();
         export = new javax.swing.JButton();
-        copyToClipboard = new javax.swing.JButton();
+        orderType = new javax.swing.JButton();
         onTopBtn = new javax.swing.JToggleButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
@@ -334,25 +334,25 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         });
         jToolBar1.add(export);
 
-        copyToClipboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/copyToClipboard.png"))); // NOI18N
-        copyToClipboard.setToolTipText("复制到剪贴板");
-        copyToClipboard.setFocusable(false);
-        copyToClipboard.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        copyToClipboard.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        copyToClipboard.addMouseListener(new java.awt.event.MouseAdapter() {
+        orderType.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/copyToClipboard.png"))); // NOI18N
+        orderType.setToolTipText("正排");
+        orderType.setFocusable(false);
+        orderType.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        orderType.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        orderType.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                copyToClipboardMouseEntered(evt);
+                orderTypeMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                copyToClipboardMouseExited(evt);
+                orderTypeMouseExited(evt);
             }
         });
-        copyToClipboard.addActionListener(new java.awt.event.ActionListener() {
+        orderType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                copyToClipboardActionPerformed(evt);
+                orderTypeActionPerformed(evt);
             }
         });
-        jToolBar1.add(copyToClipboard);
+        jToolBar1.add(orderType);
 
         onTopBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/onTop.png"))); // NOI18N
         onTopBtn.setToolTipText("总在最上");
@@ -737,9 +737,10 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         this.controller.itemSelect(this.resultList.getSelectedValue());
     }//GEN-LAST:event_resultListValueChanged
 
-    private void copyToClipboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyToClipboardActionPerformed
-        this.controller.uiCopyContentToClipboard();
-    }//GEN-LAST:event_copyToClipboardActionPerformed
+    private void orderTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orderTypeActionPerformed
+        // this.controller.uiCopyContentToClipboard();
+        this.controller.reorderItems();
+    }//GEN-LAST:event_orderTypeActionPerformed
 
     private void codeTextHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_codeTextHyperlinkUpdate
 
@@ -768,9 +769,9 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         this.controller.uiSetStatusBar(this.filterText.getToolTipText());
     }//GEN-LAST:event_filterTextMouseEntered
 
-    private void copyToClipboardMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_copyToClipboardMouseEntered
-        this.controller.uiSetStatusBar(this.copyToClipboard.getToolTipText());
-    }//GEN-LAST:event_copyToClipboardMouseEntered
+    private void orderTypeMouseEntered(MouseEvent evt) {//GEN-FIRST:event_orderTypeMouseEntered
+        this.controller.uiSetStatusBar(this.orderType.getToolTipText());
+    }//GEN-LAST:event_orderTypeMouseEntered
 
     private void keyWordTextMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_keyWordTextMouseExited
         this.controller.uiSetStatusBarReady();
@@ -780,9 +781,9 @@ public final class CodeLib2Main extends javax.swing.JPanel {
         this.controller.uiSetStatusBarReady();
     }//GEN-LAST:event_filterTextMouseExited
 
-    private void copyToClipboardMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_copyToClipboardMouseExited
+    private void orderTypeMouseExited(MouseEvent evt) {//GEN-FIRST:event_orderTypeMouseExited
         this.controller.uiSetStatusBarReady();
-    }//GEN-LAST:event_copyToClipboardMouseExited
+    }//GEN-LAST:event_orderTypeMouseExited
 
     private void exportMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportMouseEntered
         this.controller.uiSetStatusBar(this.export.getToolTipText());
@@ -973,7 +974,6 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     javax.swing.JPanel browserPanel;
     org.fife.ui.rsyntaxtextarea.RSyntaxTextArea codeText;
     javax.swing.JTabbedPane contentTab;
-    private javax.swing.JButton copyToClipboard;
     private javax.swing.JButton export;
     private javax.swing.JButton exportAttachment;
     javax.swing.JTextField filterText;
@@ -998,6 +998,7 @@ public final class CodeLib2Main extends javax.swing.JPanel {
     private javax.swing.JButton newInst;
     private javax.swing.JToggleButton onTopBtn;
     private javax.swing.JButton open;
+    javax.swing.JButton orderType;
     javax.swing.JScrollPane rTextScrollPane;
     private javax.swing.JButton remove;
     private javax.swing.JButton removeAttachment;
